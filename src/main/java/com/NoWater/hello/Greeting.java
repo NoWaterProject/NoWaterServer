@@ -1,4 +1,4 @@
-package hello;
+package com.NoWater.hello;
 
 /**
  * Created by wukai on 16-11-18.
