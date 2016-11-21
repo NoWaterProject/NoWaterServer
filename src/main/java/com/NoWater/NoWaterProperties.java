@@ -12,7 +12,12 @@ public final class NoWaterProperties {
 
     static {
         Properties prop = new Properties();
-        File propertiesFile = new File("conf/Online.properties");
+        File propertiesFile;
+        String userName = System.getProperty("user.name");
+        if (userName.equals("root"))
+            propertiesFile = new File("conf/Online.properties");
+        else
+            propertiesFile = new File("conf/Offline.properties");
 
         try {
             InputStream in = new FileInputStream(propertiesFile);
