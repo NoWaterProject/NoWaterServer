@@ -12,7 +12,7 @@ public final class NoWaterProperties {
 
     static {
         Properties prop = new Properties();
-        File propertiesFile = new File("conf/NoWater.properties");
+        File propertiesFile = new File("conf/Online.properties");
 
         try {
             InputStream in = new FileInputStream(propertiesFile);
