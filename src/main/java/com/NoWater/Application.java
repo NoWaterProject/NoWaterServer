@@ -5,6 +5,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.embedded.ConfigurableEmbeddedServletContainer;
 import org.springframework.boot.context.embedded.EmbeddedServletContainerCustomizer;
 
+import com.NoWater.NoWaterProperties;
+
 /**
  * Created by wukai on 16-11-18.
  */
@@ -17,6 +19,7 @@ public class Application implements EmbeddedServletContainerCustomizer {
 
     @Override
     public void customize(ConfigurableEmbeddedServletContainer container) {
-        container.setPort(8888);
+        int port = Integer.parseInt(NoWaterProperties.getPort());
+        container.setPort(port);
     }
 }
