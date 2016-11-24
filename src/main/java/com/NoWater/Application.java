@@ -18,7 +18,7 @@ public class Application implements EmbeddedServletContainerCustomizer {
 
     @Override
     public void customize(ConfigurableEmbeddedServletContainer container) {
-        int port = Integer.parseInt(NoWaterProperties.getPort());
+        int port = Integer.parseInt(NoWaterProperties.getDb_port());
         container.setPort(port);
     }
 }

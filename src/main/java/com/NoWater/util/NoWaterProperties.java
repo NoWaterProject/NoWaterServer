@@ -7,9 +7,10 @@ import java.util.Properties;
  */
 
 public final class NoWaterProperties {
-    private static String port;
+    private static String db_port;
+    private static String db_password;
     private static String db_user;
-
+    private static String db_url;
     static {
         Properties prop = new Properties();
         File propertiesFile;
@@ -22,8 +23,10 @@ public final class NoWaterProperties {
         try {
             InputStream in = new FileInputStream(propertiesFile);
             prop.load(in);
-            port = prop.getProperty("port").trim();
+            db_port = prop.getProperty("port").trim();
             db_user = prop.getProperty("database.user").trim();
+            db_password = prop.getProperty("database.password").trim();
+            db_url = prop.getProperty("database.url").trim();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -35,12 +38,19 @@ public final class NoWaterProperties {
     private NoWaterProperties() {
     }
 
-    public static String getPort() {
-        return port;
+    public static String getDb_port() {
+        return db_port;
     }
 
-    public static String getDbUser() {
+    public static String getDb_password() {
+        return db_password;
+    }
+
+    public static String getDb_user() {
         return db_user;
     }
 
+    public static String getDb_url() {
+        return db_url;
+    }
 }
