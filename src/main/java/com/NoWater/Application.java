@@ -1,5 +1,6 @@
 package com.NoWater;
 
+import com.NoWater.util.NoWaterProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.embedded.ConfigurableEmbeddedServletContainer;

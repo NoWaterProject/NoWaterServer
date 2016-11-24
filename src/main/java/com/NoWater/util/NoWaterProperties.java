@@ -1,4 +1,4 @@
-package com.NoWater;
+package com.NoWater.util;
 import java.io.*;
 import java.util.Properties;
 
@@ -36,11 +36,11 @@ public final class NoWaterProperties {
     }
 
     public static String getPort() {
-            return port;
-        }
+        return port;
+    }
 
     public static String getDbUser() {
-            return db_user;
-        }
+        return db_user;
+    }
 
 }
