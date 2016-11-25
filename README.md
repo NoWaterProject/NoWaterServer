@@ -4,3 +4,6 @@
 装好最新版maven，配好环境变量。
 * mvn clean package
 * java -jar target/NoWaterServer-1.0-SNAPSHOT.jar
+
+## MySQL
+* 执行脚本命令：mysql -u root -p -D NoWater<nowater.sql
