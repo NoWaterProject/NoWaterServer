@@ -1,30 +1,12 @@
-/*
-Navicat MySQL Data Transfer
-
-Source Server         : localhost_3306
-Source Server Version : 50142
-Source Host           : localhost:3306
-Source Database       : nowater
-
-Target Server Type    : MYSQL
-Target Server Version : 50142
-File Encoding         : 65001
-
-Date: 2016-11-25 12:55:23
-*/
-
-SET FOREIGN_KEY_CHECKS=0;
-
 -- ----------------------------
 -- Table structure for `admin`
 -- ----------------------------
 DROP TABLE IF EXISTS `admin`;
 CREATE TABLE `admin` (
-  `user_id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
   `password` varchar(100) NOT NULL,
-  PRIMARY KEY (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  PRIMARY KEY (`name`)
+);
 
 -- ----------------------------
 -- Records of admin
@@ -40,7 +22,7 @@ CREATE TABLE `comment_product` (
   `user_id` int(11) NOT NULL,
   `user_name` varchar(1024) NOT NULL,
   PRIMARY KEY (`comment_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+);
 
 -- ----------------------------
 -- Records of comment_product
@@ -58,7 +40,7 @@ CREATE TABLE `products` (
   `photo_id` varchar(1024) NOT NULL,
   `quantity_stock` int(11) NOT NULL,
   PRIMARY KEY (`product_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+);
 
 -- ----------------------------
 -- Records of products
@@ -73,7 +55,7 @@ CREATE TABLE `size_product` (
   `description` varchar(1024) NOT NULL,
   `product_id` int(11) NOT NULL,
   PRIMARY KEY (`choice_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+);
 
 -- ----------------------------
 -- Records of size_product
@@ -91,10 +73,5 @@ CREATE TABLE `user` (
   `address1` varchar(1024) DEFAULT NULL,
   `address2` varchar(1024) DEFAULT NULL,
   PRIMARY KEY (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+);
 
--- ----------------------------
--- Records of user
--- ----------------------------
-INSERT INTO `user` VALUES ('1', 'test', '1111', '2222', null, null);
-INSERT INTO `user` VALUES ('2', 'test', '1111', '2222', null, null);
