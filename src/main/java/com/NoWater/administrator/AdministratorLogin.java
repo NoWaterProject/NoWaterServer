@@ -26,6 +26,11 @@ public class AdministratorLogin {
     public Status login(@RequestParam(value = "name", defaultValue = "/") String name,
                         @RequestParam(value = "password", defaultValue = "/") String password,
                         HttpServletResponse response) throws Exception {
+        Cookie cookie = new Cookie("name","value");
+        cookie.setMaxAge(1800);
+        cookie.setPath("/");
+        response.addCookie(cookie);
+
         List<Object> list = new ArrayList<Object>();
         DBUtil db = new DBUtil();
         String sql = "select * from admin";

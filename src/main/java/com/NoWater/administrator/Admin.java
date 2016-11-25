@@ -6,7 +6,7 @@ package com.NoWater.administrator;
 public class Admin {
     private String name;
     private String password;
-
+    private int user_id;
     public String getName() {
         return name;
     }
@@ -23,8 +23,8 @@ public class Admin {
         this.password = password;
     }
 
-    public Admin(String name, String password) {
+    /*public Admin(String name, String password) {
         this.name = name;
         this.password = password;
-    }
+    }*/
 }
