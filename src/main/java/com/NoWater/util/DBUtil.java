@@ -104,7 +104,7 @@ public class DBUtil {
         return false;
     }
 
-    public <T> List<T> quseryInfo(String sql, List<Object> param, Class<T> zlass) throws InstantiationException,
+    public <T> List<T> queryInfo(String sql, List<Object> param, Class<T> zlass) throws InstantiationException,
             IllegalAccessException,
             NoSuchFieldException,
             SecurityException {
