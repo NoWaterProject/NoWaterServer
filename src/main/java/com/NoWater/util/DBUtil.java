@@ -10,7 +10,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DBUntil {
+public class DBUtil {
 
     public static String driver = "com.mysql.jdbc.Driver";
 
@@ -53,7 +53,7 @@ public class DBUntil {
         this.conn = conn;
     }
 
-    public DBUntil() {
+    public DBUtil() {
         try {
             Class.forName(driver);
         } catch (ClassNotFoundException e) {
