@@ -29,7 +29,7 @@ public class AdministratorLogin {
         List<Object> list = new ArrayList<Object>();
         DBUtil db = new DBUtil();
         String sql = "select * from admin";
-        List<Admin> adminList = db.quseryInfo(sql, list, Admin.class);
+        List<Admin> adminList = db.queryInfo(sql, list, Admin.class);
         if (adminList.get(0).getName() == name && adminList.get(0).getPassword() == password) {
             status = 200;
             uuid = Uuid.getUuid();
