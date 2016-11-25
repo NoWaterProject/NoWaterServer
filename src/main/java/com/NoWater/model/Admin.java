@@ -1,4 +1,4 @@
-package com.NoWater.administrator;
+package com.NoWater.model;
 
 /**
  * Created by ByYoung on 2016/11/25.
@@ -22,9 +22,4 @@ public class Admin {
     public void setPassword(String password) {
         this.password = password;
     }
-
-    /*public Admin(String name, String password) {
-        this.name = name;
-        this.password = password;
-    }*/
 }
