@@ -6,7 +6,7 @@ package com.NoWater.administrator;
 public class Admin {
     private String name;
     private String password;
-    private int user_id;
+
     public String getName() {
         return name;
     }
