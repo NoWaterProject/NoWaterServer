@@ -16,6 +16,8 @@ import redis.clients.jedis.Jedis;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
+import net.sf.json.JSONObject;
+
 /**
  * Created by wukai on 2016/11/21.
  */
@@ -24,11 +26,12 @@ public class AdministratorLogin {
     private Jedis jedis;
 
     @RequestMapping("/admin/login")
-    public Status login(@RequestParam(value = "name", defaultValue = "/") String name,
+    public JSONObject login(@RequestParam(value = "name", defaultValue = "/") String name,
                         @RequestParam(value = "password", defaultValue = "/") String password,
                         HttpServletResponse response) throws Exception {
-        //response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
-        int status;
+        LogHelper.info(String.format("[param] name:{0}, password:{1}", name, password));
+        response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
+        JSONObject jsonObject = new JSONObject();
         String uuid;
 
         List<Object> list = new ArrayList<Object>();
@@ -37,7 +40,7 @@ public class AdministratorLogin {
         List<Admin> adminList = db.queryInfo(sql, list, Admin.class);
 
         if (adminList.get(0).getName().equals(name) && adminList.get(0).getPassword().equals(password)) {
-            status = 200;
+            jsonObject.put("status", 200);
 
             uuid = Uuid.getUuid();
             Cookie cookie = new Cookie("admin_token", uuid);
@@ -50,10 +53,10 @@ public class AdministratorLogin {
             jedis.expire(uuid, 1800);
             jedis.expire(name, 1800);
 
-            LogHelper.info(name + "\tlogin");
+            LogHelper.info(String.format("{0} login success.", name));
         } else {
-            status = 300;
+            jsonObject.put("status", 300);
         }
-        return new Status(status);
+        return jsonObject;
     }
 }

@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.NoWater.util.LogHelper;
 
+import net.sf.json.JSONObject;
+
 
 /**
  * Created by wukai on 16-11-18.
@@ -17,10 +19,14 @@ public class GreetingController {
     private final AtomicLong counter = new AtomicLong();
 
     @RequestMapping("/greeting")
-    public Greeting greeting(@RequestParam(value="name", defaultValue="World") String name) {
+    public JSONObject greeting(@RequestParam(value="name", defaultValue="World") String name) {
         LogHelper.info("test");
-        return new Greeting(counter.incrementAndGet(),
-                String.format(template, name));
+//        return new Greeting(counter.incrementAndGet(),
+//                String.format(template, name));
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("first_time", "new");
+        jsonObject.put("count", 12345);
+        return jsonObject;
     }
 
 }

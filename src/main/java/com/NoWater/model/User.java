@@ -10,6 +10,8 @@ public class User {
     private String phone;
     private String address1;
     private String address2;
+    private String address3;
+    private int cart_pd_num;
 
     public int getUser_id() {
         return user_id;
@@ -35,6 +37,14 @@ public class User {
         return address2;
     }
 
+    public String getAddress3() {
+        return address3;
+    }
+
+    public int getCart_pd_num() {
+        return cart_pd_num;
+    }
+
     public void setUser_id(int user_id) {
         this.user_id = user_id;
     }
@@ -57,6 +67,14 @@ public class User {
 
     public void setAddress2(String address2) {
         this.address2 = address2;
+    }
+
+    public void setAddress3(String address3) {
+        this.address3 = address3;
+    }
+
+    public void setCart_pd_num(int cart_pd_num) {
+        this.cart_pd_num = cart_pd_num;
     }
 
 }
