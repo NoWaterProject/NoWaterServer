@@ -18,7 +18,7 @@ public class CustomerIsLogin {
     private Jedis jedis;
     @RequestMapping("/customer/isLogin")
     public Status idlogin(HttpServletRequest request, HttpServletResponse response) throws Exception{
-        //response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
+        response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
         int status ;
         String uuid  = CookieUtil.getCookieValueByName(request,"token");
         if (uuid !=null) {
