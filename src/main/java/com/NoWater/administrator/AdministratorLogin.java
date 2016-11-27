@@ -27,6 +27,7 @@ public class AdministratorLogin {
     public Status login(@RequestParam(value = "name", defaultValue = "/") String name,
                         @RequestParam(value = "password", defaultValue = "/") String password,
                         HttpServletResponse response) throws Exception {
+        //response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
         int status;
         String uuid;
 
