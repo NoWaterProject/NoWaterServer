@@ -27,6 +27,7 @@ public class CustomerAd {
         if (shop != null) {
             LogHelper.info("shopAd: " + shop);
             JSONArray data = JSONArray.fromObject(shop);
+            jsonObject.put("status", 200);
             jsonObject.put("data", data);
         } else {
             jsonObject.put("status", 400);
@@ -45,6 +46,7 @@ public class CustomerAd {
         if (productAd != null) {
             LogHelper.info("productAd: " + productAd);
             JSONArray data = JSONArray.fromObject(productAd);
+            jsonObject.put("status", 200);
             jsonObject.put("data", data);
         } else {
             jsonObject.put("status", 400);
