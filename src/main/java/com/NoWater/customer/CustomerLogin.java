@@ -10,6 +10,7 @@ import com.NoWater.model.User;
 import com.NoWater.util.DBUtil;
 import com.NoWater.util.LogHelper;
 import com.NoWater.util.Uuid;
+import net.sf.json.JSONObject;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,39 +27,54 @@ public class CustomerLogin {
     private Jedis jedis;
 
     @RequestMapping("/customer/login")
-    public Status login(@RequestParam(value = "name", defaultValue = "/") String name,
-                        @RequestParam(value = "password", defaultValue = "/") String password,
-                        HttpServletResponse response) throws Exception {
+    public JSONObject login(@RequestParam(value = "name", defaultValue = "/") String name,
+                            @RequestParam(value = "password", defaultValue = "/") String password,
+                            HttpServletResponse response) throws Exception {
         response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
         int status = 0;
         String uuid;
+        JSONObject jsonObject = new JSONObject();
 
         List<Object> list = new ArrayList<Object>();
         DBUtil db = new DBUtil();
         StringBuffer sql = new StringBuffer();
-        sql.append("select password from user where name = ?");
+        sql.append("select password,user_id from user where name = ?");
         list.add(name);
         List<User> userList = db.queryInfo(sql.toString(), list, User.class);
-
-        if (userList.get(0).getPassword().equals(password)) {
-            status = 200;
-
-            uuid = Uuid.getUuid();
-            Cookie cookie = new Cookie("token", uuid);
-            cookie.setMaxAge(1800);
-            cookie.setPath("/");
-            response.addCookie(cookie);
-            jedis = new Jedis("127.0.0.1", 6379);
-            jedis.set(uuid, name);
-            jedis.set(name, uuid);
-            jedis.expire(uuid, 1800);
-            jedis.expire(name, 1800);
-
-            LogHelper.info(name + "\tlogin");
-        } else {
+        if (userList.size() == 0) {
             status = 300;
-        }
-        return new Status(status);
-    }
+            jsonObject.put("status", status);
+        } else {
+            if (userList.get(0).getPassword().equals(password)) {
+                status = 200;
+                jsonObject.put("status", status);
+                uuid = Uuid.getUuid();
+                Cookie cookie = new Cookie("token", uuid);
+                cookie.setMaxAge(1800);
+                cookie.setPath("/");
+                response.addCookie(cookie);
 
+                List<Object> list1 = new ArrayList<Object>();
+                DBUtil db1 = new DBUtil();
+                StringBuffer sql1 = new StringBuffer();
+                sql1.append("select user_id from user where name = ?");
+                list1.add(name);
+                List<User> userList1 = db1.queryInfo(sql1.toString(), list1, User.class);
+                String  user_id  = userList.get(0).getUser_id().toString();
+
+                jedis = new Jedis("127.0.0.1", 6379);
+                jedis.set(uuid,user_id);
+                jedis.set(user_id, uuid);
+                jedis.expire(uuid, 1800);
+                jedis.expire(user_id, 1800);
+
+                LogHelper.info(name + "\tlogin");
+            } else {
+                status = 300;
+                jsonObject.put("status", status);
+            }
+        }
+        return jsonObject;
+    }
 }
+

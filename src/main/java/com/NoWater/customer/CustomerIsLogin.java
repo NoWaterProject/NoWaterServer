@@ -37,13 +37,22 @@ public class CustomerIsLogin {
                 List<Object> list = new ArrayList<Object>();
                 DBUtil db = new DBUtil();
                 StringBuffer sql = new StringBuffer();
-                sql.append("SELECT `user`.`name`,count(cart.user_id) cartNum FROM `user`,cart WHERE `user`.user_id =cart.user_id and cart.user_id = ? GROUP BY cart.user_id");
+                sql.append("SELECT name FROM `user` WHERE user_id  = ? ");
                 list.add(user_id);
                 List<Cart> cartList = db.queryInfo(sql.toString(), list, Cart.class);
+                String name = cartList.get(0).getName();
+
+                List<Object> list1 = new ArrayList<Object>();
+                DBUtil db1 = new DBUtil();
+                StringBuffer sql1 = new StringBuffer();
+                sql1.append("SELECT COUNT(1) cartNum FROM cart WHERE user_id = ? ");
+                list1.add(user_id);
+                List<Cart> cartList1 = db1.queryInfo(sql1.toString(), list1, Cart.class);
+                int cartNum = (int) cartList1.get(0).getCartNum();
 
                 JSONObject userInformation = new JSONObject();
-                userInformation.put("name", cartList.get(0).getName());
-                userInformation.put("cartNum", cartList.get(0).getCartNum());
+                userInformation.put("name", name);
+                userInformation.put("cartNum", cartNum);
                 JSONArray jsonArray = new JSONArray();
                 jsonArray.add(0, userInformation);
                 jsonObject.put("userInformation",jsonArray);
