@@ -53,7 +53,7 @@ public class AdministratorLogin {
             jedis.expire(uuid, 1800);
             jedis.expire(name, 1800);
 
-            LogHelper.info(String.format("{0} login success.", name));
+            LogHelper.info(String.format("%s login success.", name));
         } else {
             jsonObject.put("status", 300);
         }
