@@ -72,6 +72,7 @@ CREATE TABLE `user` (
   `telephone` varchar(1024) DEFAULT NULL,
   `address1` varchar(1024) DEFAULT NULL,
   `address2` varchar(1024) DEFAULT NULL,
+  `address3` varchar(1024) DEFAULT NULL,
   PRIMARY KEY (`user_id`)
 );
 
