@@ -69,11 +69,23 @@ CREATE TABLE `user` (
   `user_id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(1024) NOT NULL,
   `password` varchar(1024) NOT NULL,
-  `phone` varchar(1024) DEFAULT NULL,
+  `telephone` varchar(1024) DEFAULT NULL,
   `address1` varchar(1024) DEFAULT NULL,
   `address2` varchar(1024) DEFAULT NULL,
-  `address3` varchar(1024) DEFAULT NULL,
-  `cart_pd_num` int(11) DEFAULT 0,
   PRIMARY KEY (`user_id`)
+);
+
+
+-- ----------------------------
+-- Table structure for `cart`
+-- ----------------------------
+DROP TABLE IF EXISTS `cart`;
+CREATE TABLE `cart` (
+  `cart_id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `products_id` int(11) NOT NULL,
+  `num` int(11) NOT NULL,
+  `size_id` int(11) NOT NULL,
+  PRIMARY KEY (`cart_id`)
 );
 

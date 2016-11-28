@@ -4,7 +4,7 @@ package com.NoWater.model;
  * Created by 李鹏飞 on 2016/11/25 0025.
  */
 public class User {
-    private int user_id;
+    private Integer user_id;
     private String name;
     private String password;
     private String phone;
@@ -13,7 +13,7 @@ public class User {
     private String address3;
     private int cart_pd_num;
 
-    public int getUser_id() {
+    public Integer getUser_id() {
         return user_id;
     }
 
