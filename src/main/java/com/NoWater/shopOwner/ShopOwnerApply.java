@@ -25,8 +25,9 @@ import javax.servlet.http.HttpServletResponse;
 @RestController
 public class ShopOwnerApply {
     @RequestMapping("/shop-owner/status")
-    public JSONObject status(HttpServletRequest request, HttpServletResponse response) throws Exception{
+    public JSONObject status(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
+        response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
         String token = CookieUtil.getCookieValueByName(request, "token");
         JSONObject jsonObject = new JSONObject();
 
@@ -45,23 +46,21 @@ public class ShopOwnerApply {
                     String sql = "select Status from shop where owner_id = " + user_id;
                     List<Shop> shopList = db.queryInfo(sql, list, Shop.class);
 
-                    if (!shopList.isEmpty()){
+                    if (!shopList.isEmpty()) {
                         int status = shopList.get(0).getStatus();
                         if (status == 0) {
                             jsonObject.put("status", 500);  //正在审查
                         } else if (status == 1) {
                             jsonObject.put("status", 200);  //已成为卖家
                         }
-                    }else {
-                        jsonObject.put("status",400);//数据库中找不到卖家，用户未申请
+                    } else {
+                        jsonObject.put("status", 400);//数据库中找不到卖家，用户未申请
                     }
-
                 } else {
                     jsonObject.put("status", 300);
                 }
             }
         }
-
         return jsonObject;
     }
 
@@ -70,6 +69,8 @@ public class ShopOwnerApply {
                             @RequestParam(value = "shopName", defaultValue = "/") String shopName,
                             @RequestParam(value = "telephone", defaultValue = "/") String telephone,
                             HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+        response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
         String token = CookieUtil.getCookieValueByName(request, "token");
         JSONObject jsonObject = new JSONObject();
 
@@ -91,7 +92,7 @@ public class ShopOwnerApply {
                     if (!shopList.isEmpty()) {
                         int status = shopList.get(0).getStatus();
                         if (status == 0) {
-                            jsonObject.put("status", 500);  //正在审查
+                            jsonObject.put("status", 600);  //正在审查
                         } else if (status == 1) {
                             jsonObject.put("status", 200);  //已成为卖家
                         }
@@ -100,7 +101,7 @@ public class ShopOwnerApply {
                         shopList = db.queryInfo(sql, list, Shop.class);
 
                         if (!shopList.isEmpty()) {
-                            jsonObject.put("status", 600);   //店名已有人使用
+                            jsonObject.put("status", 500);   //店名已有人使用
                         } else {
                             int shop_status = 0;        //插入申请，正在成为卖家
 
