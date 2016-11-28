@@ -90,3 +90,17 @@ CREATE TABLE `cart` (
   PRIMARY KEY (`cart_id`)
 );
 
+-- ----------------------------
+-- Table structure for `shop`
+-- ----------------------------
+DROP TABLE IF EXISTS `shop`;
+CREATE TABLE `shop` (
+  `shop_id` int(11) NOT NULL AUTO_INCREMENT,
+  `shop_name` varchar(1024) DEFAULT NULL,
+  `owner_id` int(11) NOT NULL,
+  `email` varchar(1024) DEFAULT NULL,
+  `status` int(11) NOT NULL,
+  `telephone` varchar(1024) DEFAULT NULL,
+  PRIMARY KEY (`shop_id`)
+) ;
+
