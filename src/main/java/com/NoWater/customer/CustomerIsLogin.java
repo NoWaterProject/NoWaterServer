@@ -23,15 +23,16 @@ import java.util.List;
 @RestController
 public class CustomerIsLogin {
     private Jedis jedis;
+
     @RequestMapping("/customer/isLogin")
-    public JSONObject isLogin(HttpServletRequest request, HttpServletResponse response) throws Exception{
+    public JSONObject isLogin(HttpServletRequest request, HttpServletResponse response) throws Exception {
         response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
         JSONObject jsonObject = new JSONObject();
-        String uuid  = CookieUtil.getCookieValueByName(request, "token");
+        String uuid = CookieUtil.getCookieValueByName(request, "token");
         if (uuid != null) {
             jedis = new Jedis("127.0.0.1", 6379);
             String user_id = jedis.get(uuid);
-            if(uuid.equals(jedis.get(user_id))) {
+            if (uuid.equals(jedis.get(user_id))) {
                 jsonObject.put("status", 200);
 
                 List<Object> list = new ArrayList<Object>();
@@ -55,10 +56,10 @@ public class CustomerIsLogin {
                 userInformation.put("cartNum", cartNum);
                 JSONArray jsonArray = new JSONArray();
                 jsonArray.add(0, userInformation);
-                jsonObject.put("userInformation",jsonArray);
+                jsonObject.put("userInformation", jsonArray);
             } else
                 jsonObject.put("status", 300);
-        }   else
+        } else
             jsonObject.put("status", 300);
 
         return jsonObject;

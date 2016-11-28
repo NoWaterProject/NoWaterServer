@@ -38,7 +38,7 @@ public class CustomerLogin {
         List<Object> list = new ArrayList<Object>();
         DBUtil db = new DBUtil();
         StringBuffer sql = new StringBuffer();
-        sql.append("select password,user_id from user where name = ?");
+        sql.append("select password, user_id from user where name = ?");
         list.add(name);
         List<User> userList = db.queryInfo(sql.toString(), list, User.class);
         if (userList.size() == 0) {
@@ -53,17 +53,10 @@ public class CustomerLogin {
                 cookie.setMaxAge(1800);
                 cookie.setPath("/");
                 response.addCookie(cookie);
-
-                List<Object> list1 = new ArrayList<Object>();
-                DBUtil db1 = new DBUtil();
-                StringBuffer sql1 = new StringBuffer();
-                sql1.append("select user_id from user where name = ?");
-                list1.add(name);
-                List<User> userList1 = db1.queryInfo(sql1.toString(), list1, User.class);
-                String  user_id  = userList.get(0).getUser_id().toString();
+                String user_id = userList.get(0).getUser_id().toString();
 
                 jedis = new Jedis("127.0.0.1", 6379);
-                jedis.set(uuid,user_id);
+                jedis.set(uuid, user_id);
                 jedis.set(user_id, uuid);
                 jedis.expire(uuid, 1800);
                 jedis.expire(user_id, 1800);
