@@ -1,4 +1,6 @@
 package com.NoWater.util;
+import redis.clients.jedis.Jedis;
+
 import java.io.*;
 import java.util.Properties;
 
@@ -35,6 +37,11 @@ public final class NoWaterProperties {
             propertiesFile = new File("conf/Online.properties");
         else
             propertiesFile = new File("conf/Offline.properties");
+
+        Jedis jedis = new Jedis("127.0.0.1", 6379);
+        jedis.set("ProductAd", "[{\"productId\":1, \"productName\":\"GARMIN VIVOSMART HR+ (CHINESE)\", \"size\":\"1 PC\", \"price\":1799.00, \"photoIdUrl\":\"http://koprvhdix117-10038234.cos.myqcloud.com/Product1.jpg\"}, {\"productId\":2, \"productName\":\"M&M'S BUCKET RED & GREEN\", \"size\":\"710G\", \"price\":145.90, \"photoIdUrl\":\"http://koprvhdix117-10038234.cos.myqcloud.com/Product2.jpg\"},{\"productId\":3, \"productName\":\"GARMIN FORERUNNER 235 (CHINESE)\", \"size\":\"1 PC\", \"price\":2799.00, \"photoIdUrl\":\"http://koprvhdix117-10038234.cos.myqcloud.com/Product3.jpg\"},{\"productId\":4, \"productName\":\"CHILCAS CABERNET SAUVIGNON\", \"size\":\"100CL\", \"price\":89.00, \"photoIdUrl\":\"http://koprvhdix117-10038234.cos.myqcloud.com/Product4.jpg\"}, {\"productId\":5, \"productName\":\"LAURIER SG GATHER 35CM TWIN PACK\", \"size\":\"8SX2\", \"price\":35.90, \"photoIdUrl\":\"http://koprvhdix117-10038234.cos.myqcloud.com/Product5.jpg\"},{\"productId\":6, \"productName\":\"KOTEX WHITE SLIM XLONG TWIN\", \"size\":\"PACK\", \"price\":34.90, \"photoIdUrl\":\"http://koprvhdix117-10038234.cos.myqcloud.com/Product6.jpg\"},{\"productId\":7, \"productName\":\"RITZ CHEESE SANDWICH TRAY PACK\", \"size\":\"324G\", \"price\":23.90, \"photoIdUrl\":\"http://koprvhdix117-10038234.cos.myqcloud.com/Product7.jpg\"},{\"productId\":8, \"productName\":\"WHISKAS TUNA CHUNKS WITH PRAWNS\", \"size\":\"85G\", \"price\":6.90, \"photoIdUrl\":\"http://koprvhdix117-10038234.cos.myqcloud.com/Product8.jpg\"},{\"productId\":9, \"productName\":\"INNOTEC Miami Swing Ceramic Heater\", \"size\":\"UNIT\", \"price\":318.00, \"photoIdUrl\":\"http://koprvhdix117-10038234.cos.myqcloud.com/Product9.jpg\"},{\"productId\":10, \"productName\":\"SARA LEE CHOCOLATE SWIRL POUND CAKE\", \"size\":\"300G\", \"price\":33.90, \"photoIdUrl\":\"http://koprvhdix117-10038234.cos.myqcloud.com/Product10.jpg\"}]");
+        jedis.set("ShopAd", "[{\"shopId\":1, \"adPhotoUrl\":\"http://koprvhdix117-10038234.cos.myqcloud.com/HomePageDefault1.jpg\"}, {\"shopId\":2, \"adPhotoUrl\":\"http://koprvhdix117-10038234.cos.myqcloud.com/HomePageDefault2.jpg\"}, {\"shopId\":3, \"adPhotoUrl\":\"http://koprvhdix117-10038234.cos.myqcloud.com/HomePageDefault3.jpg\"}, {\"shopId\":4, \"adPhotoUrl\":\"http://koprvhdix117-10038234.cos.myqcloud.com/HomePageDefault4.jpg\"}, {\"shopId\":5, \"adPhotoUrl\":\"http://koprvhdix117-10038234.cos.myqcloud.com/HomePageDefault5.jpg\"}]");
+        LogHelper.info("ProductAd set success");
 
         try {
             InputStream in = new FileInputStream(propertiesFile);
