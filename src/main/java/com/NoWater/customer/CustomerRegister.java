@@ -1,7 +1,7 @@
 package com.NoWater.customer;
 
 import com.NoWater.model.Cart;
-import com.NoWater.model.Status;
+import com.NoWater.util.NoWaterProperties;
 import com.NoWater.model.User;
 import com.NoWater.util.DBUtil;
 import com.NoWater.util.LogHelper;
@@ -45,20 +45,42 @@ public class CustomerRegister {
                 status = 400; //电话号码不合格
                 jsonObject.put("status",status);
             }   else {
-                List<Object> list1 = new ArrayList<Object>();
-                DBUtil db1 = new DBUtil();
-                StringBuffer sql1 = new StringBuffer();
-                sql1.append("insert into user (name,password,telephone,address1,address2,address3) values (?,?,?,?,?,?)");
-                list1.add(name);
-                list1.add(password);
-                list1.add(telephone);
-                list1.add(address1);
-                list1.add(address2);
-                list1.add(address3);
-                db1.insertUpdateDeleteExute(sql1.toString(),list1);
-                status = 200;
-                jsonObject.put("status",status);
-                LogHelper.info("register: name="+name +"password="+password+"telephone="+telephone+"address1="+address1+"address2="+address2+"addres31="+address3);
+                //// TODO: 2016/11/28 0028 address判断
+                String[] addRess1 = NoWaterProperties.getAddress();
+                String [][] addRess2 = NoWaterProperties.getAddress2();
+                int addressStatus = 0;
+                for (int i = 0; i < addRess1.length ; i++) {
+                    if (address1.equals(addRess1[i])) {
+                        for (int j = 0; j < addRess2.length ; j++) {
+                            if (address2.equals(addRess2[i][j])) {
+                                addressStatus = 1;
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                }
+
+                if (addressStatus == 1) {
+                    List<Object> list1 = new ArrayList<Object>();
+                    DBUtil db1 = new DBUtil();
+                    StringBuffer sql1 = new StringBuffer();
+                    sql1.append("insert into user (name,password,telephone,address1,address2,address3) values (?,?,?,?,?,?)");
+                    list1.add(name);
+                    list1.add(password);
+                    list1.add(telephone);
+                    list1.add(address1);
+                    list1.add(address2);
+                    list1.add(address3);
+                    db1.insertUpdateDeleteExute(sql1.toString(),list1);
+                    status = 200;
+                    jsonObject.put("status",status);
+                    LogHelper.info("register: name="+name +"password="+password+"telephone="+telephone+"address1="+address1+"address2="+address2+"addres31="+address3);
+
+                }   else {
+                    status = 500 ;
+                    jsonObject.put("status",status);
+                }
             }
         }
         return jsonObject;
