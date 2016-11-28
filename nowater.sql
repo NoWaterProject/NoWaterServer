@@ -76,7 +76,6 @@ CREATE TABLE `user` (
   PRIMARY KEY (`user_id`)
 );
 
-
 -- ----------------------------
 -- Table structure for `cart`
 -- ----------------------------
@@ -88,5 +87,16 @@ CREATE TABLE `cart` (
   `num` int(11) NOT NULL,
   `size_id` int(11) NOT NULL,
   PRIMARY KEY (`cart_id`)
+);
+
+DROP TABLE IF EXISTS `shop`;
+CREATE TABLE `shop` (
+  `shop_id` int(11) NOT NULL AUTO_INCREMENT,
+  `shop_name` varchar(1024) DEFAULT NULL,
+  `owner_id` int(11) NOT NULL,
+  `email` varchar(1024) DEFAULT NULL,
+  `status` int(11) NOT NULL,
+  `telephone` VARCHAR(1024) NOT NULL,
+  PRIMARY KEY (`shop_id`)
 );
 
