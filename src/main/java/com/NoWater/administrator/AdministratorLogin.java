@@ -29,7 +29,7 @@ public class AdministratorLogin {
     public JSONObject login(@RequestParam(value = "name", defaultValue = "/") String name,
                         @RequestParam(value = "password", defaultValue = "/") String password,
                         HttpServletResponse response) throws Exception {
-        LogHelper.info(String.format("[param] name:{0}, password:{1}", name, password));
+        LogHelper.info(String.format("[param] name:%s, password:%s", name, password));
         response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
         JSONObject jsonObject = new JSONObject();
         String uuid;
