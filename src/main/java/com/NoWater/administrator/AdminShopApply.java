@@ -5,9 +5,11 @@ import com.NoWater.model.Shop;
 import com.NoWater.util.CookieUtil;
 import com.NoWater.util.DBUtil;
 import com.NoWater.util.LogHelper;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import redis.clients.jedis.Jedis;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,6 +20,7 @@ import java.util.List;
 /**
  * Created by wukai on 2016/11/29.
  */
+@RestController
 public class AdminShopApply {
 
     @RequestMapping("/admin/shop/applyList")
@@ -49,7 +52,11 @@ public class AdminShopApply {
                             List<Shop> shopApplyList = db.queryInfo(getShopApply, list, Shop.class);
 
                             jsonObject.put("status", 200);
-                            jsonObject.put("data", JSONObject.fromObject(shopApplyList));
+                            if (shopApplyList.size() == 0) {
+                                jsonObject.put("data", "{}");
+                            } else {
+                                jsonObject.put("data", JSONArray.fromObject(shopApplyList));
+                            }
                         } catch (Exception e) {
                             LogHelper.error(e.toString());
                             jsonObject.put("status", 400);
@@ -73,9 +80,9 @@ public class AdminShopApply {
         return jsonObject;
     }
 
-    @RequestMapping("/admin/shop/handle")
+    @RequestMapping("/admin/shop/handle")  // 0为未处理，1为accepted，-1为rejected
     public JSONObject adminShopHandle(@RequestParam(value = "shopId", defaultValue = "/") int shopId,
-                                      @RequestParam(value = "behavior", defaultValue = "/") String behavior,
+                                      @RequestParam(value = "behavior", defaultValue = "/") int behavior,
                                       HttpServletRequest request, HttpServletResponse response) {
         LogHelper.info(String.format("[admin/shop/handle] [param] shopId:%s, behavior:%s", shopId, behavior));
         response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
@@ -98,11 +105,23 @@ public class AdminShopApply {
                     // 确认用户名
                     if (adminList.get(0).getName().equals(name)) {
 
-                        String handleSQL = "update `shop` set `status` = 1 where `shopId` = ?";
+                        String confirmSQL = "select `status` from `shop` where `shop_id` = ?";
                         list.add(shopId);
-                        db.insertUpdateDeleteExute(handleSQL, list);
+                        List<Shop> hasShopId = db.queryInfo(confirmSQL, list, Shop.class);
 
-                        jsonObject.put("status", 200);
+                        if (hasShopId.size() == 0) {
+                            jsonObject.put("status", 500);  // don't have this shopId
+                        } else if (hasShopId.get(0).getStatus() == 1 || hasShopId.get(0).getStatus() == -1) {
+                            jsonObject.put("status", 600);  // shopId has handle
+                        } else {
+                            String handleSQL = "update `shop` set `status` = ? where `shop_id` = ?";
+                            List<Object> listHandle = new ArrayList<Object>();
+                            listHandle.add(behavior);
+                            listHandle.add(shopId);
+                            db.insertUpdateDeleteExute(handleSQL, listHandle);
+
+                            jsonObject.put("status", 200);
+                        }
 
                     } else {
                         jsonObject.put("status", 300);

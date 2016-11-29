@@ -5,19 +5,19 @@ package com.NoWater.model;
  */
 public class Shop {
 
-    private int shopId;
-    private String shopName;
-    private int ownerId;
+    private int shop_id;
+    private String shop_name;
+    private int owner_id;
     private String email;
     private int status;
     private String telephone;
 
     public void setShopName(String shopName) {
-        this.shopName = shopName;
+        this.shop_name = shopName;
     }
 
     public void setOwnerId(int ownerId) {
-        this.ownerId = ownerId;
+        this.owner_id = ownerId;
     }
 
     public void setEmail(String email) {
@@ -29,11 +29,11 @@ public class Shop {
     }
 
     public String getShopName() {
-        return shopName;
+        return shop_name;
     }
 
     public int getOwnerId() {
-        return ownerId;
+        return owner_id;
     }
 
     public String getEmail() {
@@ -53,6 +53,7 @@ public class Shop {
     }
 
     public int getShopId() {
-        return shopId;
+        return shop_id;
     }
+
 }
