@@ -27,6 +27,7 @@ public class CustomerIsLogin {
     @RequestMapping("/customer/isLogin")
     public JSONObject isLogin(HttpServletRequest request, HttpServletResponse response) throws Exception {
         response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
         JSONObject jsonObject = new JSONObject();
         String uuid = CookieUtil.getCookieValueByName(request, "token");
         if (uuid != null) {

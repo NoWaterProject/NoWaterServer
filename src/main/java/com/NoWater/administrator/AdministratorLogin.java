@@ -31,6 +31,7 @@ public class AdministratorLogin {
                         HttpServletResponse response) throws Exception {
         LogHelper.info(String.format("[param] name:%s, password:%s", name, password));
         response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
         JSONObject jsonObject = new JSONObject();
         String uuid;
 

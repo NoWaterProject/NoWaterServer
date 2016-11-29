@@ -33,6 +33,7 @@ public class CustomerLogin {
                             @RequestParam(value = "password", defaultValue = "/") String password,
                             HttpServletResponse response) throws Exception {
         response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
         int status = 0;
         String uuid;
         JSONObject jsonObject = new JSONObject();
@@ -75,6 +76,7 @@ public class CustomerLogin {
     @RequestMapping("/customer/loginout")
     public JSONObject customerLoginOut(HttpServletRequest request, HttpServletResponse response) {
         response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
         JSONObject jsonObject = new JSONObject();
 
         String token = CookieUtil.getCookieValueByName(request, "token");

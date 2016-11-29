@@ -30,6 +30,7 @@ public class ShopOwnerApply {
     public JSONObject status(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
         String token = CookieUtil.getCookieValueByName(request, "token");
         JSONObject jsonObject = new JSONObject();
 
@@ -81,6 +82,7 @@ public class ShopOwnerApply {
                             HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
         String token = CookieUtil.getCookieValueByName(request, "token");
         JSONObject jsonObject = new JSONObject();
 
@@ -126,9 +128,9 @@ public class ShopOwnerApply {
                         if (shopList.size() != 0) {
                             jsonObject.put("status", 500);   //店名已有人使用
                         } else if (!email.contains("@")) {
-                            jsonObject.put("status", 600);      // email error
+                            jsonObject.put("status", 800);      // email error
                         } else if ((telephone.indexOf(0) != '6' && telephone.indexOf(0) != 9) || telephone.length() != 8){
-                            jsonObject.put("status", 700);      // telephone error
+                            jsonObject.put("status", 900);      // telephone error
                         } else {
                             int shop_status = 0;        //插入申请，正在成为卖家
 

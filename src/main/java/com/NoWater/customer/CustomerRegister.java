@@ -28,6 +28,9 @@ public class CustomerRegister {
                                @RequestParam(value = "address3", defaultValue = "/") String address3,
                                HttpServletResponse response) throws Exception {
         response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+        LogHelper.info(String.format("[customer/register] [param] name:%s, password:%s, telephone:%s, address1:%s, address2:%s, address3:%s",
+                name, password, telephone, address1, address2, address3));
         int status = 0;
         JSONObject jsonObject = new JSONObject();
         List<Object> list = new ArrayList<Object>();
@@ -52,7 +55,7 @@ public class CustomerRegister {
                     int addressStatus = 0;
                     for (int i = 0; i < addRess1.length; i++) {
                         if (address1.equals(addRess1[i])) {
-                            for (int j = 0; j < addRess2.length; j++) {
+                            for (int j = 0; j < addRess2[i].length; j++) {
                                 if (address2.equals(addRess2[i][j])) {
                                     addressStatus = 1;
                                     break;

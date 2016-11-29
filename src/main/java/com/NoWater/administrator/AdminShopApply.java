@@ -27,6 +27,7 @@ public class AdminShopApply {
     public JSONObject adminShopApplyList(HttpServletRequest request, HttpServletResponse response) {
         LogHelper.info("shop apply list");
         response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
         JSONObject jsonObject = new JSONObject();
 
         String token = CookieUtil.getCookieValueByName(request, "admin_token");
