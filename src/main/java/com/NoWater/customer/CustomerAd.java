@@ -19,6 +19,7 @@ public class CustomerAd {
     @RequestMapping("/customer/shop/ad")
     public JSONObject shopAd(HttpServletResponse response) {
         response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
         JSONObject jsonObject = new JSONObject();
 
         Jedis jedis = new Jedis("127.0.0.1", 6379);
@@ -38,6 +39,7 @@ public class CustomerAd {
     @RequestMapping("/customer/product/ad")
     public JSONObject productAd(HttpServletResponse response) {
         response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
         JSONObject jsonObject = new JSONObject();
 
         Jedis jedis = new Jedis("127.0.0.1", 6379);
