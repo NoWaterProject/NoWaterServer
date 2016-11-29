@@ -7,6 +7,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import com.NoWater.model.Admin;
 import com.NoWater.model.Status;
 import com.NoWater.model.User;
+import com.NoWater.util.CookieUtil;
 import com.NoWater.util.DBUtil;
 import com.NoWater.util.LogHelper;
 import com.NoWater.util.Uuid;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import redis.clients.jedis.Jedis;
 
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
@@ -67,6 +69,32 @@ public class CustomerLogin {
                 jsonObject.put("status", status);
             }
         }
+        return jsonObject;
+    }
+
+    @RequestMapping("/customer/loginout")
+    public JSONObject customerLoginOut(HttpServletRequest request, HttpServletResponse response) {
+        response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
+        JSONObject jsonObject = new JSONObject();
+
+        String token = CookieUtil.getCookieValueByName(request, "token");
+        if (token != null) {
+            jedis = new Jedis("127.0.0.1", 6379);
+            String user_id = jedis.get(token);
+            String realToken = jedis.get(user_id);
+
+            if (token.equals(realToken)) {
+                // 核心start
+                jedis.del(user_id);
+                jedis.del(token);
+                // 核心end
+            } else {
+                jsonObject.put("status", 300);
+            }
+        } else {
+            jsonObject.put("status", 300);
+        }
+
         return jsonObject;
     }
 }

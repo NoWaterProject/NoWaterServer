@@ -37,25 +37,29 @@ public class AdministratorLogin {
         List<Object> list = new ArrayList<Object>();
         DBUtil db = new DBUtil();
         String sql = "select * from admin";
-        List<Admin> adminList = db.queryInfo(sql, list, Admin.class);
+        try {
+            List<Admin> adminList = db.queryInfo(sql, list, Admin.class);
+            if (adminList.get(0).getName().equals(name) && adminList.get(0).getPassword().equals(password)) {
+                jsonObject.put("status", 200);
 
-        if (adminList.get(0).getName().equals(name) && adminList.get(0).getPassword().equals(password)) {
-            jsonObject.put("status", 200);
+                uuid = Uuid.getUuid();
+                Cookie cookie = new Cookie("admin_token", uuid);
+                cookie.setMaxAge(1800);
+                cookie.setPath("/");
+                response.addCookie(cookie);
+                jedis = new Jedis("127.0.0.1", 6379);
+                jedis.set(uuid, name);
+                jedis.set(name, uuid);
+                jedis.expire(uuid, 1800);
+                jedis.expire(name, 1800);
 
-            uuid = Uuid.getUuid();
-            Cookie cookie = new Cookie("admin_token", uuid);
-            cookie.setMaxAge(1800);
-            cookie.setPath("/");
-            response.addCookie(cookie);
-            jedis = new Jedis("127.0.0.1", 6379);
-            jedis.set(uuid, name);
-            jedis.set(name, uuid);
-            jedis.expire(uuid, 1800);
-            jedis.expire(name, 1800);
-
-            LogHelper.info(String.format("%s login success.", name));
-        } else {
-            jsonObject.put("status", 300);
+                LogHelper.info(String.format("%s login success.", name));
+            } else {
+                jsonObject.put("status", 300);
+            }
+        } catch (Exception e) {
+            LogHelper.error(e.toString());
+            jsonObject.put("status", 400);
         }
         return jsonObject;
     }

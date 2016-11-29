@@ -5,6 +5,7 @@ package com.NoWater.model;
  */
 public class Shop {
 
+    private int shopId;
     private String shopName;
     private int ownerId;
     private String email;
@@ -28,7 +29,6 @@ public class Shop {
     }
 
     public String getShopName() {
-
         return shopName;
     }
 
@@ -50,5 +50,9 @@ public class Shop {
 
     public void setTelephone(String telephone) {
         this.telephone = telephone;
+    }
+
+    public int getShopId() {
+        return shopId;
     }
 }

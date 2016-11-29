@@ -51,10 +51,10 @@ CREATE TABLE `products` (
 -- ----------------------------
 DROP TABLE IF EXISTS `size_product`;
 CREATE TABLE `size_product` (
-  `choice_id` int(11) NOT NULL AUTO_INCREMENT,
+  `size_id` int(11) NOT NULL AUTO_INCREMENT,
   `description` varchar(1024) NOT NULL,
   `product_id` int(11) NOT NULL,
-  PRIMARY KEY (`choice_id`)
+  PRIMARY KEY (`size_id`)
 );
 
 -- ----------------------------
