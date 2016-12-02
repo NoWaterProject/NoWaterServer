@@ -83,15 +83,20 @@ public class CustomerLogin {
         if (token != null) {
             jedis = new Jedis("127.0.0.1", 6379);
             String user_id = jedis.get(token);
-            String realToken = jedis.get(user_id);
-
-            if (token.equals(realToken)) {
-                // 核心start
-                jedis.del(user_id);
-                jedis.del(token);
-                // 核心end
-            } else {
+            if (user_id == null) {
                 jsonObject.put("status", 300);
+            } else {
+                String realToken = jedis.get(user_id);
+
+                if (token.equals(realToken)) {
+                    // 核心start
+                    jedis.del(user_id);
+                    jedis.del(token);
+                    jsonObject.put("status", 200);
+                    // 核心end
+                } else {
+                    jsonObject.put("status", 300);
+                }
             }
         } else {
             jsonObject.put("status", 300);

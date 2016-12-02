@@ -33,7 +33,9 @@ public class CustomerIsLogin {
         if (uuid != null) {
             jedis = new Jedis("127.0.0.1", 6379);
             String user_id = jedis.get(uuid);
-            if (uuid.equals(jedis.get(user_id))) {
+            if (user_id == null) {
+                jsonObject.put("status", 300);
+            } else if (uuid.equals(jedis.get(user_id))) {
                 jsonObject.put("status", 200);
 
                 List<Object> list = new ArrayList<Object>();
@@ -58,8 +60,9 @@ public class CustomerIsLogin {
                 JSONArray jsonArray = new JSONArray();
                 jsonArray.add(0, userInformation);
                 jsonObject.put("userInformation", jsonArray);
-            } else
+            } else {
                 jsonObject.put("status", 300);
+            }
         } else
             jsonObject.put("status", 300);
 
