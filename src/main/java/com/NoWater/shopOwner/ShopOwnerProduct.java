@@ -24,7 +24,7 @@ import java.util.List;
  */
 @RestController
 public class ShopOwnerProduct {
-        @RequestMapping("shop-owner/products/list")
+    @RequestMapping("shop-owner/products/list")
     public JSONObject searchKey(
             @RequestParam(value = "startId", defaultValue = "0") int startId,
             @RequestParam(value = "count", defaultValue = "/") int count,
@@ -91,7 +91,7 @@ public class ShopOwnerProduct {
                         }
                     }
                 } else {
-                    jsonObject.put("status",300);
+                    jsonObject.put("status", 300);
                 }
             }
         }
