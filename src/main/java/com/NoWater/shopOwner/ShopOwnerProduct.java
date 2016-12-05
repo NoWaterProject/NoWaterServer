@@ -7,6 +7,8 @@ import com.NoWater.util.DBUtil;
 import com.NoWater.util.MD5;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import org.apache.commons.collections.ArrayStack;
+import org.apache.commons.lang.ObjectUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,9 +26,8 @@ import java.util.List;
 public class ShopOwnerProduct {
         @RequestMapping("shop-owner/products/list")
     public JSONObject searchKey(
-            @RequestParam(value = "startId", defaultValue = "/") int startId,
+            @RequestParam(value = "startId", defaultValue = "0") int startId,
             @RequestParam(value = "count", defaultValue = "/") int count,
-            @RequestParam(value = "searchKey", defaultValue = "/") String searchKey,
             HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
@@ -45,42 +46,49 @@ public class ShopOwnerProduct {
             } else {
                 String realToken = jedis.get(user_id);
                 if (realToken.equals(token)) {
-                    List<Object> list = new ArrayList<Object>();
-                    DBUtil db = new DBUtil();
-                    if (searchKey == null) {
-                        String sqlNoSearchKey = "select count(1) num from user a,shop b,products c where a.user_id = b.owner_id and b.shop_id = c.shop_id and user_id = ? and product_id >= ? order by product_id asc ";
-                        list.add(user_id);
+                    if (startId == -1) {
+                        jsonObject.put("status", 400);
+                    } else {
+                        DBUtil db = new DBUtil();
+                        List<Object> getShopId = new ArrayList<Object>();
+                        String getShopIdSQL = "select shop_id from shop where owner_id = ?";
+                        getShopId.add(user_id);
+                        List<Shop> getShopIdList = db.queryInfo(getShopIdSQL, getShopId, Shop.class);
+                        int shopId = getShopIdList.get(0).getShopId();
+
+                        if (startId == 0) {
+                            String getStartIdSQL = "select count(1) num from product";
+                            List<Object> EmptyList = new ArrayList<Object>();
+                            List<Product> getStartIdList = db.queryInfo(getStartIdSQL, EmptyList, Product.class);
+                            startId = (int) getStartIdList.get(0).getNum();
+                        }
+                        List<Object> list = new ArrayList<Object>();
+                        String sqlNoSearchKey = "select count(1) num,  from products c where shop_id = ? and product_id <= ?";
+                        list.add(shopId);
                         list.add(startId);
                         List<Product> productListCount = db.queryInfo(sqlNoSearchKey, list, Product.class);
                         int num = (int) productListCount.get(0).getNum();
+
+                        String queryProductInfo = "select * from products where shop_id = ? and product_id <= ? order by product_id asc";
+                        List<Product> productListInfo = db.queryInfo(queryProductInfo, list, Product.class);
+
                         if (num > count) {
                             actualCount = count;
-                            endId = startId + count;
+                            JSONArray jsonArray = new JSONArray();
+                            for (int i = 0; i < actualCount; i++) {
+                                JSONObject jsonObject1 = JSONObject.fromObject(productListInfo.get(i));
+                                jsonArray.add(jsonObject1);
+                            }
+                            endId = productListInfo.get(actualCount).getProduct_id();
+                            jsonObject.put("actualCount", actualCount);
+                            jsonObject.put("endId", endId);
+                            jsonObject.put("data", jsonArray);
                         } else {
                             actualCount = num;
-                            endId = -1;
+                            jsonObject.put("actualCount", actualCount);
+                            jsonObject.put("endId", -1);
+                            jsonObject.put("data", JSONArray.fromObject(productListInfo));
                         }
-                        String queryProductInfo = "select product_id,ad_product_url,product_name from user a,shop b,products c where a.user_id =b.owner_id and b.shop_id = c.shop_id and user_id = ? order by product_id asc limit ?,?";
-                        list.add(startId);
-                        list.add(actualCount);
-                        List<Product> productListInfo = db.queryInfo(queryProductInfo, list, Product.class);
-                        jsonObject.put("endId", endId);
-                        jsonObject.put("searchKey", searchKey);
-                        jsonObject.put("actualCount", actualCount);
-                        JSONArray jsonArray = new JSONArray();
-                        for (int i = startId; i < endId; i++) {
-                            JSONObject ob = new JSONObject();
-                            ob.put("product_id", productListInfo.get(i).getProduct_id());
-                            ob.put("product_name", productListInfo.get(i).getProduct_name());
-                            ob.put("ad_product_url", productListInfo.get(1).getAd_photo_url());
-                            jsonArray.add(i, ob);
-                        }
-                        jsonObject.put("shopProduct", jsonArray);
-                        searchKey = MD5.getInstance().getMD5(jsonObject.toString());
-                        jedis.set("searchKey",searchKey);
-                    } else {
-                        String js = jedis.get(searchKey);
-                        jsonObject.fromObject(js);
                     }
                 } else {
                     jsonObject.put("status",300);
