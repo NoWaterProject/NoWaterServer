@@ -36,10 +36,10 @@ CREATE TABLE `class` (
   PRIMARY KEY (`class_id`)
 );
 
-DROP TABLE IF EXISTS `size_product`;
-CREATE TABLE `size_product` (
-  `size_id` int(11) NOT NULL AUTO_INCREMENT,
-  `description` varchar(1024) NOT NULL,
+DROP TABLE IF EXISTS `choice_product`;
+CREATE TABLE `choice_product` (
+  `choice_id` int(11) NOT NULL AUTO_INCREMENT,
+  `choice` varchar(1024) NOT NULL,
   `product_id` int(11) NOT NULL,
   `price` double(15, 6) NOT NULL,
   `photo_url` varchar(1024) NOT NULL,
@@ -77,6 +77,7 @@ CREATE TABLE `user` (
   `address2` varchar(1024) DEFAULT NULL,
   `address3` varchar(1024) DEFAULT NULL,
   `postCode` varchar(1024) DEFAULT NULL,
+  `status` int(11) DEFAULT 1,
   PRIMARY KEY (`user_id`)
 );
 
