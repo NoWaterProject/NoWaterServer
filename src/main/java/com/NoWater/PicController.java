@@ -16,7 +16,7 @@ import com.NoWater.util.FIleUpload;
  */
 
 @RestController
-public class picController {
+public class PicController {
     /**
      * 添加新的Goods
      *
@@ -27,19 +27,18 @@ public class picController {
                           @RequestParam(value = "goodsPic[]", required = false) MultipartFile[] goodsPics) {//商品详情图,单文件、多文件都可
         response.setHeader("Access-Control-Allow-Origin", "*");
         response.setHeader("Access-Control-Allow-Credentials", "true");
-        {
-            JSONObject jsonObject = new JSONObject();
-            try {
+        JSONObject jsonObject = new JSONObject();
+        try {
 //            String goodsIdStr = request.getParameter("godosId");
-                String goodsIdStr = "111222";
-                //XXX表单其他数据的处理
-                FIleUpload.saveImgs(goodsPics, Long.valueOf(goodsIdStr));//保存图片
-                jsonObject.put("msg", "ok");
-            } catch (Exception e) {
-                e.printStackTrace();
-                jsonObject.put("error", "提交商品出错" + e.getMessage());
-            }
-            return jsonObject;
+            String goodsIdStr = "111222";
+            //XXX表单其他数据的处理
+            FIleUpload.saveImgs(goodsPics, Long.valueOf(goodsIdStr));//保存图片
+            jsonObject.put("msg", "ok");
+        } catch (Exception e) {
+            e.printStackTrace();
+            jsonObject.put("error", "提交商品出错" + e.getMessage());
         }
+        return jsonObject;
     }
+}
 }
