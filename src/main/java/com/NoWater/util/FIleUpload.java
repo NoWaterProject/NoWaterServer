@@ -13,44 +13,53 @@ import java.io.IOException;
  * Created by 李鹏飞 on 2016/12/5 0005.
  */
 
-//@Transactional(rollbackFor={IllegalStateException.class,IOException.class,RuntimeException.class})
 public class FIleUpload {
 
-    public static void saveImgs(MultipartFile[] goodsPics, long goodsId) throws IllegalStateException, IOException {
-        if (goodsPics == null || goodsPics.length <= 0) {//数组无图片
-            return;
+    public static int handleFile(MultipartFile[] picturefile, String fileDir, String fileName) {
+        try {
+            int state = saveImgs(picturefile, fileDir, fileName);  //保存图片
+            if (state == -1) {
+                return -1
+            } else {
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1;
         }
-        for (MultipartFile multipartFile : goodsPics) {
-            saveImg(multipartFile, goodsId);
+    }
+
+    public static int saveImgs(MultipartFile[] picturefile, String fileDir, String fileName) throws IllegalStateException, IOException {
+        if (picturefile == null || picturefile.length <= 0) {//数组无图片
+            return -1;
+        }
+        for (MultipartFile multipartFile : picturefile) {
+            saveImg(multipartFile, fileDir, fileName);
         }
     }
 
     /**
      * 保存单张图片
      *
-     * @param multipartFile
-     * @param goodsId    商品ID
+     * @param multipartFile     the file array
      * @author Nifury
      */
-    private static void saveImg(MultipartFile multipartFile, long goodsId) throws IllegalStateException, IOException {
+    private static void saveImg(MultipartFile multipartFile, String fileDir, String fileName) throws IllegalStateException, IOException {
         if (multipartFile != null && multipartFile.getSize() > 0) {
             //有图
             String originalFilename = multipartFile.getOriginalFilename();
             if (!(originalFilename.endsWith(".jpg") || originalFilename.endsWith(".jpeg")
                     || originalFilename.endsWith(".png"))) {
-                throw new RuntimeException("图片格式不正确==>" + originalFilename);
+                throw new RuntimeException("Format Error" + originalFilename);
             }
-            String GOODS_PIC_DIR = "/tmp/pictmp/";
             //商品图片
-            File dir = new File(GOODS_PIC_DIR + goodsId + "/");
+            File dir = new File(fileDir);
             //目录不存在则创建目录
             if (!dir.exists()) {
                 dir.mkdir();
             }
-            String newFilename = (long) (Math.random() * 1000000)
-                    + originalFilename.substring(originalFilename.lastIndexOf("."));
             //保存文件
-            multipartFile.transferTo(new File(GOODS_PIC_DIR + goodsId + "/" + newFilename));
+            multipartFile.transferTo(new File(fileDir + fileName));
         }
     }
 

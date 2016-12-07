@@ -28,17 +28,16 @@ public class PicController {
         response.setHeader("Access-Control-Allow-Origin", "*");
         response.setHeader("Access-Control-Allow-Credentials", "true");
         JSONObject jsonObject = new JSONObject();
-        try {
-//            String goodsIdStr = request.getParameter("godosId");
-            String goodsIdStr = "111222";
-            //XXX表单其他数据的处理
-            FIleUpload.saveImgs(goodsPics, Long.valueOf(goodsIdStr));//保存图片
-            jsonObject.put("msg", "ok");
-        } catch (Exception e) {
-            e.printStackTrace();
-            jsonObject.put("error", "提交商品出错" + e.getMessage());
-        }
-        return jsonObject;
+//        try {
+////            String goodsIdStr = request.getParameter("godosId");
+//            String goodsIdStr = "111222";
+//            //XXX表单其他数据的处理
+//            FIleUpload.saveImgs(goodsPics, Long.valueOf(goodsIdStr));//保存图片
+//            jsonObject.put("msg", "ok");
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            jsonObject.put("error", "提交商品出错" + e.getMessage());
+//        }
+//        return jsonObject;
     }
-}
 }

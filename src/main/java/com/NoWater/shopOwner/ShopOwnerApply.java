@@ -10,10 +10,12 @@ import com.NoWater.model.Shop;
 import com.NoWater.model.Status;
 import com.NoWater.util.CookieUtil;
 import com.NoWater.util.DBUtil;
+import com.NoWater.util.FIleUpload;
 import net.sf.json.JSONArray;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import redis.clients.jedis.Jedis;
 
 import net.sf.json.JSONObject;
@@ -79,6 +81,7 @@ public class ShopOwnerApply {
     public JSONObject apply(@RequestParam(value = "email", defaultValue = "/") String email,
                             @RequestParam(value = "shopName", defaultValue = "/") String shopName,
                             @RequestParam(value = "telephone", defaultValue = "/") String telephone,
+                            @RequestParam(value = "shopOwnerIdCardPhoto[]", required = false) MultipartFile[] shopOwnerIdCardPhoto,
                             HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
