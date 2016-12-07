@@ -10,8 +10,34 @@ public class Product {
     private int shop_id;
     private int class_id;
     private String product_photo_url;
-    private int default_size;
+    private int is_del;
     private long num;
+    private double price;
+    private int quantity_stock;
+
+    public int getIs_del() {
+        return is_del;
+    }
+
+    public void setIs_del(int is_del) {
+        this.is_del = is_del;
+    }
+
+    public int getQuantity_stock() {
+        return quantity_stock;
+    }
+
+    public void setQuantity_stock(int quantity_stock) {
+        this.quantity_stock = quantity_stock;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
+    public double getPrice() {
+        return price;
+    }
 
     public long getNum() {
         return num;
@@ -69,11 +95,4 @@ public class Product {
         this.product_photo_url = product_photo_url;
     }
 
-    public int getDefault_size() {
-        return default_size;
-    }
-
-    public void setDefault_size(int default_size) {
-        this.default_size = default_size;
-    }
 }
