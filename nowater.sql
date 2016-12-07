@@ -25,6 +25,8 @@ CREATE TABLE `products` (
   `product_name` varchar(1024) NOT NULL,
   `ad_photo_url` varchar(1024) DEFAULT NULL,
   `product_photo_url` varchar(1024) NOT NULL,
+  `photo_name_list` varchar(1024) NOT NULL,
+  `photo_url_list` varchar(1024) NOT NULL,
   `price` double(15, 6) NOT NULL,
   `quantity_stock` int(11) NOT NULL,
   `is_del` int(11) DEFAULT 0,
