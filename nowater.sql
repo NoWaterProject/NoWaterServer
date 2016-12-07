@@ -23,14 +23,21 @@ CREATE TABLE `products` (
   `shop_id` int(11) NOT NULL,
   `class_id` int(11) NOT NULL,
   `product_name` varchar(1024) NOT NULL,
-  `ad_photo_url` varchar(1024) DEFAULT NULL,
-  `product_photo_url` varchar(1024) NOT NULL,
-  `photo_name_list` varchar(1024) NOT NULL,
-  `photo_url_list` varchar(1024) NOT NULL,
   `price` double(15, 6) NOT NULL,
   `quantity_stock` int(11) NOT NULL,
   `is_del` int(11) DEFAULT 0,
   PRIMARY KEY (`product_id`)
+);
+
+DROP TABLE IF EXISTS `product_photo`;
+CREATE TABLE  `product_photo` (
+  `photo_id` int(11) NOT NULL AUTO_INCREMENT,
+  `file_name` varchar(1024) NOT NULL,
+  `product_id` int(11) NOT NULL,
+  `url` varchar(1024) NOT NULL,
+  `photo_type` int(11) NOT NULL,
+  `is_del` int(11) DEFAULT 0,
+  PRIMARY KEY (`photo_id`)
 );
 
 DROP TABLE IF EXISTS `class`;
