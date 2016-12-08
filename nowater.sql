@@ -13,7 +13,6 @@ CREATE TABLE `shop` (
   `email` varchar(1024) NOT NULL,
   `status` int(11) NOT NULL,
   `telephone` VARCHAR(1024) NOT NULL,
-  `shop_ad_photo_url` DEFAULT NULL,
   PRIMARY KEY (`shop_id`)
 );
 
@@ -29,11 +28,11 @@ CREATE TABLE `products` (
   PRIMARY KEY (`product_id`)
 );
 
-DROP TABLE IF EXISTS `product_photo`;
-CREATE TABLE  `product_photo` (
+DROP TABLE IF EXISTS `photo`;
+CREATE TABLE  `photo` (
   `photo_id` int(11) NOT NULL AUTO_INCREMENT,
   `file_name` varchar(1024) NOT NULL,
-  `product_id` int(11) NOT NULL,
+  `belong_id` int(11) NOT NULL,
   `url` varchar(1024) NOT NULL,
   `photo_type` int(11) NOT NULL,
   `is_del` int(11) DEFAULT 0,

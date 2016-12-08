@@ -3,7 +3,7 @@ package com.NoWater.model;
 /**
  * Created by wukai on 2016/12/7.
  */
-public class ProductPhoto {
+public class Photo {
     public void setFile_name(String file_name) {
         this.file_name = file_name;
     }
@@ -12,8 +12,8 @@ public class ProductPhoto {
         this.photo_id = photo_id;
     }
 
-    public void setProduct_id(int product_id) {
-        this.product_id = product_id;
+    public void setProduct_id(int belong_id) {
+        this.belong_id = belong_id;
     }
 
     public void setUrl(String url) {
@@ -30,7 +30,7 @@ public class ProductPhoto {
     }
 
     public int getProduct_id() {
-        return product_id;
+        return belong_id;
     }
 
     public String getUrl() {
@@ -39,7 +39,7 @@ public class ProductPhoto {
 
     private String file_name;
     private int photo_id;
-    private int product_id;
+    private int belong_id;
     private String url;
 
     public int getPhoto_type() {
