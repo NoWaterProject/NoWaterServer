@@ -1,4 +1,4 @@
-package com.NoWater.customer;
+package com.NoWater.util;
 
 import java.util.Date;
 import java.util.Properties;
@@ -13,29 +13,26 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 
-/**
- * 
- * @author Qixuan.Chen
- */
 public class SendEmail {
 
     public static final String HOST = "smtp.sina.com";
-    public static final String PROTOCOL = "smtp";   
+    public static final String PROTOCOL = "smtp";
     public static final int PORT = 25;
-    public static final String FROM = "nowater_project@sina.com";//发件人的email
-    public static final String PWD = "nowaterproject";//发件人密码
+    public static final String FROM = "nowater_project@sina.com"; //发件人的email
+    public static final String PWD = "nowaterproject"; //发件人密码
 
     /**
      * 获取Session
+     *
      * @return
      */
     private static Session getSession() {
         Properties props = new Properties();
-        props.put("mail.smtp.host", HOST);//设置服务器地址
-        props.put("mail.store.protocol" , PROTOCOL);//设置协议
-        props.put("mail.smtp.port", PORT);//设置端口
-        props.put("mail.smtp.auth" , true);
-        props.put("mail.smtp.starttls.enable","true");
+        props.put("mail.smtp.host", HOST); //设置服务器地址
+        props.put("mail.store.protocol", PROTOCOL); //设置协议
+        props.put("mail.smtp.port", PORT); //设置端口
+        props.put("mail.smtp.auth", true);
+        props.put("mail.smtp.starttls.enable", "true");
 
         Authenticator authenticator = new Authenticator() {
 
@@ -45,15 +42,15 @@ public class SendEmail {
             }
 
         };
-        Session session = Session.getDefaultInstance(props , authenticator);
+        Session session = Session.getDefaultInstance(props, authenticator);
 
         return session;
     }
 
-    public static void send(String toEmail , String content) {
+    public static void send(String toEmail, String content) {
         Session session = getSession();
         try {
-            System.out.println("--send--"+content);
+            System.out.println("--send--" + content);
             // Instantiate a message
             Message msg = new MimeMessage(session);
 
@@ -63,21 +60,13 @@ public class SendEmail {
             msg.setRecipients(Message.RecipientType.TO, address);
             msg.setSubject("账号激活邮件");
             msg.setSentDate(new Date());
-            msg.setContent(content , "text/html;charset=utf-8");
+            msg.setContent(content, "text/html;charset=utf-8");
 
             //Send the message
             Transport.send(msg);
-        }
-        catch (MessagingException mex) {
+        } catch (MessagingException mex) {
             mex.printStackTrace();
         }
     }
-
-//    public static void main(String[] args)
-//{
-//      SendEmail t1=new SendEmail();
-//      t1.send("1040356809@qq.com","lalala");
-//}
-
 
 }
