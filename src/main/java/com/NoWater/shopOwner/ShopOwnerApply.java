@@ -2,15 +2,10 @@ package com.NoWater.shopOwner;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.atomic.AtomicLong;
 
-import com.NoWater.model.Admin;
 import com.NoWater.model.Shop;
-import com.NoWater.model.Status;
 import com.NoWater.util.CookieUtil;
 import com.NoWater.util.DBUtil;
-import com.NoWater.util.FIleUpload;
 import net.sf.json.JSONArray;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
