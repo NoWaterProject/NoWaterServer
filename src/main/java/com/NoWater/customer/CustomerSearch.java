@@ -18,8 +18,8 @@ import java.util.*;
 @RestController
 public class CustomerSearch {
     @RequestMapping("customer/product/search")
-    public JSONArray productSearch(@RequestParam(value = "keyWord", defaultValue = "/") String keyWord,
-                                   @RequestParam(value = "count",defaultValue = "/") int count,
+    public JSONObject productSearch(@RequestParam(value = "keyWord", defaultValue = "/") String keyWord,
+                                   @RequestParam(value = "count", defaultValue = "/") int count,
                                    @RequestParam(value = "shopId", required = false, defaultValue = "0") int shopId,
                                    @RequestParam(value = "startId", required = false, defaultValue = "0") int startId,
                                    HttpServletResponse response) throws Exception {
@@ -27,7 +27,7 @@ public class CustomerSearch {
         response.setHeader("Access-Control-Allow-Credentials", "true");
 
         JSONArray jsonArray = new JSONArray();
-        List<Product> productsList = new ArrayList<Product>();
+        List<Product> productsList;
         int actualCount = 0;
         int endId = startId;
         DBUtil db = new DBUtil();
@@ -36,12 +36,12 @@ public class CustomerSearch {
         String sql = null;
 
         if (shopId != 0) {                                             //店铺搜索
-            sql = "select * from products where product_name like ? and shop_id = ? order by product_id desc";
+            sql = "select * from products where product_name like ? and shop_id = ? and is_del = 0 order by product_id desc";
             list.add(keyWords);
             list.add(shopId);
             productsList = db.queryInfo(sql, list, Product.class);
         } else {                                                     //全站搜索
-            sql = "select * from products where product_name like ? order by product_id desc";
+            sql = "select * from products where product_name like ? and is_del = 0 order by product_id desc";
             list.add(keyWords);
             productsList = db.queryInfo(sql, list, Product.class);
         }
@@ -52,36 +52,33 @@ public class CustomerSearch {
             if (actualCount != 0) {                                 //查到数据
                 if ((actualCount - startId > 0) && (actualCount - startId <= count)) {        //数据到最后一页
                     JSONObject jsonObject = new JSONObject();
-                    jsonObject.put("status", 400);
+                    jsonObject.put("status", 200);
                     jsonObject.put("endId", -1);
                     jsonObject.put("actualCount", actualCount);
-                    jsonArray.add(jsonObject);
-                    jsonArray.add(JSONArray.fromObject(productsList.subList(startId, actualCount)));
-                    return jsonArray;
-                }else {                                            //数据没到最后一页
+                    jsonObject.put("data", JSONArray.fromObject(productsList));
+                    return jsonObject;
+                } else {                                            //数据没到最后一页
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put("status", 200);
                     jsonObject.put("endId", startId + count);
                     jsonObject.put("actualCount", actualCount);
                     jsonArray.add(jsonObject);
                     jsonArray.add(JSONArray.fromObject(productsList.subList(startId, startId + count)));
-                    return jsonArray;
+                    return jsonObject;
                 }
-            }else {                                                  //没查到数据，endId返回-1
+            } else {                                                  //没查到数据，endId返回-1
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("status", 200);
                 jsonObject.put("endId", -1);
                 jsonObject.put("actualCount", actualCount);
-                jsonArray.add(jsonObject);
-                return jsonArray;
+                jsonObject.put("data", "[]");
+                return jsonObject;
             }
-        }else {
+        } else {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("status", 400);
             jsonObject.put("endId", -1);
-            jsonObject.put("actualCount", actualCount);
-            jsonArray.add(jsonObject);
-            return jsonArray;
+            return jsonObject;
         }
     }
 }
