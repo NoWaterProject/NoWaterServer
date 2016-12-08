@@ -34,7 +34,8 @@ public class ShopOwnerProduct {
         response.setHeader("Access-Control-Allow-Credentials", "true");
         String token = CookieUtil.getCookieValueByName(request, "token");
         JSONObject jsonObject = new JSONObject();
-        int actualCount = 0, endId = 0;
+        int actualCount;
+        int endId;
 
         if (token == null) {
             jsonObject.put("status", 300);
@@ -69,8 +70,11 @@ public class ShopOwnerProduct {
                         List<Product> productListCount = db.queryInfo(sqlNoSearchKey, list, Product.class);
                         int num = (int) productListCount.get(0).getNum();
 
-                        String queryProductInfo = "select * from products where shop_id = ? and product_id <= ? order by product_id asc";
-                        List<Product> productListInfo = db.queryInfo(queryProductInfo, list, Product.class);
+                        String queryProductNotDel = "select * from products where shop_id = ? and product_id <= ? and `is_del` = 0 order by product_id asc";
+                        String queryProductDel = "select * from products where shop_id = ? and product_id <= ? and `is_del` = 1 order by product_id asc";
+                        List<Product> productListInfo = db.queryInfo(queryProductNotDel, list, Product.class);
+                        List<Product> productListDel = db.queryInfo(queryProductDel, list, Product.class);
+                        productListInfo.addAll(productListDel);
 
                         if (num > count) {
                             actualCount = count;
@@ -80,15 +84,15 @@ public class ShopOwnerProduct {
                                 jsonArray.add(jsonObject1);
                             }
                             endId = productListInfo.get(actualCount).getProduct_id();
-                            jsonObject.put("actualCount", actualCount);
                             jsonObject.put("endId", endId);
                             jsonObject.put("data", jsonArray);
                         } else {
                             actualCount = num;
-                            jsonObject.put("actualCount", actualCount);
                             jsonObject.put("endId", -1);
                             jsonObject.put("data", JSONArray.fromObject(productListInfo));
                         }
+                        jsonObject.put("status", 200);
+                        jsonObject.put("actualCount", actualCount);
                     }
                 } else {
                     jsonObject.put("status", 300);
