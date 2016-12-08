@@ -15,11 +15,11 @@ import java.io.IOException;
 
 public class FIleUpload {
 
-    public static int handleFile(MultipartFile[] picturefile, String fileDir, String fileName) {
+    public static int handleFile(MultipartFile[] pictureFile, String fileDir, String fileName) {
         try {
-            int state = saveImgs(picturefile, fileDir, fileName);  //保存图片
+            int state = saveImgs(pictureFile, fileDir, fileName);  //保存图片
             if (state == -1) {
-                return -1
+                return -1;
             } else {
 
             }
@@ -29,20 +29,18 @@ public class FIleUpload {
         }
     }
 
-    public static int saveImgs(MultipartFile[] picturefile, String fileDir, String fileName) throws IllegalStateException, IOException {
-        if (picturefile == null || picturefile.length <= 0) {//数组无图片
+    public static int saveImgs(MultipartFile[] pictureFile, String fileDir, String fileName) throws IllegalStateException, IOException {
+        if (pictureFile == null || pictureFile.length <= 0) {//数组无图片
             return -1;
         }
-        for (MultipartFile multipartFile : picturefile) {
+        for (MultipartFile multipartFile : pictureFile) {
             saveImg(multipartFile, fileDir, fileName);
         }
+
     }
 
     /**
      * 保存单张图片
-     *
-     * @param multipartFile     the file array
-     * @author Nifury
      */
     private static void saveImg(MultipartFile multipartFile, String fileDir, String fileName) throws IllegalStateException, IOException {
         if (multipartFile != null && multipartFile.getSize() > 0) {
