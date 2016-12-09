@@ -26,7 +26,7 @@ import java.util.ArrayList;
 @RestController
 public class PictureUpload {
     /**
-     * 添加新的Goods
+     * 上传图片
      */
     @RequestMapping(value = "/picture/upload", method = RequestMethod.POST)
     public JSONObject add(HttpServletResponse response, HttpServletRequest request,
@@ -37,32 +37,21 @@ public class PictureUpload {
         JSONObject jsonObject = new JSONObject();
 
         String uuid = CookieUtil.getCookieValueByName(request, "token");
-        if (uuid != null) {
-            Jedis jedis = new Jedis("127.0.0.1", 6379);
-            String userId = jedis.get(uuid);
-            if (userId == null) {
-                LogHelper.info("user not login.");
-                jsonObject.put("status", 300);
-            } else {
-                String realToken = jedis.get(userId);
-                if (realToken.equals(uuid)) {
-                    try {
-                        ArrayList<String> filenameList = FileUpload.handleFile(PictureFile, userId); //保存图片
-                        jsonObject.put("status", 200);
-                        jsonObject.put("data", JSONArray.fromObject(filenameList));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        jsonObject.put("status", 400);
-                    }
-                } else {
-                    LogHelper.info("user not login.");
-                    jsonObject.put("status", 300);
-                }
-            }
-        } else {
-            LogHelper.info("user not login.");
+        String userId = CookieUtil.confirmUser(uuid);
+        if (userId == null) {
             jsonObject.put("status", 300);
+            return jsonObject;
         }
+
+        try {
+            ArrayList<String> filenameList = FileUpload.handleFile(PictureFile, userId);    //保存图片
+            jsonObject.put("status", 200);
+            jsonObject.put("data", JSONArray.fromObject(filenameList));
+        } catch (Exception e) {
+            e.printStackTrace();
+            jsonObject.put("status", 400);
+        }
+
         return jsonObject;
     }
 }
