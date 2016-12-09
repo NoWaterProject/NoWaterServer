@@ -49,7 +49,6 @@ public class CustomerRegister {
                     status = 400; //电话号码不合格
                     jsonObject.put("status", status);
                 } else {
-                    //// TODO: 2016/11/28 0028 address判断
                     String[] addRess1 = NoWaterProperties.getAddress();
                     String[][] addRess2 = NoWaterProperties.getAddress2();
                     int addressStatus = 0;
