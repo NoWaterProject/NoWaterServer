@@ -3,20 +3,18 @@ package com.NoWater.util;
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.request.DelFileRequest;
 import com.qcloud.cos.request.UploadFileRequest;
-import com.qcloud.cos.sign.Credentials;
 import net.sf.json.JSONObject;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /**
  * Created by 李鹏飞 on 2016/12/5 0005.
  */
 
-public class FileUpload {
+public final class FileUpload {
 
     public static ArrayList<String> handleFile(MultipartFile[] pictureFile, String fileDir) {
         try {
