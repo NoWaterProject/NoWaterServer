@@ -30,41 +30,37 @@ public class CustomerIsLogin {
         response.setHeader("Access-Control-Allow-Credentials", "true");
         JSONObject jsonObject = new JSONObject();
         String uuid = CookieUtil.getCookieValueByName(request, "token");
-        if (uuid != null) {
-            jedis = new Jedis("127.0.0.1", 6379);
-            String user_id = jedis.get(uuid);
-            if (user_id == null) {
-                jsonObject.put("status", 300);
-            } else if (uuid.equals(jedis.get(user_id))) {
-                jsonObject.put("status", 200);
+        String user_id = CookieUtil.confirmUser(uuid);
 
-                List<Object> list = new ArrayList<Object>();
-                DBUtil db = new DBUtil();
-                StringBuffer sql = new StringBuffer();
-                sql.append("SELECT name FROM `user` WHERE user_id  = ? ");
-                list.add(user_id);
-                List<Cart> cartList = db.queryInfo(sql.toString(), list, Cart.class);
-                String name = cartList.get(0).getName();
-
-                List<Object> list1 = new ArrayList<Object>();
-                DBUtil db1 = new DBUtil();
-                StringBuffer sql1 = new StringBuffer();
-                sql1.append("SELECT COUNT(1) cartNum FROM cart WHERE user_id = ? ");
-                list1.add(user_id);
-                List<Cart> cartList1 = db1.queryInfo(sql1.toString(), list1, Cart.class);
-                int cartNum = (int) cartList1.get(0).getCartNum();
-
-                JSONObject userInformation = new JSONObject();
-                userInformation.put("name", name);
-                userInformation.put("cartNum", cartNum);
-                JSONArray jsonArray = new JSONArray();
-                jsonArray.add(0, userInformation);
-                jsonObject.put("userInformation", jsonArray);
-            } else {
-                jsonObject.put("status", 300);
-            }
-        } else
+        if (user_id == null) {
             jsonObject.put("status", 300);
+            return jsonObject;
+        }
+
+        jsonObject.put("status", 200);
+
+        List<Object> list = new ArrayList<>();
+        DBUtil db = new DBUtil();
+        StringBuffer sql = new StringBuffer();
+        sql.append("SELECT name FROM `user` WHERE user_id = ?");
+        list.add(user_id);
+        List<User> nameList = db.queryInfo(sql.toString(), list, User.class);
+        String name = nameList.get(0).getName();
+
+        List<Object> list1 = new ArrayList<>();
+        DBUtil db1 = new DBUtil();
+        StringBuffer sql1 = new StringBuffer();
+        sql1.append("SELECT COUNT(1) cartNum FROM cart WHERE user_id = ? ");
+        list1.add(user_id);
+        List<Cart> cartList1 = db1.queryInfo(sql1.toString(), list1, Cart.class);
+        int cartNum = (int) cartList1.get(0).getCartNum();
+
+        JSONObject userInformation = new JSONObject();
+        userInformation.put("name", name);
+        userInformation.put("cartNum", cartNum);
+        JSONArray jsonArray = new JSONArray();
+        jsonArray.add(0, userInformation);
+        jsonObject.put("userInformation", jsonArray);
 
         return jsonObject;
     }

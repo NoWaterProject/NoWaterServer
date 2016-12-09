@@ -20,6 +20,26 @@ public final class NoWaterProperties {
             {"Chek Lap Kok", "Chinese University", "Clear Water Bay", "Discovery Bay", "Fairview Park", "Fanling", "Fo Tan", "HKUST", "Kwai Chung", "Long Ping", "Ma On Shan", "Ma Wan", "Pat Heung", "Sai Kung (North)", "Sai Kung (South)", "Science Park", "Sha Tin", "Sheung Shui", "Siu Lek Yuen", "Tai Po", "Tai Wai", "Tin Shui Wai", "Tseung Kwan O", "Tsing Yi", "Tsuen Wan", "Tuen Mun", "Tung Chung", "Wu Kai Sha", "Yuen Long"},
             {"Aberdeen", "Admiralty", "Ap Lei Chau", "Big Wave Bay", "Causeway Bay", "Central", "Central Sheung Wan", "Central South", "Chai Wan", "Gloucester Road", "Happy Valley", "Harbour Road", "Jardine's Lookout", "Kennedy Town", "Lai Tak Tsuen", "Mid-Levels", "Mid-Levels West", "North Point", "Pok Fu Lam", "Quarry Bay", "Sai Wan", "Shau Kei Wan", "Shek O", "Sheung Wan West", "Siu Sai Wan", "So Kon Po", "Southern District", "Stanley", "Tai Hang Road", "The Peak", "Tim Mei Ave", "Tin Hau", "Wah Fu", "Wan Chai", "Wong Chuk Hang"}
     };
+    private static String cos_appId;
+    private static String cos_secretId;
+    private static String cos_bucketName;
+    private static String cos_secretKey;
+
+    public static String getCos_appId() {
+        return cos_appId;
+    }
+
+    public static String getCos_secretId() {
+        return cos_secretId;
+    }
+
+    public static String getCos_secretKey() {
+        return cos_secretKey;
+    }
+
+    public static String getCos_bucketName() {
+        return cos_bucketName;
+    }
 
     public static String[] getAddress() {
         return address;
@@ -50,6 +70,10 @@ public final class NoWaterProperties {
             db_user = prop.getProperty("database.user").trim();
             db_password = prop.getProperty("database.password").trim();
             db_url = prop.getProperty("database.url").trim();
+            cos_appId = prop.getProperty("cos.appId").trim();
+            cos_secretId = prop.getProperty("cos.secretId").trim();
+            cos_secretKey = prop.getProperty("cos.secretKey").trim();
+            cos_bucketName = prop.getProperty("cos.bucketName").trim();
         } catch (IOException e) {
             e.printStackTrace();
         }

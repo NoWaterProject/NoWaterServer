@@ -61,7 +61,7 @@ CREATE TABLE `comment_product` (
   `comment_content` varchar(1024) NOT NULL,
   `user_id` int(11) NOT NULL,
   `user_name` varchar(1024) NOT NULL,
-  `product_id` varchar()
+  `product_id` int(11) NOT NULL,
   PRIMARY KEY (`comment_id`)
 );
 
