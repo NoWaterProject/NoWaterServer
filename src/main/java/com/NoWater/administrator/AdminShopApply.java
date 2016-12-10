@@ -1,6 +1,7 @@
 package com.NoWater.administrator;
 
 import com.NoWater.model.Admin;
+import com.NoWater.model.Photo;
 import com.NoWater.model.Shop;
 import com.NoWater.util.CookieUtil;
 import com.NoWater.util.DBUtil;
@@ -39,7 +40,7 @@ public class AdminShopApply {
 
             if (token.equals(realToken)) {
                 // 获取管理员用户名
-                List<Object> list = new ArrayList<Object>();
+                List<Object> list = new ArrayList<>();
                 DBUtil db = new DBUtil();
                 String sql = "select * from admin";
                 try {
@@ -56,7 +57,19 @@ public class AdminShopApply {
                             if (shopApplyList.size() == 0) {
                                 jsonObject.put("data", "{}");
                             } else {
-                                jsonObject.put("data", JSONArray.fromObject(shopApplyList));
+                                JSONArray jsonArray = new JSONArray();
+                                for (int i = 0; i < shopApplyList.size(); i++) {
+                                    JSONObject itemObject = JSONObject.fromObject(shopApplyList.get(i));
+
+                                    String getPhotoSQL = "select * from photo where belong_id = ? and photo_type = ?";
+                                    List<Object> getPhotoList = new ArrayList<>();
+                                    getPhotoList.add(shopApplyList.get(i).getOwnerId());
+                                    getPhotoList.add(4);
+                                    List<Photo> photoList = db.queryInfo(getPhotoSQL, getPhotoList, Photo.class);
+
+                                    itemObject.put("photo", JSONArray.fromObject(photoList));
+                                    jsonArray.add(itemObject);
+                                }
                             }
                         } catch (Exception e) {
                             LogHelper.error(e.toString());
@@ -113,8 +126,8 @@ public class AdminShopApply {
 
                         if (hasShopId.size() == 0) {
                             jsonObject.put("status", 500);  // don't have this shopId
-                        } else if (hasShopId.get(0).getStatus() == 1 || hasShopId.get(0).getStatus() == -1) {
-                            jsonObject.put("status", 600);  // shopId has handle
+                        } else if (hasShopId.get(0).getStatus() == 1 || hasShopId.get(0).getStatus() == -1 || hasShopId.get(0).getStatus() == 2) {
+                            jsonObject.put("status", 600);  // shopId has handle or email isn't confirm
                         } else {
                             String handleSQL = "update `shop` set `status` = ? where `shop_id` = ?";
                             List<Object> listHandle = new ArrayList<>();

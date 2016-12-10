@@ -7,6 +7,7 @@ import com.NoWater.model.Photo;
 import com.NoWater.model.Shop;
 import com.NoWater.util.*;
 import net.sf.json.JSONArray;
+import org.apache.commons.collections.ArrayStack;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -59,6 +60,11 @@ public class ShopOwnerApply {
                 if (ttl == -2) {
                     jsonObject.put("status", 600);              //超时
 
+                    List<Object> listUpdate = new ArrayList<>();
+                    listUpdate.add(user_id);
+                    String sqlUpdate = "update `shop` set `status`=-1 where `owner_id` = ?";
+                    db.insertUpdateDeleteExute(sqlUpdate, listUpdate);
+
                 } else if (ttl == -1) {
                     jedis.expire(user_id + "email", 86400);     //没有设置上超时
                     jsonObject.put("status", 700);              //处于邮箱验证阶段，请用户验证邮箱
@@ -71,6 +77,12 @@ public class ShopOwnerApply {
             ownerList.add(user_id);
             List<Shop> shopInfo = db.queryInfo(sqlGetInfo, ownerList, Shop.class);
             jsonObject.put("data", JSONArray.fromObject(shopInfo));
+
+            String getPhotoSQL = "select * from photo where belong_id = ? and photo_type = 4";
+            List<Object> getPhotoList = new ArrayList<>();
+            getPhotoList.add(user_id);
+            List<Photo> photoList = db.queryInfo(getPhotoSQL, getPhotoList, Photo.class);
+            jsonObject.put("photo", JSONArray.fromObject(photoList));
         } else {
             jsonObject.put("status", 400);      //数据库中找不到卖家，用户未申请
         }
@@ -173,16 +185,31 @@ public class ShopOwnerApply {
                 String path = "/tmp/" + user_id + "/" + fileName;
                 LogHelper.info("addFile:" + path);
                 String cmd = "/usr/bin/python /root/src/base/COS_API.py upload " + "/" + fileName + " " + path + " > /root/py_cos.log";
-                LogHelper.info("cmd:" + cmd);
+                LogHelper.info("add file cmd:" + cmd);
                 Process proc = Runtime.getRuntime().exec(cmd);
                 proc.waitFor();
+
+                List<Object> insertPhoto = new ArrayList<>();
+                insertPhoto.add(fileName);
+                insertPhoto.add(user_id);
+                insertPhoto.add("http://koprvhdix117-10038234.file.myqcloud.com/" + fileName);
+                insertPhoto.add(4);
+                String insertPhotoSQL = "insert into `photo` (file_name, belong_id, url, photo_type) values (?, ?, ?, ?)";
+                db.insertUpdateDeleteExute(insertPhotoSQL, insertPhoto);
             }
             // 从对象存储器中删除
             for (int i = 0; i < deleteFileNameList.size(); i++) {
+                String fileName = addFileNameList.get(i);
                 String path = "/" + deleteFileNameList.get(i);
                 String cmd = "/usr/bin/python /root/src/base/COS_API.py delete " + path + " > /root/py_cos.log";
+                LogHelper.info("delete cmd:" + cmd);
                 Process proc = Runtime.getRuntime().exec(cmd);
                 proc.waitFor();
+
+                String deleteSQL = "update `photo` set `is_del` = 1 where `file_name` = ?";
+                List<Object> deleteFile = new ArrayList<>();
+                deleteFile.add(fileName);
+                db.insertUpdateDeleteExute(deleteSQL, deleteFile);
             }
 
             // 邮箱验证

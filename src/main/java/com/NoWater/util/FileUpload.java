@@ -66,36 +66,4 @@ public final class FileUpload {
         }
         return "";
     }
-
-    public static void UploadCOS(String localPath, String fileName) {
-        int appId = 10038234;
-        String secretId = "AKIDkTQGMuCeJvtTTlqg911BfF393ghumqHp";
-        String secretKey = "ZE1uBa6jfbsB0vVyfbWhw5JuZKPwaEwh";
-        String bucketName = "koprvhdix117";
-
-        COSClient cosClient = new COSClient(appId, secretId, secretKey);
-
-        UploadFileRequest uploadFileRequest = new UploadFileRequest(bucketName, "/" + fileName, localPath);
-        String uploadFileRet = cosClient.uploadFile(uploadFileRequest);
-
-        LogHelper.info(bucketName + "\t"+ secretId + "\t" + secretKey);
-        JSONObject jsonObject = JSONObject.fromObject(uploadFileRet);
-        LogHelper.info("COS Return:" + jsonObject.toString());
-//        return jsonObject.getInt("code");
-    }
-
-    public static void DeleteCOS(String fileName) {
-        int appId = Integer.parseInt(NoWaterProperties.getCos_appId());
-        String secretId = NoWaterProperties.getCos_secretId();
-        String secretKey = NoWaterProperties.getCos_secretKey();
-        String bucketName = NoWaterProperties.getCos_bucketName();
-
-        COSClient cosClient = new COSClient(appId, secretId, secretKey);
-        
-        DelFileRequest delFileRequest = new DelFileRequest(bucketName, "/" + fileName);
-        String delFileRet = cosClient.delFile(delFileRequest);
-        JSONObject jsonObject = JSONObject.fromObject(delFileRet);
-        LogHelper.info("COS Return:" + jsonObject.toString());
-//        return jsonObject.getInt("code");
-    }
 }
