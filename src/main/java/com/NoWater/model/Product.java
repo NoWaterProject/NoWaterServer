@@ -14,6 +14,7 @@ public class Product {
     private long num;
     private double price;
     private int quantity_stock;
+    private String class_name;
 
     public int getIs_del() {
         return is_del;
@@ -95,4 +96,11 @@ public class Product {
         this.product_photo_url = product_photo_url;
     }
 
+    public String getClass_name() {
+        return class_name;
+    }
+
+    public void setClass_name(String class_name) {
+        this.class_name = class_name;
+    }
 }
