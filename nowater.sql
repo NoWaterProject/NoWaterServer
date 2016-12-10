@@ -46,6 +46,13 @@ CREATE TABLE `class` (
   PRIMARY KEY (`class_id`)
 );
 
+DROP TABLE IF EXISTS `favorite` ;
+CREATE TABLE `favorite` (
+  `user_id` int(11) NOT NULL ,
+  `type` int(11) NOT NULL ,
+  `id` int(11) NOT NULL ,
+);
+
 DROP TABLE IF EXISTS `cart`;
 CREATE TABLE `cart` (
   `cart_id` int(11) NOT NULL AUTO_INCREMENT,
