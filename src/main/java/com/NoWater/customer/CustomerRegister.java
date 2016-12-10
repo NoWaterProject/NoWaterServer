@@ -26,6 +26,7 @@ public class CustomerRegister {
                                @RequestParam(value = "address1", defaultValue = "/") String address1,
                                @RequestParam(value = "address2", defaultValue = "/") String address2,
                                @RequestParam(value = "address3", defaultValue = "/") String address3,
+                               @RequestParam(value = "postCode", defaultValue = "710126") String postCode,
                                HttpServletResponse response) throws Exception {
         response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
         response.setHeader("Access-Control-Allow-Credentials", "true");
@@ -68,13 +69,14 @@ public class CustomerRegister {
                         List<Object> list1 = new ArrayList<Object>();
                         DBUtil db1 = new DBUtil();
                         StringBuffer sql1 = new StringBuffer();
-                        sql1.append("insert into user (name,password,telephone,address1,address2,address3) values (?,?,?,?,?,?)");
+                        sql1.append("insert into user (name,password,telephone,address1,address2,address3,postCode) values (?,?,?,?,?,?,?)");
                         list1.add(name);
                         list1.add(password);
                         list1.add(telephone);
                         list1.add(address1);
                         list1.add(address2);
                         list1.add(address3);
+                        list1.add(postCode);
                         db1.insertUpdateDeleteExute(sql1.toString(), list1);
                         status = 200;
                         jsonObject.put("status", status);

@@ -117,7 +117,7 @@ public class AdminShopApply {
                             jsonObject.put("status", 600);  // shopId has handle
                         } else {
                             String handleSQL = "update `shop` set `status` = ? where `shop_id` = ?";
-                            List<Object> listHandle = new ArrayList<Object>();
+                            List<Object> listHandle = new ArrayList<>();
                             listHandle.add(behavior);
                             listHandle.add(shopId);
                             db.insertUpdateDeleteExute(handleSQL, listHandle);
