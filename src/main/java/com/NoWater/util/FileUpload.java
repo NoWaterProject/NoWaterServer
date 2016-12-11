@@ -1,14 +1,17 @@
 package com.NoWater.util;
 
+import com.NoWater.model.Photo;
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.request.DelFileRequest;
 import com.qcloud.cos.request.UploadFileRequest;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by 李鹏飞 on 2016/12/5 0005.
@@ -65,5 +68,98 @@ public final class FileUpload {
             return fileName + extensions;
         }
         return "";
+    }
+
+    public static int UploadToCOS(ArrayList<String> addFileNameList, String belong_id, int photoType) {
+        for(int i = 0; i < addFileNameList.size(); i++) {
+            String fileName = addFileNameList.get(i);
+            String path = "/tmp/" + user_id + "/" + fileName;
+            LogHelper.info("addFile:" + path);
+            String cmd = "/usr/bin/python /root/src/base/COS_API.py upload " + "/" + fileName + " " + path + " > /root/py_cos.log";
+            LogHelper.info("add file cmd:" + cmd);
+            try {
+                Process proc = Runtime.getRuntime().exec(cmd);
+                proc.waitFor();
+            } catch (Exception e) {
+                e.printStackTrace();
+                return -1;
+            }
+
+            DBUtil db = new DBUtil();
+            List<Object> insertPhoto = new ArrayList<>();
+            insertPhoto.add(fileName);
+            insertPhoto.add(belong_id);
+            insertPhoto.add("http://koprvhdix117-10038234.file.myqcloud.com/" + fileName);
+            insertPhoto.add(photoType);
+            String insertPhotoSQL = "insert into `photo` (file_name, belong_id, url, photo_type) values (?, ?, ?, ?)";
+            db.insertUpdateDeleteExute(insertPhotoSQL, insertPhoto);
+        }
+        return 1;
+    }
+
+    public static int DeleteFileCOS(ArrayList<String> deleteFileNameList, ) {
+        for (int i = 0; i < deleteFileNameList.size(); i++) {
+            String fileName = deleteFileNameList.get(i);
+            String path = "/" + deleteFileNameList.get(i);
+            String cmd = "/usr/bin/python /root/src/base/COS_API.py delete " + path + " > /root/py_cos.log";
+            LogHelper.info("delete cmd:" + cmd);
+            try {
+                Process procDelete = Runtime.getRuntime().exec(cmd);
+                procDelete.waitFor();
+            } catch (Exception e) {
+                e.printStackTrace();
+                return -2;
+            }
+
+            DBUtil db = new DBUtil();
+            String deleteSQL = "update `photo` set `is_del` = 1 where `file_name` = ?";
+            List<Object> deleteFile = new ArrayList<>();
+            deleteFile.add(fileName);
+            db.insertUpdateDeleteExute(deleteSQL, deleteFile);
+        }
+        return 1;
+    }
+
+    public static ArrayList<String> jsonToArrayList(String jsonString) {
+        JSONArray jsonArray = JSONArray.fromObject(jsonString);
+        int jsonArraySize = jsonArray.size();
+        ArrayList<String> returnFileName = new ArrayList<>();
+        for (int i = 0; i < jsonArraySize; i++) {
+            String fileName = jsonArray.getString(i);
+            returnFileName.add(fileName);
+        }
+        return returnFileName;
+    }
+
+    public static int fileExists(String belong_id, ArrayList<String> fileNameList) {
+        for (int i = 0; i < fileNameList.size(); i++) {
+            String fileName = fileNameList.get(i);
+            String path = "/tmp/" + belong_id + "/" + fileName;
+            File dir = new File(path);
+            if (!dir.exists()) {
+                return -4;
+            }
+        }
+        return 0;
+    }
+
+    public static ArrayList<String> dbFileNameList(String belong_id, int photoType) {
+        String fileNameSQL = "select file_name from photo where belong_id = ? and is_del = 0 and photo_type = ?";
+        List<Object> getFileNameList = new ArrayList<>();
+        getFileNameList.add(belong_id);
+        getFileNameList.add(photoType);
+        DBUtil db = new DBUtil();
+        List<Photo> dbFileList;
+        try {
+            dbFileList = db.queryInfo(fileNameSQL, getFileNameList, Photo.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        ArrayList<String> deleteFileNameList = new ArrayList<>();
+        for (int i = 0; i < dbFileList.size(); i++) {
+            deleteFileNameList.add(dbFileList.get(i).getFile_name());
+        }
+        return deleteFileNameList;
     }
 }

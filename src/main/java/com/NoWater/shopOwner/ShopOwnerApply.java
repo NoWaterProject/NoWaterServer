@@ -145,71 +145,33 @@ public class ShopOwnerApply {
         } else {
             int shop_status = 2;            //插入申请，正在成为卖家
 
-            JSONArray jsonArray = JSONArray.fromObject(fileNameList);
-            int jsonArraySize = jsonArray.size();
-            ArrayList<String> unionFileName = new ArrayList<>();
-            ArrayList<String> addFileNameList = new ArrayList<>();
-            for (int i = 0; i < jsonArraySize; i++) {
-                String fileName = jsonArray.getString(i);
-                addFileNameList.add(fileName);
-                unionFileName.add(fileName);
-            }
+            ArrayList<String> unionFileName = FileUpload.jsonToArrayList(fileNameList);
+            ArrayList<String> addFileNameList = FileUpload.jsonToArrayList(fileNameList);
             LogHelper.info("add:" + addFileNameList.toString());
 
-            String fileNameSQL = "select file_name from photo where belong_id = ? and is_del = 0 and photo_type = 4";
-            List<Object> getFileNameList = new ArrayList<>();
-            getFileNameList.add(String.valueOf(user_id));
-            List<Photo> dbFileList = db.queryInfo(fileNameSQL, getFileNameList, Photo.class);
-            ArrayList<String> deleteFileNameList = new ArrayList<>();
-            for (int i = 0; i < dbFileList.size(); i++) {
-                deleteFileNameList.add(dbFileList.get(i).getFile_name());
-            }
-
+            ArrayList<String> deleteFileNameList = FileUpload.dbFileNameList(user_id, 3);
             // 求差集，获得需要添加的和需要删除的fileName
             addFileNameList.removeAll(deleteFileNameList);
             deleteFileNameList.removeAll(unionFileName);
 
-            for (int i = 0; i < addFileNameList.size(); i++) {
-                String fileName = addFileNameList.get(i);
-                String path = "/tmp/" + user_id + "/" + fileName;
-                File dir = new File(path);
-                if (!dir.exists()) {
-                    jsonObject.put("status", 1000);     //图片不存在，error
-                    return jsonObject;
-                }
+            int status = FileUpload.fileExists(user_id, addFileNameList);
+            if (status == -4) {
+                jsonObject.put("status", 1040);
+                return jsonObject;
             }
 
             // 添加到对象存储器
-            for (int i = 0; i < addFileNameList.size(); i++) {
-                String fileName = addFileNameList.get(i);
-                String path = "/tmp/" + user_id + "/" + fileName;
-                LogHelper.info("addFile:" + path);
-                String cmd = "/usr/bin/python /root/src/base/COS_API.py upload " + "/" + fileName + " " + path + " > /root/py_cos.log";
-                LogHelper.info("add file cmd:" + cmd);
-                Process proc = Runtime.getRuntime().exec(cmd);
-                proc.waitFor();
-
-                List<Object> insertPhoto = new ArrayList<>();
-                insertPhoto.add(fileName);
-                insertPhoto.add(user_id);
-                insertPhoto.add("http://koprvhdix117-10038234.file.myqcloud.com/" + fileName);
-                insertPhoto.add(4);
-                String insertPhotoSQL = "insert into `photo` (file_name, belong_id, url, photo_type) values (?, ?, ?, ?)";
-                db.insertUpdateDeleteExute(insertPhotoSQL, insertPhoto);
+            status = FileUpload.UploadToCOS(addFileNameList, user_id, 3);
+            if (status == -1) {
+                jsonObject.put("status", 1010);         //上传失败
+                return jsonObject;
             }
-            // 从对象存储器中删除
-            for (int i = 0; i < deleteFileNameList.size(); i++) {
-                String fileName = addFileNameList.get(i);
-                String path = "/" + deleteFileNameList.get(i);
-                String cmd = "/usr/bin/python /root/src/base/COS_API.py delete " + path + " > /root/py_cos.log";
-                LogHelper.info("delete cmd:" + cmd);
-                Process proc = Runtime.getRuntime().exec(cmd);
-                proc.waitFor();
 
-                String deleteSQL = "update `photo` set `is_del` = 1 where `file_name` = ?";
-                List<Object> deleteFile = new ArrayList<>();
-                deleteFile.add(fileName);
-                db.insertUpdateDeleteExute(deleteSQL, deleteFile);
+            // 从对象存储器中删除
+            status = FileUpload.DeleteFileCOS(deleteFileNameList);
+            if (status == -2) {
+                jsonObject.put("status", 1020);
+                return jsonObject;
             }
 
             // 邮箱验证
