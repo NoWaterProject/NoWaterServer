@@ -46,11 +46,13 @@ CREATE TABLE `class` (
   PRIMARY KEY (`class_id`)
 );
 
-DROP TABLE IF EXISTS `favorite` ;
+DROP TABLE IF EXISTS `favorite`;
 CREATE TABLE `favorite` (
-  `user_id` int(11) NOT NULL ,
-  `type` int(11) NOT NULL ,
-  `id` int(11) NOT NULL ,
+  `favorite_id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `type` int(11) NOT NULL,
+  `id` int(11) NOT NULL,
+  PRIMARY KEY (`favorite_id`)
 );
 
 DROP TABLE IF EXISTS `cart`;
