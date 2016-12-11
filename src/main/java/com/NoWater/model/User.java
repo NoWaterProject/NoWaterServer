@@ -11,9 +11,37 @@ public class User {
     private String address1;
     private String address2;
     private String address3;
+    private int post_code;
+
+    public void setPostCode(int post_code) {
+        this.post_code = post_code;
+    }
+
+    public void setFirstName(String first_name) {
+        this.first_name = first_name;
+    }
+
+    public void setLastName(String last_name) {
+        this.last_name = last_name;
+    }
+
+    public int getPostCode() {
+        return post_code;
+    }
+
+    public String getFirstName() {
+        return first_name;
+    }
+
+    public String getLastName() {
+        return last_name;
+    }
+
+    private String first_name;
+    private String last_name;
     private int cart_pd_num;
 
-    public Integer getUser_id() {
+    public Integer getUserId() {
         return user_id;
     }
 
@@ -41,11 +69,11 @@ public class User {
         return address3;
     }
 
-    public int getCart_pd_num() {
+    public int getCartPdNum() {
         return cart_pd_num;
     }
 
-    public void setUser_id(int user_id) {
+    public void setUserId(int user_id) {
         this.user_id = user_id;
     }
 
@@ -73,7 +101,7 @@ public class User {
         this.address3 = address3;
     }
 
-    public void setCart_pd_num(int cart_pd_num) {
+    public void setCartPdNum(int cart_pd_num) {
         this.cart_pd_num = cart_pd_num;
     }
 

@@ -11,11 +11,11 @@ public class Cart {
     private int num;
     private long cartNum;
 
-    public int getProduct_id() {
+    public int getProductId() {
         return product_id;
     }
 
-    public void setProduct_id(int product_id) {
+    public void setProductId(int product_id) {
         this.product_id = product_id;
     }
 
@@ -27,11 +27,11 @@ public class Cart {
         this.cartNum = cartNum;
     }
 
-    public void setCart_id(int cart_id) {
+    public void setCartId(int cart_id) {
         this.cart_id = cart_id;
     }
 
-    public void setUser_id(int user_id) {
+    public void setUserId(int user_id) {
         this.user_id = user_id;
     }
 
@@ -39,14 +39,13 @@ public class Cart {
         this.num = num;
     }
 
-    public int getCart_id() {
+    public int getCartId() {
         return cart_id;
     }
 
-    public int getUser_id() {
+    public int getUserId() {
         return user_id;
     }
-
 
     public int getNum() {
         return num;

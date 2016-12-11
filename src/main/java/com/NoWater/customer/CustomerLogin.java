@@ -56,7 +56,7 @@ public class CustomerLogin {
                 cookie.setMaxAge(1800);
                 cookie.setPath("/");
                 response.addCookie(cookie);
-                String user_id = userList.get(0).getUser_id().toString();
+                String user_id = userList.get(0).getUserId().toString();
 
                 jedis = new Jedis("127.0.0.1", 6379);
                 jedis.set(uuid, user_id);

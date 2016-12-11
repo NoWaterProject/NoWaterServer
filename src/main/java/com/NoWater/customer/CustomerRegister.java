@@ -27,6 +27,8 @@ public class CustomerRegister {
                                @RequestParam(value = "address2", defaultValue = "/") String address2,
                                @RequestParam(value = "address3", defaultValue = "/") String address3,
                                @RequestParam(value = "postCode", defaultValue = "710126") String postCode,
+                               @RequestParam(value = "firstName", defaultValue = "") String firstName,
+                               @RequestParam(value = "lastName", defaultValue = "") String lastName,
                                HttpServletResponse response) throws Exception {
         response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
         response.setHeader("Access-Control-Allow-Credentials", "true");
@@ -66,10 +68,10 @@ public class CustomerRegister {
                     }
 
                     if (addressStatus == 1) {
-                        List<Object> list1 = new ArrayList<Object>();
+                        List<Object> list1 = new ArrayList<>();
                         DBUtil db1 = new DBUtil();
                         StringBuffer sql1 = new StringBuffer();
-                        sql1.append("insert into user (name,password,telephone,address1,address2,address3,postCode) values (?,?,?,?,?,?,?)");
+                        sql1.append("insert into user (name,password,telephone,address1,address2,address3,postCode, firstName, lastName) values (?,?,?,?,?,?,?,?,?)");
                         list1.add(name);
                         list1.add(password);
                         list1.add(telephone);
@@ -77,6 +79,8 @@ public class CustomerRegister {
                         list1.add(address2);
                         list1.add(address3);
                         list1.add(postCode);
+                        list1.add(firstName);
+                        list1.add(lastName);
                         db1.insertUpdateDeleteExute(sql1.toString(), list1);
                         status = 200;
                         jsonObject.put("status", status);

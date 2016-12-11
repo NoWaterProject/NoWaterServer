@@ -1,11 +1,13 @@
 package com.NoWater.util;
 
 import com.NoWater.model.Photo;
+import com.NoWater.model.Product;
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.request.DelFileRequest;
 import com.qcloud.cos.request.UploadFileRequest;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import org.springframework.cglib.core.ProcessArrayCallback;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -73,13 +75,16 @@ public final class FileUpload {
     public static int UploadToCOS(ArrayList<String> addFileNameList, String belong_id, int photoType) {
         for(int i = 0; i < addFileNameList.size(); i++) {
             String fileName = addFileNameList.get(i);
-            String path = "/tmp/" + user_id + "/" + fileName;
+            String path = "/tmp/" + belong_id + "/" + fileName;
             LogHelper.info("addFile:" + path);
             String cmd = "/usr/bin/python /root/src/base/COS_API.py upload " + "/" + fileName + " " + path + " > /root/py_cos.log";
             LogHelper.info("add file cmd:" + cmd);
+            String rmCmd = "rm -f " + path;
             try {
                 Process proc = Runtime.getRuntime().exec(cmd);
                 proc.waitFor();
+                Process proc2 = Runtime.getRuntime().exec(rmCmd);
+                proc2.waitFor();
             } catch (Exception e) {
                 e.printStackTrace();
                 return -1;
@@ -97,7 +102,7 @@ public final class FileUpload {
         return 1;
     }
 
-    public static int DeleteFileCOS(ArrayList<String> deleteFileNameList, ) {
+    public static int DeleteFileCOS(ArrayList<String> deleteFileNameList) {
         for (int i = 0; i < deleteFileNameList.size(); i++) {
             String fileName = deleteFileNameList.get(i);
             String path = "/" + deleteFileNameList.get(i);
@@ -131,10 +136,10 @@ public final class FileUpload {
         return returnFileName;
     }
 
-    public static int fileExists(String belong_id, ArrayList<String> fileNameList) {
+    public static int fileExists(String userId, ArrayList<String> fileNameList) {
         for (int i = 0; i < fileNameList.size(); i++) {
             String fileName = fileNameList.get(i);
-            String path = "/tmp/" + belong_id + "/" + fileName;
+            String path = "/tmp/" + userId + "/" + fileName;
             File dir = new File(path);
             if (!dir.exists()) {
                 return -4;

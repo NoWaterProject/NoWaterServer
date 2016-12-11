@@ -81,7 +81,9 @@ CREATE TABLE `user` (
   `address1` varchar(1024) DEFAULT NULL,
   `address2` varchar(1024) DEFAULT NULL,
   `address3` varchar(1024) DEFAULT NULL,
-  `postCode` varchar(1024) DEFAULT NULL,
+  `post_code` varchar(1024) DEFAULT NULL,
+  `first_name` varchar(1024) DEFAULT NULL,
+  `last_name` varchar(1024) DEFAULT NULL,
   `status` int(11) DEFAULT 1,
   PRIMARY KEY (`user_id`)
 );
