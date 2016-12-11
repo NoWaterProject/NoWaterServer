@@ -6,29 +6,26 @@ package com.NoWater.model;
 public class Product {
     private int product_id;
     private String product_name;
-    private String ad_photo_url;
     private int shop_id;
     private int class_id;
-    private String product_photo_url;
     private int is_del;
     private long num;
     private double price;
     private int quantity_stock;
-    private String class_name;
 
-    public int getIs_del() {
+    public int getIsDel() {
         return is_del;
     }
 
-    public void setIs_del(int is_del) {
+    public void setIsDel(int is_del) {
         this.is_del = is_del;
     }
 
-    public int getQuantity_stock() {
+    public int getQuantityStock() {
         return quantity_stock;
     }
 
-    public void setQuantity_stock(int quantity_stock) {
+    public void setQuantityStock(int quantity_stock) {
         this.quantity_stock = quantity_stock;
     }
 
@@ -48,59 +45,36 @@ public class Product {
         this.num = num;
     }
 
-    public int getProduct_id() {
+    public int getProductId() {
         return product_id;
     }
 
-    public void setProduct_id(int product_id) {
+    public void setProductId(int product_id) {
         this.product_id = product_id;
     }
 
-    public String getProduct_name() {
+    public String getProductName() {
         return product_name;
     }
 
-    public void setProduct_name(String product_name) {
+    public void setProductName(String product_name) {
         this.product_name = product_name;
     }
 
-    public String getAd_photo_url() {
-        return ad_photo_url;
-    }
-
-    public void setAd_photo_url(String ad_photo_url) {
-        this.ad_photo_url = ad_photo_url;
-    }
-
-    public int getShop_id() {
+    public int getShopId() {
         return shop_id;
     }
 
-    public void setShop_id(int shop_id) {
+    public void setShopId(int shop_id) {
         this.shop_id = shop_id;
     }
 
-    public int getClass_id() {
+    public int getClassId() {
         return class_id;
     }
 
-    public void setClass_id(int class_id) {
+    public void setClassId(int class_id) {
         this.class_id = class_id;
     }
 
-    public String getProduct_photo_url() {
-        return product_photo_url;
-    }
-
-    public void setProduct_photo_url(String product_photo_url) {
-        this.product_photo_url = product_photo_url;
-    }
-
-    public String getClass_name() {
-        return class_name;
-    }
-
-    public void setClass_name(String class_name) {
-        this.class_name = class_name;
-    }
 }

@@ -71,7 +71,7 @@ public class CustomerRegister {
                         List<Object> list1 = new ArrayList<>();
                         DBUtil db1 = new DBUtil();
                         StringBuffer sql1 = new StringBuffer();
-                        sql1.append("insert into user (name,password,telephone,address1,address2,address3,postCode, firstName, lastName) values (?,?,?,?,?,?,?,?,?)");
+                        sql1.append("insert into user (name,password,telephone,address1,address2,address3,post_code, first_name, last_name) values (?,?,?,?,?,?,?,?,?)");
                         list1.add(name);
                         list1.add(password);
                         list1.add(telephone);
@@ -81,11 +81,16 @@ public class CustomerRegister {
                         list1.add(postCode);
                         list1.add(firstName);
                         list1.add(lastName);
-                        db1.insertUpdateDeleteExute(sql1.toString(), list1);
+                        try {
+                            db1.insertUpdateDeleteExute(sql1.toString(), list1);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            jsonObject.put("status", 1000);
+                            return jsonObject;
+                        }
                         status = 200;
                         jsonObject.put("status", status);
                         LogHelper.info("register: name=" + name + "password=" + password + "telephone=" + telephone + "address1=" + address1 + "address2=" + address2 + "addres3=" + address3);
-
                     } else {
                         status = 500;
                         jsonObject.put("status", status);

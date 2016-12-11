@@ -70,6 +70,7 @@ public class AdminShopApply {
                                     itemObject.put("photo", JSONArray.fromObject(photoList));
                                     jsonArray.add(itemObject);
                                 }
+                                jsonObject.put("data", jsonArray);
                             }
                         } catch (Exception e) {
                             LogHelper.error(e.toString());
@@ -112,7 +113,7 @@ public class AdminShopApply {
 
             if (token.equals(realToken)) {
                 // 获取管理员用户名
-                List<Object> list = new ArrayList<Object>();
+                List<Object> list = new ArrayList<>();
                 DBUtil db = new DBUtil();
                 String sql = "select * from admin";
                 try {

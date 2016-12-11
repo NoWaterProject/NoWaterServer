@@ -91,7 +91,7 @@ public class ShopOwnerProductHandle {
             String getProduct = "select * from products where product_name = ? and shop_id = ?";
             getProductName.add(shop_id);
             List<Product> productDetail = db.queryInfo(getProduct, getProductName, Product.class);
-            int productId = productDetail.get(0).getProduct_id();
+            int productId = productDetail.get(0).getProductId();
 
             status = FileUpload.UploadToCOS(addFileNameList, String.valueOf(productId), 2);
             if (status == -1) {

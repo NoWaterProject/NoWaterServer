@@ -66,7 +66,7 @@ public class CustomerSearch {
         if (actualCount > count) {
             List<Product> data = productsList.subList(0, count);
             jsonObject.put("actualCount", count);
-            jsonObject.put("startId", productsList.get(count).getProduct_id());
+            jsonObject.put("startId", productsList.get(count).getProductId());
             jsonObject.put("data", JSONArray.fromObject(data));
         } else {
             jsonObject.put("actualCount", actualCount);

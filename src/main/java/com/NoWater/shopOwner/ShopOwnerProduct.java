@@ -84,7 +84,7 @@ public class ShopOwnerProduct {
                                 JSONObject jsonObject1 = JSONObject.fromObject(productListInfo.get(i));
                                 jsonArray.add(jsonObject1);
                             }
-                            endId = productListInfo.get(actualCount).getProduct_id();
+                            endId = productListInfo.get(actualCount).getProductId();
                             jsonObject.put("endId", endId);
                             jsonObject.put("data", jsonArray);
                         } else {

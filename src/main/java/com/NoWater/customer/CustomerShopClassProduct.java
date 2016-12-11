@@ -62,7 +62,7 @@ public class CustomerShopClassProduct {
             jsonObject.put("status",500);//商铺不存在
         } else {
 
-            List<Object> getShopClassExist = new ArrayList<Object>();
+            List<Object> getShopClassExist = new ArrayList<>();
             String getShopClassExistSQL = "select * from products where shop_id = ? and class_id = ?";
             getShopClassExist.add(shopId);
             getShopClassExist.add(classId);
@@ -99,7 +99,7 @@ public class CustomerShopClassProduct {
                         JSONObject jsonObject1 = JSONObject.fromObject(productListInfo.get(i));
                         jsonArray.add(jsonObject1);
                     }
-                    nextStartId = productListInfo.get(actualCount).getProduct_id();
+                    nextStartId = productListInfo.get(actualCount).getProductId();
                     jsonObject.put("nextStartId", nextStartId);
                     jsonObject.put("data", jsonArray);
                 } else {
