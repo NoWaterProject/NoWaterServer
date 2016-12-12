@@ -66,10 +66,10 @@ public class Photo {
         this.is_del = is_del;
     }
 
-    public static ArrayList<String> getPhotoURL (String getPhotoSQL, Product product, int photoType) {
+    public static ArrayList<String> getPhotoURL (String getPhotoSQL, int belong_id, int photoType) {
         DBUtil db = new DBUtil();
         List<Object> getPhotoSQLList = new ArrayList<>();
-        getPhotoSQLList.add(product.getProductId());
+        getPhotoSQLList.add(belong_id);
         getPhotoSQLList.add(photoType);
         List<Photo> photoList;
         try {

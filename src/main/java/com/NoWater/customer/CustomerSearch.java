@@ -80,11 +80,12 @@ public class CustomerSearch {
 
             String getPhotoSQL = "select * from photo where belong_id = ? and photo_type = ?";
 
-            jsonObject1.put("photoUrl", JSONArray.fromObject(Photo.getPhotoURL(getPhotoSQL, productList.get(i), 2)));
+            jsonObject1.put("photoUrl", JSONArray.fromObject(Photo.getPhotoURL(getPhotoSQL, productList.get(i).getProductId(), 2)));
             jsonArray.add(jsonObject1);
         }
 
         jsonObject.put("status", 200);
+        jsonObject.put("data", jsonArray);
 
         return jsonObject;
     }

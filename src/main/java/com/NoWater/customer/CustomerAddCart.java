@@ -23,7 +23,7 @@ public class CustomerAddCart {
     private Jedis jedis;
     DBUtil db = new DBUtil();
 
-    @RequestMapping("/customer/cartAdding")
+    @RequestMapping("/customer/cart/adding")
     public JSONObject CustomerCartAdding(@RequestParam(value = "productId", defaultValue = "0") String productId,
                                          @RequestParam(value = "num", defaultValue = "1") int num,
                                          HttpServletRequest request, HttpServletResponse response) throws Exception {

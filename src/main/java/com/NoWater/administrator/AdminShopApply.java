@@ -62,12 +62,8 @@ public class AdminShopApply {
                                     JSONObject itemObject = JSONObject.fromObject(shopApplyList.get(i));
 
                                     String getPhotoSQL = "select * from photo where belong_id = ? and photo_type = ?";
-                                    List<Object> getPhotoList = new ArrayList<>();
-                                    getPhotoList.add(shopApplyList.get(i).getOwnerId());
-                                    getPhotoList.add(3);
-                                    List<Photo> photoList = db.queryInfo(getPhotoSQL, getPhotoList, Photo.class);
 
-                                    itemObject.put("photo", JSONArray.fromObject(photoList));
+                                    itemObject.put("photo", JSONArray.fromObject(Photo.getPhotoURL(getPhotoSQL, shopApplyList.get(i).getOwnerId(), 3)));
                                     jsonArray.add(itemObject);
                                 }
                                 jsonObject.put("data", jsonArray);

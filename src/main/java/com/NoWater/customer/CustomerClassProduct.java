@@ -77,6 +77,8 @@ public class CustomerClassProduct {
             getProductSQLlist.add(startId);
         }
 
+        getProductSQL.append(" and is_del = 0");
+
         DBUtil db = new DBUtil();
         List<Product> productList = db.queryInfo(getProductSQL.toString(), getProductSQLlist, Product.class);
 
@@ -94,11 +96,11 @@ public class CustomerClassProduct {
         for (int i = 0; i < actualCount; i++) {
             JSONObject jsonObject1 = JSONObject.fromObject(productList.get(i));
 
-            Product product = productList.get(i);
+            int product_id = productList.get(i).getProductId();
 
             String getPhotoSQL = "select * from photo where belong_id = ? and photo_type = ?";
 
-            jsonObject1.put("photoUrl", JSONArray.fromObject(Photo.getPhotoURL(getPhotoSQL, product, 2)));
+            jsonObject1.put("photoUrl", JSONArray.fromObject(Photo.getPhotoURL(getPhotoSQL, product_id, 2)));
             jsonArray.add(jsonObject1);
         }
 
