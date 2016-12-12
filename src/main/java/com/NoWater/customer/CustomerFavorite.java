@@ -40,7 +40,7 @@ public class CustomerFavorite {
             if (user_id == null) {
                 jsonObject.put("status", 300);
             } else if (uuid.equals(jedis.get(user_id))) {
-                List<Object> addFavo = new ArrayList<Object>();
+                List<Object> addFavo = new ArrayList<>();
                 DBUtil db = new DBUtil();
                 String queryInfo="select * from favorite where user_id = ? and type = ? and id = ?";
                 addFavo.add(user_id);

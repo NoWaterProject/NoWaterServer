@@ -28,28 +28,13 @@ public class CustomerShopClassList {
 
         response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
         response.setHeader("Access-Control-Allow-Credentials", "true");
-        String token = CookieUtil.getCookieValueByName(request, "token");
         JSONObject jsonObject = new JSONObject();
 
-        if (token == null) {
-            jsonObject.put("status", 300);
-        } else {
-            Jedis jedis = new Jedis("127.0.0.1", 6379);
-            String user_id = jedis.get(token);
-            if (user_id == null) {
-                jsonObject.put("status", 300);
-            } else {
-                String realToken = jedis.get(user_id);
-                if (!realToken.equals(token)) {
-                    jsonObject.put("status", 300);
-                }
-            }
-        }
         if (shop_id <= 0) {
             jsonObject.put("status", 400);
         } else {
             DBUtil db = new DBUtil();
-            List<Object> list = new ArrayList<Object>();
+            List<Object> list = new ArrayList<>();
             String queryCount = "select count(distinct class_id) num from products where shop_id = ?";
             list.add(shop_id);
             List<Product> getProductClassCount = db.queryInfo(queryCount, list, Product.class);
@@ -59,7 +44,8 @@ public class CustomerShopClassList {
             List<Product> getProductClass = db.queryInfo(queryClass, list, Product.class);
 
             if (getProductClass.size() == 0) {
-                jsonObject.put("status", 400);
+                jsonObject.put("status", 200);
+                jsonObject.put("data", "[]");
             } else {
                 JSONArray jsonArray = new JSONArray();
                 for (int i = 0; i < classCount; i++) {

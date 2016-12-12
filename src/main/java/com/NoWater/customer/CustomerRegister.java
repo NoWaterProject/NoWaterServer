@@ -36,7 +36,7 @@ public class CustomerRegister {
                 name, password, telephone, address1, address2, address3));
         int status = 0;
         JSONObject jsonObject = new JSONObject();
-        List<Object> list = new ArrayList<Object>();
+        List<Object> list = new ArrayList<>();
         DBUtil db = new DBUtil();
         StringBuffer sql = new StringBuffer();
         sql.append("select user_id from user where name = ?");

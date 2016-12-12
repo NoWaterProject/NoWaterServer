@@ -38,7 +38,7 @@ public class CustomerLogin {
         String uuid;
         JSONObject jsonObject = new JSONObject();
 
-        List<Object> list = new ArrayList<Object>();
+        List<Object> list = new ArrayList<>();
         DBUtil db = new DBUtil();
         StringBuffer sql = new StringBuffer();
         sql.append("select password, user_id from user where name = ?");

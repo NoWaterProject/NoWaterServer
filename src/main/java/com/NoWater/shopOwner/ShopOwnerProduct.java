@@ -52,7 +52,7 @@ public class ShopOwnerProduct {
                         jsonObject.put("status", 400);
                     } else {
                         DBUtil db = new DBUtil();
-                        List<Object> getShopId = new ArrayList<Object>();
+                        List<Object> getShopId = new ArrayList<>();
                         String getShopIdSQL = "select shop_id from shop where owner_id = ?";
                         getShopId.add(user_id);
                         List<Shop> getShopIdList = db.queryInfo(getShopIdSQL, getShopId, Shop.class);
@@ -60,11 +60,11 @@ public class ShopOwnerProduct {
 
                         if (startId == 0) {
                             String getStartIdSQL = "select count(1) num from product";
-                            List<Object> EmptyList = new ArrayList<Object>();
+                            List<Object> EmptyList = new ArrayList<>();
                             List<Product> getStartIdList = db.queryInfo(getStartIdSQL, EmptyList, Product.class);
                             startId = (int) getStartIdList.get(0).getNum();
                         }
-                        List<Object> list = new ArrayList<Object>();
+                        List<Object> list = new ArrayList<>();
                         String sqlNoSearchKey = "select count(1) num,  from products c where shop_id = ? and product_id <= ?";
                         list.add(shopId);
                         list.add(startId);

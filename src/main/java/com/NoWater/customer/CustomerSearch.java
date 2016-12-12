@@ -1,5 +1,6 @@
 package com.NoWater.customer;
 
+import com.NoWater.model.Photo;
 import com.NoWater.model.Product;
 import com.NoWater.util.CookieUtil;
 import com.NoWater.util.DBUtil;
@@ -31,15 +32,16 @@ public class CustomerSearch {
 
         JSONObject jsonObject = new JSONObject();
 
-        List<Product> productsList;
+        List<Product> productList;
         DBUtil db = new DBUtil();
         List<Object> list = new ArrayList<>();
         String[] keyWords = keyWord.split(" ");
         StringBuffer sql = new StringBuffer("select * from products where ");
 
         for (int i = 0; i < keyWords.length; i++) {
-            sql.append("product_name like '%?%' and ");
-            list.add(keyWords[i]);
+            sql.append("product_name like '%");
+            sql.append(keyWords[i]);
+            sql.append("%' and ");
         }
 
         if (shopId != 0) {
@@ -60,18 +62,26 @@ public class CustomerSearch {
 
         sql.append("is_del = 0 order by product_id desc");
         LogHelper.info(sql.toString());
-        productsList = db.queryInfo(sql.toString(), list, Product.class);
-        int actualCount = productsList.size();      //实际查询到的数量
+        productList = db.queryInfo(sql.toString(), list, Product.class);
+        int actualCount;      //实际查询到的数量
 
-        if (actualCount > count) {
-            List<Product> data = productsList.subList(0, count);
-            jsonObject.put("actualCount", count);
-            jsonObject.put("startId", productsList.get(count).getProductId());
-            jsonObject.put("data", JSONArray.fromObject(data));
+        if (productList.size() > count) {
+            actualCount = count;
+            jsonObject.put("startId", productList.get(count).getProductId());
         } else {
-            jsonObject.put("actualCount", actualCount);
+            actualCount = productList.size();
             jsonObject.put("startId", -1);
-            jsonObject.put("data", JSONArray.fromObject(productsList));
+        }
+        jsonObject.put("actualCount", count);
+
+        JSONArray jsonArray = new JSONArray();
+        for (int i = 0; i < actualCount; i++) {
+            JSONObject jsonObject1 = JSONObject.fromObject(productList.get(i));
+
+            String getPhotoSQL = "select * from photo where belong_id = ? and photo_type = ?";
+
+            jsonObject1.put("photoUrl", JSONArray.fromObject(Photo.getPhotoURL(getPhotoSQL, productList.get(i), 2)));
+            jsonArray.add(jsonObject1);
         }
 
         jsonObject.put("status", 200);

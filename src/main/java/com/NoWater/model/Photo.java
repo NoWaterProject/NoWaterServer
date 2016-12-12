@@ -1,18 +1,24 @@
 package com.NoWater.model;
 
+import com.NoWater.util.DBUtil;
+import net.sf.json.JSONArray;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by wukai on 2016/12/7.
  */
 public class Photo {
-    public void setFile_name(String file_name) {
+    public void setFileName(String file_name) {
         this.file_name = file_name;
     }
 
-    public void setPhoto_id(int photo_id) {
+    public void setPhotoId(int photo_id) {
         this.photo_id = photo_id;
     }
 
-    public void setProduct_id(int belong_id) {
+    public void setProductId(int belong_id) {
         this.belong_id = belong_id;
     }
 
@@ -25,11 +31,11 @@ public class Photo {
         return file_name;
     }
 
-    public int getPhoto_id() {
+    public int getPhotoId() {
         return photo_id;
     }
 
-    public int getProduct_id() {
+    public int getProductId() {
         return belong_id;
     }
 
@@ -41,23 +47,42 @@ public class Photo {
     private int photo_id;
     private int belong_id;
     private String url;
+    private int photo_type;
+    private int is_del;
 
-    public int getPhoto_type() {
+    public int getPhotoType() {
         return photo_type;
     }
 
-    public int getIs_del() {
+    public int getIsDel() {
         return is_del;
     }
 
-    public void setPhoto_type(int photo_type) {
+    public void setPhotoType(int photo_type) {
         this.photo_type = photo_type;
     }
 
-    public void setIs_del(int is_del) {
+    public void setIsDel(int is_del) {
         this.is_del = is_del;
     }
 
-    private int photo_type;
-    private int is_del;
+    public static ArrayList<String> getPhotoURL (String getPhotoSQL, Product product, int photoType) {
+        DBUtil db = new DBUtil();
+        List<Object> getPhotoSQLList = new ArrayList<>();
+        getPhotoSQLList.add(product.getProductId());
+        getPhotoSQLList.add(photoType);
+        List<Photo> photoList;
+        try {
+            photoList = db.queryInfo(getPhotoSQL, getPhotoSQLList, Photo.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        ArrayList<String> StringList = new ArrayList<>();
+        for (int i = 0; i < photoList.size(); i++) {
+            StringList.add(photoList.get(i).getUrl());
+        }
+        return StringList;
+    }
 }
