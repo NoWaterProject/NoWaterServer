@@ -78,11 +78,16 @@ public class ShopOwnerApply {
             List<Shop> shopInfo = db.queryInfo(sqlGetInfo, ownerList, Shop.class);
             jsonObject.put("data", JSONArray.fromObject(shopInfo));
 
-            String getPhotoSQL = "select * from photo where belong_id = ? and photo_type = 4";
-            List<Object> getPhotoList = new ArrayList<>();
-            getPhotoList.add(user_id);
-            List<Photo> photoList = db.queryInfo(getPhotoSQL, getPhotoList, Photo.class);
-            jsonObject.put("photo", JSONArray.fromObject(photoList));
+            String getPhotoSQL = "select * from photo where belong_id = ? and photo_type = ?";
+            int userId;
+            try{
+                userId = Integer.parseInt(user_id);
+            } catch (Exception e) {
+                e.printStackTrace();
+                jsonObject.put("status", 1050);
+                return jsonObject;
+            }
+            jsonObject.put("photo", JSONArray.fromObject(Photo.getPhotoURL(getPhotoSQL, userId, 3)));
         } else {
             jsonObject.put("status", 400);      //数据库中找不到卖家，用户未申请
         }

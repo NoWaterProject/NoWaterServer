@@ -52,7 +52,8 @@ public final class FileUpload {
             //有图
             String originalFilename = multipartFile.getOriginalFilename();
             if (!(originalFilename.endsWith(".jpg") || originalFilename.endsWith(".jpeg")
-                    || originalFilename.endsWith(".png"))) {
+                    || originalFilename.endsWith(".png") || originalFilename.endsWith(".JPG")
+                    || originalFilename.endsWith(".JPEG") || originalFilename.endsWith(".PNG"))) {
                 throw new RuntimeException("Format Error" + originalFilename);
             }
             String extensions = originalFilename.substring(originalFilename.indexOf("."));

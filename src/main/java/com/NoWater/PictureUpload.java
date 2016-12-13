@@ -36,13 +36,12 @@ public class PictureUpload {
         response.setHeader("Access-Control-Allow-Credentials", "true");
         JSONObject jsonObject = new JSONObject();
 
-        String userId = "1";
-//        String uuid = CookieUtil.getCookieValueByName(request, "token");
-//        String userId = CookieUtil.confirmUser(uuid);
-//        if (userId == null) {
-//            jsonObject.put("status", 300);
-//            return jsonObject;
-//        }
+        String uuid = CookieUtil.getCookieValueByName(request, "token");
+        String userId = CookieUtil.confirmUser(uuid);
+        if (userId == null) {
+            jsonObject.put("status", 300);
+            return jsonObject;
+        }
 
         try {
             ArrayList<String> filenameList = FileUpload.handleFile(PictureFile, userId);    //保存图片
