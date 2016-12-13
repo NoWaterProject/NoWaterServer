@@ -24,7 +24,7 @@ import java.util.List;
  */
 @RestController
 public class ShopOwnerProductHandle {
-    @RequestMapping("shop-owner/products/edit")
+    @RequestMapping("/shop-owner/products/edit")
     public JSONObject ShopOwnerEdit(
             @RequestParam(value = "productId", defaultValue = "0") int product_id,
             @RequestParam(value = "classId", defaultValue = "0") int class_id,
@@ -93,7 +93,7 @@ public class ShopOwnerProductHandle {
             List<Product> productDetail = db.queryInfo(getProduct, getProductName, Product.class);
             int productId = productDetail.get(0).getProductId();
 
-            status = FileUpload.UploadToCOS(addFileNameList, String.valueOf(productId), 2);
+            status = FileUpload.UploadToCOS(addFileNameList, userId, String.valueOf(productId), 2);
             if (status == -1) {
                 jsonObject.put("status", 1010);
                 return jsonObject;
@@ -112,7 +112,7 @@ public class ShopOwnerProductHandle {
                 return jsonObject;
             }
 
-            status = FileUpload.UploadToCOS(addFileNameList, String.valueOf(product_id), 2);
+            status = FileUpload.UploadToCOS(addFileNameList, userId, String.valueOf(product_id), 2);
             if (status == -1) {
                 jsonObject.put("status", 1010);
                 return jsonObject;
@@ -130,7 +130,7 @@ public class ShopOwnerProductHandle {
             db.insertUpdateDeleteExute(sql.toString(), param);
             jsonObject.put("status", 200);                  //修改商品成功
         }
-
+        LogHelper.info(String.format("[/shop-owner/products/edit] %s", jsonObject.toString()));
         return jsonObject;
     }
 }

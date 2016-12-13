@@ -59,6 +59,7 @@ public class CustomerAddCart {
             LogHelper.info("add success.");
             jsonObject.put("status", 200);
         }
+        LogHelper.info(String.format("[/customer/cart/adding] %s", jsonObject.toString()));
         return jsonObject;
     }
 }

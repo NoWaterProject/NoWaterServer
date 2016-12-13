@@ -1,5 +1,5 @@
 # (Group 6: Our Name is NoWater) ParknShop interface documentation
-* How to confirm the user? We get the token from cookie, and use the token searching redis to get the userId, and use the userId searching redis to get the real token. If the token from cookie is equal to the real token, the user is login.
+* How to confirm the user? We get the token from cookie, and use the token searching redis to get the userId, and use the userId searching redis to get the real token. If the token from cookie is equal to the real token, we can confirm the user is login.
 * The Return should be JSON.
 
 ## Customer Interface（interface path is started with customer）
@@ -7,9 +7,7 @@
 * **customer/register**
 
     The interface is used to customer's register.
-
     First, we need to judge whether the name posted is unique. We should get all the name from MySQL, then judge whether the name in them.
-
     Second, we need to judge whether the address is legal. We get the address array from redis.
     Third, we need to judge whether the telephone is started with 6 and 9, and the length of it is 8.
 

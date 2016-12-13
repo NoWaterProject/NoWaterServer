@@ -4,6 +4,7 @@ import com.NoWater.model.Photo;
 import com.NoWater.model.Product;
 import com.NoWater.util.CookieUtil;
 import com.NoWater.util.DBUtil;
+import com.NoWater.util.LogHelper;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,7 +22,7 @@ import java.util.List;
  */
 @RestController
 public class CustomerShopClassList {
-    @RequestMapping("customer/shop/class/list")
+    @RequestMapping("/customer/shop/class/list")
     public JSONObject customerShopClassList(
             @RequestParam(value = "shop_id", defaultValue = "0") int shop_id,
             HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -55,6 +56,7 @@ public class CustomerShopClassList {
                 jsonObject.put("data", jsonArray);
             }
         }
+        LogHelper.info(String.format("[/customer/shop/class/list] %s", jsonObject.toString()));
         return jsonObject;
     }
 }

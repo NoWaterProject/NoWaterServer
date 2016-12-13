@@ -73,12 +73,12 @@ public final class FileUpload {
         return "";
     }
 
-    public static int UploadToCOS(ArrayList<String> addFileNameList, String belong_id, int photoType) {
+    public static int UploadToCOS(ArrayList<String> addFileNameList, String userId, String belongId, int photoType) {
         for(int i = 0; i < addFileNameList.size(); i++) {
             String fileName = addFileNameList.get(i);
-            String path = "/tmp/" + belong_id + "/" + fileName;
+            String path = "/tmp/" + userId + "/" + fileName;
             LogHelper.info("addFile:" + path);
-            String cmd = "/usr/bin/python /root/src/base/COS_API.py upload " + "/" + fileName + " " + path + " > /root/py_cos.log";
+            String cmd = "/usr/bin/python /root/src/base/COS_API.py upload " + "/" + fileName + " " + path;
             LogHelper.info("add file cmd:" + cmd);
             String rmCmd = "rm -f " + path;
             try {
@@ -94,7 +94,7 @@ public final class FileUpload {
             DBUtil db = new DBUtil();
             List<Object> insertPhoto = new ArrayList<>();
             insertPhoto.add(fileName);
-            insertPhoto.add(belong_id);
+            insertPhoto.add(belongId);
             insertPhoto.add("http://koprvhdix117-10038234.file.myqcloud.com/" + fileName);
             insertPhoto.add(photoType);
             String insertPhotoSQL = "insert into `photo` (file_name, belong_id, url, photo_type) values (?, ?, ?, ?)";
@@ -107,7 +107,7 @@ public final class FileUpload {
         for (int i = 0; i < deleteFileNameList.size(); i++) {
             String fileName = deleteFileNameList.get(i);
             String path = "/" + deleteFileNameList.get(i);
-            String cmd = "/usr/bin/python /root/src/base/COS_API.py delete " + path + " > /root/py_cos.log";
+            String cmd = "/usr/bin/python /root/src/base/COS_API.py delete " + path;
             LogHelper.info("delete cmd:" + cmd);
             try {
                 Process procDelete = Runtime.getRuntime().exec(cmd);

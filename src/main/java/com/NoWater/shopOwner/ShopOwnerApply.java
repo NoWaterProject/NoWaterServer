@@ -166,7 +166,7 @@ public class ShopOwnerApply {
             }
 
             // 添加到对象存储器
-            status = FileUpload.UploadToCOS(addFileNameList, user_id, 3);
+            status = FileUpload.UploadToCOS(addFileNameList, user_id, user_id, 3);
             if (status == -1) {
                 jsonObject.put("status", 1010);         //上传失败
                 return jsonObject;

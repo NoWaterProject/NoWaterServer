@@ -5,6 +5,7 @@ import com.NoWater.model.Product;
 import com.NoWater.model.Shop;
 import com.NoWater.util.CookieUtil;
 import com.NoWater.util.DBUtil;
+import com.NoWater.util.LogHelper;
 import com.NoWater.util.MD5;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -26,7 +27,7 @@ import java.util.List;
 @RestController
 public class ShopOwnerProduct {
     @RequestMapping("shop-owner/products/list")
-    public JSONObject searchKey(
+    public JSONObject ShopOwnerProductsList(
             @RequestParam(value = "startId", defaultValue = "0") int startId,
             @RequestParam(value = "count", defaultValue = "/") int count,
             HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -43,7 +44,7 @@ public class ShopOwnerProduct {
             return jsonObject;
         }
 
-        if (startId == -1) {
+        if (startId < 0) {
             jsonObject.put("status", 400);
             return jsonObject;
         }
@@ -53,43 +54,39 @@ public class ShopOwnerProduct {
         String getShopIdSQL = "select shop_id from shop where owner_id = ?";
         getShopId.add(user_id);
         List<Shop> getShopIdList = db.queryInfo(getShopIdSQL, getShopId, Shop.class);
+        if (getShopIdList.size() == 0) {
+            jsonObject.put("status", 500);              // user isn't shop owner
+            return jsonObject;
+        }
         int shopId = getShopIdList.get(0).getShopId();
 
         StringBuffer queryProductNotDel = new StringBuffer();
         StringBuffer queryProductDel = new StringBuffer();
-        queryProductNotDel.append("select * from products where shop_id = ?");
-        queryProductDel.append("select * from products where shop_id = ?");
+        queryProductNotDel.append("select * from products where shop_id = ? and `is_del` = 0 order by product_id desc");
+        queryProductDel.append("select * from products where shop_id = ? and `is_del` = 1 order by product_id desc");
         List<Object> list = new ArrayList<>();
         list.add(shopId);
-        if (startId != 0) {
-            queryProductNotDel.append(" and product_id <= ?");
-            queryProductDel.append(" and product_id <= ?");
-            list.add(startId);
-        }
-
-        queryProductNotDel.append(" and `is_del` = 0 order by product_id asc");
-        queryProductDel.append(" and `is_del` = 1 order by product_id asc");
 
         List<Product> productListInfo = db.queryInfo(queryProductNotDel.toString(), list, Product.class);
         List<Product> productListDel = db.queryInfo(queryProductDel.toString(), list, Product.class);
         productListInfo.addAll(productListDel);
 
-        if (productListInfo.size() > count) {
+        if (productListInfo.size() - startId > count) {
             actualCount = count;
-            endId = productListInfo.get(actualCount).getProductId();
+            endId = startId + count;
             jsonObject.put("endId", endId);
         } else {
-            actualCount = productListInfo.size();
+            actualCount = productListInfo.size() - startId;
             jsonObject.put("endId", -1);
         }
 
         JSONArray jsonArray = new JSONArray();
         for (int i = 0; i < actualCount; i++) {
-            JSONObject jsonObject1 = JSONObject.fromObject(productListInfo.get(i));
+            JSONObject jsonObject1 = JSONObject.fromObject(productListInfo.get(i + startId));
 
-            int product_id = productListInfo.get(i).getProductId();
+            int product_id = productListInfo.get(i + startId).getProductId();
 
-            String getPhotoSQL = "select * from photo where belong_id = ? and photo_type = ?";
+            String getPhotoSQL = "select * from photo where belong_id = ? and photo_type = ? and is_del = 0";
             jsonObject1.put("photo", JSONArray.fromObject(Photo.getPhotoURL(getPhotoSQL, product_id, 2)));
             jsonArray.add(jsonObject1);
         }
@@ -98,6 +95,7 @@ public class ShopOwnerProduct {
         jsonObject.put("actualCount", actualCount);
         jsonObject.put("data", jsonArray);
 
+        LogHelper.info("[shop-owner/products/list] " + jsonObject.toString());
         return jsonObject;
     }
 }

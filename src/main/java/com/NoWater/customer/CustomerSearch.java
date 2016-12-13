@@ -21,7 +21,7 @@ import java.util.*;
 
 @RestController
 public class CustomerSearch {
-    @RequestMapping("customer/product/search")
+    @RequestMapping("/customer/product/search")
     public JSONObject productSearch(@RequestParam(value = "keyWord", defaultValue = "/") String keyWord,
                                     @RequestParam(value = "count", defaultValue = "/") int count,
                                     @RequestParam(value = "shopId", required = false, defaultValue = "0") int shopId,
@@ -72,13 +72,13 @@ public class CustomerSearch {
             actualCount = productList.size();
             jsonObject.put("startId", -1);
         }
-        jsonObject.put("actualCount", count);
+        jsonObject.put("actualCount", actualCount);
 
         JSONArray jsonArray = new JSONArray();
         for (int i = 0; i < actualCount; i++) {
             JSONObject jsonObject1 = JSONObject.fromObject(productList.get(i));
 
-            String getPhotoSQL = "select * from photo where belong_id = ? and photo_type = ?";
+            String getPhotoSQL = "select * from photo where belong_id = ? and photo_type = ? and is_del = 0";
 
             jsonObject1.put("photoUrl", JSONArray.fromObject(Photo.getPhotoURL(getPhotoSQL, productList.get(i).getProductId(), 2)));
             jsonArray.add(jsonObject1);
@@ -87,6 +87,7 @@ public class CustomerSearch {
         jsonObject.put("status", 200);
         jsonObject.put("data", jsonArray);
 
+        LogHelper.info(String.format("[/customer/product/search] %s", jsonObject.toString()));
         return jsonObject;
     }
 }

@@ -88,6 +88,7 @@ public class AdminShopApply {
             jsonObject.put("status", 300);
         }
 
+        LogHelper.info(String.format("[/admin/shop/applyList] %s", jsonObject.toString()));
         return jsonObject;
     }
 
@@ -148,7 +149,7 @@ public class AdminShopApply {
         } else {
             jsonObject.put("status", 300);
         }
-
+        LogHelper.info(String.format("[/admin/shop/handle] %s", jsonObject.toString()));
         return jsonObject;
     }
 }

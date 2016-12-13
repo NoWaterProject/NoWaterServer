@@ -35,7 +35,7 @@ public class AdministratorLogin {
         JSONObject jsonObject = new JSONObject();
         String uuid;
 
-        List<Object> list = new ArrayList<Object>();
+        List<Object> list = new ArrayList<>();
         DBUtil db = new DBUtil();
         String sql = "select * from admin";
         try {
@@ -54,7 +54,7 @@ public class AdministratorLogin {
                 jedis.expire(uuid, 1800);
                 jedis.expire(name, 1800);
 
-                LogHelper.info(String.format("%s login success.", name));
+                LogHelper.info(String.format("[/admin/login] %s login success.", name));
             } else {
                 jsonObject.put("status", 300);
             }
