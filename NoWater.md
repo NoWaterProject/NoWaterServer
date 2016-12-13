@@ -1,50 +1,50 @@
-# NoWater接口文档
-* 目前日志系统仍未完成
-* 连接数据库的方案未确定，先用jdbc吧
-* 除登录、注册、和验证码相关的接口外，首先从cookie中获取token，然后在redis中获取用户名，如果获取不到，则未登录。
+# (Group 6: Our Name is NoWater) ParknShop interface documentation
+* How to confirm the user? We get the token from cookie, and use the token searching redis to get the userId, and use the userId searching redis to get the real token. If the token from cookie is equal to the real token, the user is login.
+* The Return should be JSON.
 
 ---
-## Customer相关接口（所有开头都用customer）
-* 目前验证码还未找到解决方案
-* 还剩商品详情页、购物车、收藏、购买页面、订单页面
+## Customer Interface（interface path is started with customer）
 
 * **customer/register**
-    需要判断Name是否唯一（需要把所有Name从数据库中取出，然后判断，避免被SQL注射），地址是否合法（从redis中获取数据并判断），电话号码是否合法，注册成功需要将用户数据添加到数据库（添加用户名时判断一下是否有双引号）。
+    The interface is used to customer's register.
+    First, we need to judge whether the name posted is unique. We should get all the name from MySQL, then judge whether the name in them.
+    Second, we need to judge whether the address is legal. We get the address array from redis.
+    Third, we need to judge whether the telephone is started with 6 and 9, and the length of it is 8.
 
-    所需参数：
+    Request Param：
     
-    * name（string，用户名，必须在数据库中唯一）
-    * password（string，密码，MD5加密后的32位字符串）
-    * telephone（string，电话号码，电话号码必须合法）
-    * email（string，邮箱地址，需要进行邮箱验证）
-    * address1（string，香港岛，九龙，or新界）
-    * address2（string，香港的哪个区域）
-    * address3（string，用户填的地址）
-    * postCode（string，邮编）
-    * firstName（string，首名字）
-    * lastName（string）
+    * name (string, the username used in login)
+    * password (string, it should be encrypted in MD5)
+    * telephone (string)
+    * address1 (string, Kowloon(KLN), NT_Island(NT), or HongkongIsland(HK))
+    * address2 (string, District)
+    * address3 (string, Address)
+    * postCode (string)
+    * firstName (string)
+    * lastName (string)
 
-    返回：
+    Return：
     
-    * 状态码（status）：
-        * 200（注册成功）
-        * 300（用户名不合法，已被注册）
-        * 400（电话号码不合法）
-        * 500（地址不合法）
+    * status：
+        * 200 (success)
+        * 300 (username has been register)
+        * 400 (telephone error)
+        * 500 (address error)
 
 * **customer/login**
+    We should
     先判断用户名是否存在，之后再判断密码是否正确。生成token，以token为键值向redis中写入user_id，同时以user_id为键值写入token，将token以**token**为关键字写入cookie。
 
-    所需参数：
+    Request Param：
     
-    * name（string，用户名）
-    * password（string，密码）
+    * name (string, username)
+    * password (string, it should be encrypted in MD5)
     
-    返回：
+    Return：
     
-    * 状态码（status）：
-        * 200（登录成功）
-        * 300（用户名不存在或密码错误）
+    * status：
+        * 200 (登录成功)
+        * 300 (用户名不存在或密码错误)
 
 ### 首页
 
