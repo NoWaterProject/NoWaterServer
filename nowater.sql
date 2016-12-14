@@ -13,6 +13,7 @@ CREATE TABLE `shop` (
   `email` varchar(1024) NOT NULL,
   `status` int(11) NOT NULL,
   `telephone` VARCHAR(1024) NOT NULL,
+  `is_del` int(11) DEFAULT 0,
   PRIMARY KEY (`shop_id`)
 );
 
@@ -50,7 +51,7 @@ DROP TABLE IF EXISTS `favorite`;
 CREATE TABLE `favorite` (
   `favorite_id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
-  `type` int(11) NOT NULL,
+  `favorite_type` int(11) NOT NULL,
   `id` int(11) NOT NULL,
   PRIMARY KEY (`favorite_id`)
 );
@@ -61,6 +62,7 @@ CREATE TABLE `cart` (
   `user_id` int(11) NOT NULL,
   `num` int(11) NOT NULL,
   `product_id` int(11) NOT NULL,
+  `is_del` int(11) DEFAULT 0,
   PRIMARY KEY (`cart_id`)
 );
 
