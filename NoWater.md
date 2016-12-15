@@ -301,14 +301,86 @@
         * isDel（int，是否已下架）
         * photo（数组，都是url，展示时展示第一张图片）
 
-### 订单相关
+### 订单/结算相关
 
-* ****
+* 订单状态说明：
+    * -3：预订单状态，订单未确认
+    * -2：已退款取消订单（专为广告设计）
+    * -1：订单已取消（用户未付款手动取消），或者超时未付款（超时时间为1小时）
+    *  0：订单已确认，待付款
+    *  1：用户已付款，待管理员确认付款
+    *  2：管理员已确认付款，待发货
+    *  3：店家已发货，待收货
+    *  4：待评价（一天后跳到订单完成）
+    *  5：订单完成；
 
+* **order/prepare**         （未开始）
 
-### 店铺界面
+    用于生成待确认的订单。比如用于点了**立即购买**，或者在购物车中点了**结算**，或者申请广告界面点了申请
+
+    所需参数：
+
+    * orderType（int，订单类型：0为customer订单，1为shop owner申请ParknShop首页商品广告订单，2为shop owner申请ParknShop首页店铺广告订单）
+    * productId（int，商品Id，当orderType为0时，就是customer下单的商品。当orderType为1时，需要做广告的商品。当orderType为2时，productId为0）
+    * price（float，单价，非必须，如果orderType为0，就不用传了）
+    * num（int，数量）
+
+    返回：
+
+    * 状态码（status）：
+        * 200（成功）
+        * 300（**前端不用考虑**，用户未登录）
+    * data：
+        * orderId（int，订单Id）
+        * orderType（int，订单类型）
+        * productId（int，商品Id）
+        * time（string，生成预订单时间）
+        * initiatorId（int，发起者Id）
+        * targetId（int，目标店铺Id）
+        * address（string，地址）
+        * num（int，数量）
+        * price（float，单价）
+        * sumPrice（float，总价）
+        * status（int，状态，这时状态为-3）
+
+* **order/confirm**     （未开始）
+
+    订单确认，跳到付款界面。
+
+    所需参数：
+
+    * orderId（int，订单Id）
+
+    返回：
+
+    * 状态码（status）：
+        * 200（成功）
+        * 300（**前端不用考虑**，用户未登录）
+        * 400（**前端不用考虑**，orderId不存在）
+        * 500（**前端不用考虑**，orderId和用户对不上）
+    * sumPrice（float，如果需要的话，返回总金额）
+
+* **order/price**       （未开始）
+
+    订单付款接口，用于付款界面。
+
+    所需参数：
+
+    * orderIdList（JSON string，orderId列表）
+    * sumPrice（float，总金额）
+    * aliPay（string支付宝账号）
+
+    返回：
+
+    * 状态码（status）：
+        * 200（成功）
+        * 300（**前端不用考虑**，用户未登录）
+        * 400（**前端不用考虑**，用户和orderId对应不上）
+
+### 店铺/商品展示相关
 
 * **customer/shop/class/list**          （未测试）
+    
     获取店铺的商品类别。
     
     所需参数：
@@ -319,33 +391,46 @@
 
     * 状态码（status）：
         * 200（成功）
-        * 300（用户未登录，一样成功）
         * 400（商铺不存在，不返回后续数据）
     * data（数组）：
         * classId（int，类别Id）
         * className（string，类别名）
 
-* **customer/shop/product/ad**
-    获取某个商店的广告。在Shop Owner允许用户上传广告照片，然后绑定商品Id。
+* **customer/product/show**         （未开始）
+    
+    用于商品详情页。
 
     所需参数：
 
-    * shopId（int，店铺Id）
+    * productId（int，商品Id）
 
     返回：
 
     * 状态码（status）：
         * 200（成功）
-        * 300（用户未登录）
-    * adNum（int，广告数量，即数组大小，也就是界面放多少个广告）
-    * data（数组）：
-        * productId（int，商品Id）
-        * photoUrl（string，广告照片的Url）
+        * 400（**前端不用考虑**，商品不存在）
+        * 500（商品已下架）
+    * data
+        * shop
+            * shopId（int，商铺Id）
+            * shopName（string，店名）
+            * ownerId（int，店主Id）
+            * email（string，电子邮箱）
+            * telephone（string，电话）
+            * status（int，状态码）
+        * product
+            * productId（int，商品Id）
+            * classId（int，类别Id）
+            * productName（string，商品名）
+            * price（int，价格）
+            * quantityStock（int，库存数量）
+            * isDel（int，是否已下架）
+            * photo（数组，都是url，展示所有图片）
 
----
 ## Shop Owner相关接口
 
-* **shop-owner/status**
+* **shop-owner/status**     （已完成）
+
     用于判断shop owner的状态，处于未申请，处于申请中，已成为卖家。
 
     所需参数：无
@@ -357,8 +442,19 @@
         * 300（用户未登录）
         * 400（用户未申请成为卖家）
         * 500（用户的申请正在处于审批状态）
+        * 600（已拒绝）
+        * 700（正在进行邮箱验证）
+    * data：
+        * shopId（int，商铺Id）
+        * shopName（string，店名）
+        * ownerId（int，店主Id）
+        * email（string，电子邮箱）
+        * telephone（string，电话）
+        * status（int，状态码）
+    * photo（数组，都是url）
 
-* **shop-owner/apply**
+* **shop-owner/apply**  （有修改，增加支付宝账号，未完成）
+
     用于用户申请成为shop owner。同样需要cookie验证username是否正确。
 
     所需参数：
@@ -366,6 +462,8 @@
     * email（string，邮箱）
     * shopName（string，店名）
     * telephone（string，电话号码，需要以6和9开头，并且为8位）
+    * aliPay（string，支付宝账号）
+    * fileNameList（JSON数组字符串，已上传的照片名）
     
     返回：
     
@@ -374,8 +472,15 @@
         * 300（用户未登录，失败）
         * 400（邮箱不规范）
         * 500（店名已有人使用）
+        * 600（正在审查）
+        * 610（邮箱未验证）
+        * 700（已成为卖家）
+        * 800（email格式错误，没有@）
+        * 900（电话号码格式错误）
+        * 1000、1010、1020、1030、1040（服务器错误）
         
-* **shop-owner/products/list**
+* **shop-owner/products/list**          （已完成）
+
     用于返回该店铺所有的商品列表
 
     所需参数：
@@ -401,26 +506,8 @@
         * isDel（int，是否已下架）
         * photo（数组，都是url）
         
-* **shop-owner/products/detail**
-    用于返回商品详情
+* **shop-owner/products/edit**          （已完成）
 
-    所需参数：
-    
-    * productId
-    
-    返回：
-    
-    * 状态码（status）：
-        * 200（成功）
-        * 300（该商品不存在）
-    * data：
-        * productId（商品id）
-        * productName（商品名称）
-        * price（单价）
-        * photoIdUrl（存储照片的URL）
-        * quantityStock（库存数量）
-        
-* **shop-owner/products/edit**
     用于添加和修改商品
 
     所需参数：
@@ -441,7 +528,25 @@
         * 500（商品名重复）
         * 1010、1020、1030、1040（服务器错误）
 
----
+* **picture/upload**                    （已完成）
+
+    上传照片的接口
+
+    所需参数：
+
+    * goodsPic[]
+
+    返回：
+
+    * 状态码（status）
+        * 200（成功）
+        * 300（用户未登录，暂时没有cookie验证）
+        * 400（失败）
+
+* **shop-owner/ad/photo/confirm**
+
+    用于确认广告所用
+
 ## Admin相关接口
 * 查看管理员**cookie**时，身份验证是：**admin_token**的值。
     

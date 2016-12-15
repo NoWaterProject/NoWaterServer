@@ -98,7 +98,7 @@ public class CustomerClassProduct {
 
             int product_id = productList.get(i).getProductId();
 
-            String getPhotoSQL = "select * from photo where belong_id = ? and photo_type = ?";
+            String getPhotoSQL = "select * from photo where belong_id = ? and photo_type = ? and is_del = 0";
 
             jsonObject1.put("photoUrl", JSONArray.fromObject(Photo.getPhotoURL(getPhotoSQL, product_id, 2)));
             jsonArray.add(jsonObject1);

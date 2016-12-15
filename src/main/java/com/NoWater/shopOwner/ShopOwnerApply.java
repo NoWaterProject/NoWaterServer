@@ -78,7 +78,7 @@ public class ShopOwnerApply {
             List<Shop> shopInfo = db.queryInfo(sqlGetInfo, ownerList, Shop.class);
             jsonObject.put("data", JSONArray.fromObject(shopInfo));
 
-            String getPhotoSQL = "select * from photo where belong_id = ? and photo_type = ?";
+            String getPhotoSQL = "select * from photo where belong_id = ? and photo_type = ? and is_del = 0";
             int userId;
             try{
                 userId = Integer.parseInt(user_id);
