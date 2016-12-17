@@ -101,26 +101,6 @@
         * price（double，单价）
         * photoIdUrl（string，存储照片的URL，用product表中的product_photo_url）
 
-* **customer/shop/info**        （未开始）
-
-    用于返回店铺信息。（用于店铺首页，也可以用于商品详情页）
-
-    所需参数：
-
-    * shopId（int，店铺Id）
-
-    返回：
-
-    * 状态码（status）：
-        * 200（成功）
-        * 400（**前端不用考虑**，shopId不存在）
-    * shopId（int，商铺Id）
-    * shopName（string，店名）
-    * ownerId（int，店主Id）
-    * email（string，电子邮箱）
-    * telephone（string，电话）
-    * status（int，状态码）
-
 ### 购物车/收藏相关
 
 * 购物车结算接口，请看**订单相关**
@@ -400,24 +380,30 @@
 
 ### 店铺/商品展示相关
 
-* **customer/shop/class/list**          （未测试）
-    
-    获取店铺的商品类别。
-    
+* **customer/shop/info**        （进入测试阶段）
+
+    用于返回店铺信息。（用于店铺首页，也可以用于商品详情页）
+
     所需参数：
-    
+
     * shopId（int，店铺Id）
-    
+
     返回：
 
     * 状态码（status）：
         * 200（成功）
-        * 400（商铺不存在，不返回后续数据）
-    * data（数组）：
+        * 400（**前端不用考虑**，shopId不存在）
+    * shopId（int，商铺Id）
+    * shopName（string，店名）
+    * ownerId（int，店主Id）
+    * email（string，电子邮箱）
+    * telephone（string，电话）
+    * status（int，状态码）
+    * classList（数组）：
         * classId（int，类别Id）
         * className（string，类别名）
 
-* **customer/product/show**         （未开始）
+* **customer/product/show**         （进入测试阶段）
     
     用于商品详情页。
 
@@ -430,7 +416,7 @@
     * 状态码（status）：
         * 200（成功）
         * 400（**前端不用考虑**，商品不存在）
-        * 500（商品已下架）
+        * 500（商品已下架，此时仍然会返回商品信息）
     * data
         * shop
             * shopId（int，商铺Id）

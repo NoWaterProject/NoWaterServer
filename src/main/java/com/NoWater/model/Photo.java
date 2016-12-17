@@ -10,6 +10,13 @@ import java.util.List;
  * Created by wukai on 2016/12/7.
  */
 public class Photo {
+    private String file_name;
+    private int photo_id;
+    private int belong_id;
+    private String url;
+    private int photo_type;
+    private int is_del;
+
     public void setFileName(String file_name) {
         this.file_name = file_name;
     }
@@ -42,13 +49,6 @@ public class Photo {
     public String getUrl() {
         return url;
     }
-
-    private String file_name;
-    private int photo_id;
-    private int belong_id;
-    private String url;
-    private int photo_type;
-    private int is_del;
 
     public int getPhotoType() {
         return photo_type;
