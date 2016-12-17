@@ -40,6 +40,37 @@ CREATE TABLE  `photo` (
   PRIMARY KEY (`photo_id`)
 );
 
+DROP TABLE IF EXISTS `order`;
+CREATE TABLE `order` (
+  `order_id` int(11) NOT NULL AUTO_INCREMENT,
+  `order_type` int(11) NOT NULL,
+  `product_id` int(11) DEFAULT 0,
+
+  `time` varchar(1024) NOT NULL,
+
+  `initiator_id` int(11) NOT NULL,
+  `target_id` int(11) NOT NULL,
+
+  `address` varchar(1024) DEFAULT NULL,
+
+  `num` int(11) NOT NULL,
+  `price` float(15, 6) NOT NULL,
+  `sum_price` float(15, 6) NOT NULL,
+  `payment_id` int(11) DEFAULT -1,
+
+  `status` int(11) DEFAULT 0,
+  PRIMARY KEY (`order_id`)
+);
+
+DROP TABLE IF EXISTS `payment`;
+CREATE TABLE `payment` (
+  `payment_id` int(11) NOT NULL AUTO_INCREMENT,
+  `aliPay_account` varchar(1024) NOT NULL,
+  `price` float(15, 6) NOT NULL,
+  `status` int(11) NOT NULL,
+  PRIMARY KEY (`payment_id`)
+);
+
 DROP TABLE IF EXISTS `favorite`;
 CREATE TABLE `favorite` (
   `favorite_id` int(11) NOT NULL AUTO_INCREMENT,
