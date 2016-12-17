@@ -40,13 +40,6 @@ CREATE TABLE  `photo` (
   PRIMARY KEY (`photo_id`)
 );
 
-DROP TABLE IF EXISTS `class`;
-CREATE TABLE `class` (
-  `class_id` int(11) NOT NULL AUTO_INCREMENT,
-  `class_name` varchar(1024) NOT NULL,
-  PRIMARY KEY (`class_id`)
-);
-
 DROP TABLE IF EXISTS `favorite`;
 CREATE TABLE `favorite` (
   `favorite_id` int(11) NOT NULL AUTO_INCREMENT,

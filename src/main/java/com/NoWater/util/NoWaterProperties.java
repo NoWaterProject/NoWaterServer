@@ -21,12 +21,28 @@ public final class NoWaterProperties {
             {"Aberdeen", "Admiralty", "Ap Lei Chau", "Big Wave Bay", "Causeway Bay", "Central", "Central Sheung Wan", "Central South", "Chai Wan", "Gloucester Road", "Happy Valley", "Harbour Road", "Jardine's Lookout", "Kennedy Town", "Lai Tak Tsuen", "Mid-Levels", "Mid-Levels West", "North Point", "Pok Fu Lam", "Quarry Bay", "Sai Wan", "Shau Kei Wan", "Shek O", "Sheung Wan West", "Siu Sai Wan", "So Kon Po", "Southern District", "Stanley", "Tai Hang Road", "The Peak", "Tim Mei Ave", "Tin Hau", "Wah Fu", "Wan Chai", "Wong Chuk Hang"}
     };
 
+    private static String[] className = {
+            "TV& Home Theater",
+            "Computers & Tablets",
+            "Cell Phones",
+            "Cameras & Camcorders",
+            "Audio",
+            "Car Electronics & GPS",
+            "Video, Games, Movies & Music",
+            "Health, Fitness & Sports",
+            "Home & Office"
+    };
+
     public static String[] getAddress() {
         return address;
     }
 
     public static String[][] getAddress2() {
         return address2;
+    }
+
+    public static String[] getClassName() {
+        return className;
     }
 
     static {
