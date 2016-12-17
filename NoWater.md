@@ -51,6 +51,7 @@
 
 * **添加到购物车接口**、**加入收藏接口** 请看**购物车/收藏相关**
 * **搜索接口**、**按类检索接口** 请看**搜索/按类检索相关**
+* **店铺信息**请看本模块
 
 * **customer/isLogin**  （完成）
 
@@ -99,6 +100,26 @@
         * productName（string，商品名称）
         * price（double，单价）
         * photoIdUrl（string，存储照片的URL，用product表中的product_photo_url）
+
+* **customer/shop/info**        （未开始）
+
+    用于返回店铺信息。（用于店铺首页，也可以用于商品详情页）
+
+    所需参数：
+
+    * shopId（int，店铺Id）
+
+    返回：
+
+    * 状态码（status）：
+        * 200（成功）
+        * 400（**前端不用考虑**，shopId不存在）
+    * shopId（int，商铺Id）
+    * shopName（string，店名）
+    * ownerId（int，店主Id）
+    * email（string，电子邮箱）
+    * telephone（string，电话）
+    * status（int，状态码）
 
 ### 购物车/收藏相关
 
@@ -320,7 +341,7 @@
 
     所需参数：
 
-    * orderType（int，订单类型：0为customer订单，1为shop owner申请ParknShop首页商品广告订单，2为shop owner申请ParknShop首页店铺广告订单）
+    * orderType（int，订单类型：0为customer立即购买订单，1为shop owner申请ParknShop首页商品广告订单，2为shop owner申请ParknShop首页店铺广告订单，3为customer购物车结算订单）
     * productId（int，商品Id，当orderType为0时，就是customer下单的商品。当orderType为1时，需要做广告的商品。当orderType为2时，productId为0）
     * price（float，单价，非必须，如果orderType为0，就不用传了）
     * num（int，数量）
@@ -543,10 +564,6 @@
         * 300（用户未登录，暂时没有cookie验证）
         * 400（失败）
 
-* **shop-owner/ad/photo/confirm**
-
-    用于确认广告所用
-
 ## Admin相关接口
 * 查看管理员**cookie**时，身份验证是：**admin_token**的值。
     
@@ -564,17 +581,50 @@
         * 200（成功）
         * 300（密码错误或用户名错误）
 
-* **admin/shop/applyList**
+* **admin/shop/applyList**          （已完成，后续补全文档）
     用于展示处于申请状态的shop的记录。
 
-* **admin/shop/handle**
+* **admin/shop/handle**             （已完成，后续补全文档）
     用于处理申请状态的shop。
 
-* **admin/product/ad/manage**
-    管理首页的商品广告。需要将结果写进redis。
+* **admin/shop/list**
 
-    所需参数：
+    用于展示商家列表
 
-    * sizeId（int，尺寸Id）
+    所需参数：无
+
+    返回：
+
+    * 状态码（status）：
+        * 200（成功）
+        * 300（admin未登录）
+    * data：
+        * shopId（int，商铺Id）
+        * shopName（string，店名）
+        * ownerId（int，店主Id）
+        * email（string，电子邮箱）
+        * telephone（string，电话）
+        * status（int，状态码）
     
-    
+* **admin/customer/list**
+
+    用于展示customer列表
+
+    所需参数：无
+
+    返回：
+
+    * 状态码（status）：
+        * 200（成功）
+        * 300（admin未登录）
+    * data：
+        * userId（int，用户Id）
+        * name（string，用户名）
+        * telephone（string，电话号码）
+        * address1（string）
+        * address2（string）
+        * address3（string）
+        * postCode（string）
+        * firstName（string）
+        * lastName（string）
+        * status（int）
