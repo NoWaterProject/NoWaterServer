@@ -66,6 +66,21 @@ public class AdminOrder {
     public JSONObject paymentList(@RequestParam(value = "count") int count,
                                   @RequestParam(value = "startId", defaultValue = "0") int startId,
                                   HttpServletRequest request, HttpServletResponse response) {
-        
+        response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+
+        JSONObject jsonObject = new JSONObject();
+        LogHelper.info(String.format("[admin/payment/list] [param] [count:%s, startId:%s]", count, startId));
+
+        String token = CookieUtil.getCookieValueByName(request, "admin_token");
+        String admin = CookieUtil.confirmUser(token);
+
+        if (admin == null) {
+            jsonObject.put("status", 300);
+            return jsonObject;
+        }
+
+        String getPaymentSQL = "select * from `payment` where `status` = 0";
+
     }
 }
