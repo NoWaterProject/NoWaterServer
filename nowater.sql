@@ -58,7 +58,7 @@ CREATE TABLE `order` (
   `sum_price` float(15, 6) NOT NULL,
   `payment_id` int(11) DEFAULT -1,
 
-  `status` int(11) DEFAULT 0,
+  `status` int(11) DEFAULT -3,
   PRIMARY KEY (`order_id`)
 );
 
@@ -67,7 +67,8 @@ CREATE TABLE `payment` (
   `payment_id` int(11) NOT NULL AUTO_INCREMENT,
   `aliPay_account` varchar(1024) NOT NULL,
   `price` float(15, 6) NOT NULL,
-  `status` int(11) NOT NULL,
+  `time` varchar(1024) NOT NULL,
+  `status` int(11) DEFAULT 0,
   PRIMARY KEY (`payment_id`)
 );
 

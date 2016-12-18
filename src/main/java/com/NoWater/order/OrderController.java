@@ -5,12 +5,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.NoWater.model.Cart;
-import com.NoWater.model.Order;
-import com.NoWater.model.Product;
-import com.NoWater.model.User;
+import com.NoWater.model.*;
 import com.NoWater.util.CookieUtil;
 import com.NoWater.util.DBUtil;
+import com.NoWater.util.OrderUtil;
 import com.sun.org.apache.xpath.internal.operations.Or;
 import net.sf.json.JSONArray;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.NoWater.util.LogHelper;
 
 import net.sf.json.JSONObject;
+import redis.clients.jedis.Jedis;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -31,12 +30,12 @@ import javax.servlet.http.HttpServletResponse;
 @RestController
 public class OrderController {
     @RequestMapping("/order/prepare")
-    public JSONObject greeting(@RequestParam(value = "orderType", defaultValue = "3") int orderType,
-                               @RequestParam(value = "productId", defaultValue = "0") int productId,
-                               @RequestParam(value = "price", defaultValue = "0.0") float price,
-                               @RequestParam(value = "num", defaultValue = "0") int num,
-                               @RequestParam(value = "cartIdList", defaultValue = "[]") String cartIdList,
-                               HttpServletRequest request, HttpServletResponse response) {
+    public JSONObject orderPrepare(@RequestParam(value = "orderType", defaultValue = "3") int orderType,
+                                   @RequestParam(value = "productId", defaultValue = "0") int productId,
+                                   @RequestParam(value = "price", defaultValue = "0.0") float price,
+                                   @RequestParam(value = "num", defaultValue = "0") int num,
+                                   @RequestParam(value = "cartIdList", defaultValue = "[]") String cartIdList,
+                                   HttpServletRequest request, HttpServletResponse response) {
 
         response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
         response.setHeader("Access-Control-Allow-Credentials", "true");
@@ -66,6 +65,7 @@ public class OrderController {
         } catch (Exception e) {
             e.printStackTrace();
             jsonObject.put("status", 1100);
+            LogHelper.info(String.format("[order/prepare] %s", jsonObject.toString()));
             return jsonObject;
         }
 
@@ -85,82 +85,196 @@ public class OrderController {
 
         if (orderType == 3) {
             JSONArray jsonArray = JSONArray.fromObject(cartIdList);
+            String getCart = "(";
+
+            if (jsonArray.size() == 0) {
+                jsonObject.put("status", 500);
+                return jsonObject;
+            }
+
             for (int i = 0; i < jsonArray.size(); i++) {
                 int cartId = jsonArray.getInt(i);
+                getCart += String.valueOf(cartId);
+                if (i != jsonArray.size() - 1)
+                    getCart += ", ";
+            }
+            getCart += ")";
+            String getCartSQL = "select * from `cart` where `cart_id` in ? and `is_del` = 0";
+            List<Object> getCartList = new ArrayList<>();
+            getCartList.add(getCart);
+            List<Cart> cartList;
+            try {
+                cartList = db.queryInfo(getCartSQL, getCartList, Cart.class);
+            } catch (Exception e) {
+                e.printStackTrace();
+                jsonObject.put("status", 1100);
+                LogHelper.info(String.format("[order/prepare] %s", jsonObject.toString()));
+                return jsonObject;
+            }
 
-                String getCartSQL = "select * from cart where cart_id = ?";
-                List<Object> getCartList = new ArrayList<>();
-                getCartList.add(cartId);
-                List<Cart> cartList;
-                try {
-                    cartList = db.queryInfo(getCartSQL, getCartList, Cart.class);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    jsonObject.put("status", 1100);
-                    return jsonObject;
-                }
+            if (cartList.size() != jsonArray.size()) {
+                jsonObject.put("status", 400);
+                LogHelper.info(String.format("[order/prepare] %s", jsonObject.toString()));
+                return jsonObject;
+            }
 
-                for (int j = 0; j < cartList.size(); j++) {
-                    int orderId = insertOrder(3, cartList.get(j).getProductId(),
-                            currentTime, user_id, address, cartList.get(j).getNum());
-                    orderList.add(orderId);
-                }
+            for (int i = 0; i < cartList.size(); i++) {
+                int orderId = OrderUtil.insertOrder(3, cartList.get(i).getProductId(),
+                        currentTime, user_id, address, cartList.get(i).getNum());
+                orderList.add(orderId);
+                Jedis jedis = new Jedis("127.0.0.1", 6379);
+                jedis.set("orderId:" + String.valueOf(orderId), String.valueOf(cartList.get(i).getCartId()));
             }
         } else {
-            int orderId = insertOrder(orderType, productId, currentTime, user_id, address, num);
+            int orderId = OrderUtil.insertOrder(orderType, productId, currentTime, user_id, address, num);
             orderList.add(orderId);
         }
         jsonObject.put("status", 200);
         jsonObject.put("orderIdList", orderList);
+        LogHelper.info(String.format("[order/prepare] %s", jsonObject.toString()));
         return jsonObject;
     }
 
-    private static int insertOrder(int order_type, int productId,
-                                    String time, int user_id,
-                                    String address,
-                                    int num) {
+    @RequestMapping("order/confirm")
+    public JSONObject orderConfirm(@RequestParam(value = "orderIdList") int orderIdList,
+                                   HttpServletRequest request, HttpServletResponse response) {
+
+        response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+        JSONObject jsonObject = new JSONObject();
         DBUtil db = new DBUtil();
 
-        String getProductSQL = "select * from products where product_id = ?";
-        List<Object> getProductList = new ArrayList<>();
-        getProductList.add(productId);
-        List<Product> ProductItem;
-        try {
-            ProductItem = db.queryInfo(getProductSQL, getProductList, Product.class);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return -10;
+        LogHelper.info(String.format("[order/confirm] [param] [orderIdList: %s]", orderIdList));
+
+        String token = CookieUtil.getCookieValueByName(request, "token");
+        String userId = CookieUtil.confirmUser(token);
+
+        if (userId == null) {
+            jsonObject.put("status", 300);
+            LogHelper.info(String.format("[order/confirm] %s", jsonObject.toString()));
+            return jsonObject;
         }
 
-        double price = ProductItem.get(0).getPrice();
+        JSONArray jsonArray = JSONArray.fromObject(orderIdList);
+        for (int i = 0; i < jsonArray.size(); i++) {
+            int orderId = jsonArray.getInt(i);
 
-        String insertOrderSQL = "insert into order (order_type, product_id, time, initiator_id, target_id, address, num, price, sum_price) values(?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        List<Object> insertList = new ArrayList<>();
-        insertList.add(order_type);
-        insertList.add(productId);
-        insertList.add(time);
-        insertList.add(user_id);
-        insertList.add(ProductItem.get(0).getShopId());
-        insertList.add(address);
-        insertList.add(num);
-        insertList.add(price);
-        insertList.add(num * price);
+            int status = OrderUtil.confirmOrderUserId(orderId, userId, -3);
 
-        db.insertUpdateDeleteExute(insertOrderSQL, insertList);
+            if (status != 200) {
+                jsonObject.put("status", 200);
+                LogHelper.info(String.format("[order/confirm] %s", jsonObject.toString()));
+                return jsonObject;
+            }
 
-        String getOrderIdSQL = "select order_id from order where order_type = ? and initiator_id = ? and time = ?";
-        List<Object> orderIdList = new ArrayList<>();
-        orderIdList.add(order_type);
-        orderIdList.add(user_id);
-        orderIdList.add(time);
-        List<Order> orderItem;
-        try {
-            orderItem = db.queryInfo(getOrderIdSQL, orderIdList, Order.class);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return -10;
+            Jedis jedis = new Jedis("127.0.0.1", 6379);
+            String cartId = jedis.get("orderId:" + String.valueOf(orderId));
+
+            if (cartId != null) {
+                String deleteCartSQL = "update `cart` set `is_del` = 1 where `cart_id` = ?";
+                List<Object> deleteCartList = new ArrayList<>();
+                deleteCartList.add(Integer.parseInt(cartId));
+                db.insertUpdateDeleteExute(deleteCartSQL, deleteCartList);
+            }
+
+            List<Object> getConfirmOrderId = new ArrayList<>();
+            getConfirmOrderId.add(orderId);
+
+            String updateConfirm = "update `order` set `status` = 0 where `order_id` = ?";
+            db.insertUpdateDeleteExute(updateConfirm, getConfirmOrderId);
+
+            jsonObject.put("status", 200);
+            LogHelper.info(String.format("[order/confirm] %s", jsonObject.toString()));
         }
-
-        return orderItem.get(0).getOrderId();
+        return jsonObject;
     }
+
+    @RequestMapping("order/price")
+    public JSONObject orderPrice(@RequestParam(value = "orderIdList") int orderIdList,
+                                 @RequestParam(value = "aliPay") String aliPay,
+                                 HttpServletRequest request, HttpServletResponse response) {
+        response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+        JSONObject jsonObject = new JSONObject();
+        DBUtil db = new DBUtil();
+
+        LogHelper.info(String.format("[order/confirm] [param] [orderIdList: %s, aliPay: %s]", orderIdList, aliPay));
+
+        String token = CookieUtil.getCookieValueByName(request, "token");
+        String userId = CookieUtil.confirmUser(token);
+
+        if (userId == null) {
+            jsonObject.put("status", 300);
+            LogHelper.info(String.format("[order/price] %s", jsonObject.toString()));
+            return jsonObject;
+        }
+
+        double sumPrice = 0.0;
+        JSONArray jsonArray = JSONArray.fromObject(orderIdList);
+        for (int i = 0; i < jsonArray.size(); i++) {
+            int orderId = jsonArray.getInt(i);
+
+            int status = OrderUtil.confirmOrderUserId(orderId, userId, 0);
+
+            if (status != 200) {
+                jsonObject.put("status", 200);
+                LogHelper.info(String.format("[order/price] %s", jsonObject.toString()));
+                return jsonObject;
+            }
+
+            List<Object> getOrderList = new ArrayList<>();
+            getOrderList.add(orderId);
+
+            String updateConfirm = "select * from `order` where `order_id` = ?";
+            List<Order> orderList;
+            try {
+                orderList = db.queryInfo(updateConfirm, getOrderList, Order.class);
+            } catch (Exception e) {
+                e.printStackTrace();
+                jsonObject.put("status", 1100);
+                LogHelper.info(String.format("[order/price] %s", jsonObject.toString()));
+                return jsonObject;
+            }
+
+            sumPrice += orderList.get(0).getPrice();
+        }
+
+        String pat = "yyyy-MM-dd HH:mm:ss";
+        SimpleDateFormat sdf = new SimpleDateFormat(pat);
+        String currentTime = sdf.format(new Date());
+
+        String insertPayment = "insert into `payment` (aliPay_account, price, time) values (?, ?, ?)";
+        List<Object> insertPaymentList = new ArrayList<>();
+        insertPaymentList.add(aliPay);
+        insertPaymentList.add(sumPrice);
+        insertPaymentList.add(currentTime);
+        db.insertUpdateDeleteExute(insertPayment, insertPaymentList);
+
+        String getPaymentSQL = "select * from `payment` where `aliPay_account` = ? and `price` = ? and `time` = ?";
+        List<Payment> paymentList;
+        try {
+            paymentList = db.queryInfo(getPaymentSQL, insertPaymentList, Payment.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+            jsonObject.put("status", 1100);
+            LogHelper.info(String.format("[order/price] %s", jsonObject.toString()));
+            return jsonObject;
+        }
+
+        int paymentId = paymentList.get(0).getPaymentId();
+
+        for (int i = 0; i < jsonArray.size(); i++) {
+            int orderId = jsonArray.getInt(i);
+
+            String updatePaymentSQL = "update `order` set `status` = 1 and `payment_id` = ? where `order_id` = ?";
+            List<Object> updateList = new ArrayList<>();
+            updateList.add(paymentId);
+            updateList.add(orderId);
+            db.insertUpdateDeleteExute(updatePaymentSQL, updateList);
+        }
+        jsonObject.put("stauts", 200);
+        LogHelper.info(String.format("[order/price] %s", jsonObject.toString()));
+        return jsonObject;
+    }
+
 }

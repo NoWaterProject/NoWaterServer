@@ -315,7 +315,7 @@
     *  4：待评价（一天后跳到订单完成）
     *  5：订单完成；
 
-* **order/prepare**         （未开始）
+* **order/prepare**         （进入测试阶段）
 
     用于生成待确认的订单。比如用于点了**立即购买**，或者在购物车中点了**结算**，或者申请广告界面点了申请
 
@@ -368,7 +368,6 @@
     所需参数：
 
     * orderIdList（JSON string，orderId列表）
-    * sumPrice（float，总金额）
     * aliPay（string支付宝账号）
 
     返回：

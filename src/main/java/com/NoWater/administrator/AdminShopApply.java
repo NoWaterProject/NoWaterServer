@@ -26,7 +26,7 @@ public class AdminShopApply {
 
     @RequestMapping("/admin/shop/applyList")
     public JSONObject adminShopApplyList(HttpServletRequest request, HttpServletResponse response) {
-        LogHelper.info("shop apply list");
+        LogHelper.info("[admin/shop/apply/list]");
         response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
         response.setHeader("Access-Control-Allow-Credentials", "true");
         JSONObject jsonObject = new JSONObject();
