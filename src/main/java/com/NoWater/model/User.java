@@ -12,6 +12,15 @@ public class User {
     private String address2;
     private String address3;
     private int post_code;
+    private int status;
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
 
     public void setPostCode(int post_code) {
         this.post_code = post_code;

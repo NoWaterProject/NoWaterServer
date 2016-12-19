@@ -11,6 +11,7 @@ public class Shop {
     private String email;
     private int status;
     private String telephone;
+    private int is_del;
 
     public void setShopName(String shopName) {
         this.shop_name = shopName;
@@ -56,4 +57,15 @@ public class Shop {
         return shop_id;
     }
 
+    public int getIsDel() {
+        return is_del;
+    }
+
+    public void setIs_del(int is_del) {
+        this.is_del = is_del;
+    }
+
+    public void setShop_id(int shop_id) {
+        this.shop_id = shop_id;
+    }
 }
