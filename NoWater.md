@@ -709,7 +709,33 @@
 
 * **admin/customer/delete**
 
+    恢复加入了黑名单的用户
+    
+    所需参数：
+    
+    * userId（int，需要从黑名单中移除的店铺Id）
+    
+    返回：
+    
+    * 状态码（status）：
+        * 200（成功）
+        * 300（管理员未登录）
+        * 400（userId不存在）
+
 * **admin/customer/blacklist/deleting**
+
+    删除用户
+    
+    所需参数：
+    
+    * userId（int，需要删除的用户Id）
+    
+    返回：
+    
+    * 状态码（status）：
+        * 200（成功）
+        * 300（管理员未登录）
+        * 400（userId不存在）
 
 * **admin/shop/blacklist/adding**
 
@@ -724,8 +750,36 @@
     * 状态码（status）：
         * 200（成功）
         * 300（管理员未登录）
-        * 400（该店铺已删除）
+        * 400（shopId不存在）
+        * 500（shopId已删除）
 
 * **admin/shop/delete**
 
+    删除商铺
+    
+    所需参数：
+    
+    * shopId（int，需要删除的shopId）
+    
+    返回：
+    
+    * 状态码（status）：
+        * 200（成功）
+        * 300（管理员未登录）
+        * 400（shopId不存在）
+
 * **admin/shop/blacklist/deleting**
+
+    恢复加入了黑名单的店铺
+    
+    所需参数：
+    
+    * shopId（int，需要从黑名单中移除的店铺Id）
+    
+    返回：
+    
+    * 状态码（status）：
+        * 200（成功）
+        * 300（管理员未登录）
+        * 400（shopId不存在）
+        * 500（shopId已删除）
