@@ -356,7 +356,6 @@
     所需参数：
 
     * orderIdList（JSON string，orderId列表）
-    * aliPay（string支付宝账号）
 
     返回：
 
@@ -709,7 +708,7 @@
 
 * **admin/customer/delete**
 
-    恢复加入了黑名单的用户
+    删除用户
     
     所需参数：
     
@@ -724,7 +723,7 @@
 
 * **admin/customer/blacklist/deleting**
 
-    删除用户
+    恢复加入了黑名单的用户
     
     所需参数：
     
