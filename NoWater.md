@@ -379,13 +379,41 @@
         * 300（用户未登录）
         * 400（订单错误）
         
+* **order/detail**
+
+    订单详情
+    
+    所需参数：
+    
+    * orderId（int，订单Id）
+    
+    返回：
+    
+    * 状态码（status）：
+        * 200（成功）
+        * 300（用户未登录）
+        * 400（订单不存在）
+    * orderId（int，订单Id）
+    * orderType（int，订单类型）
+    * productId（int，商品Id）
+    * time（string，生成预订单时间）
+    * initiatorId（int，发起者Id）
+    * targetId（int，目标店铺Id）
+    * address（string，地址）
+    * num（int，数量）
+    * price（float，单价）
+    * sumPrice（float，总价）
+    * status（int，状态）
+        
 * **order/list**
 
     用于展示各个状态的order。
     
     所需参数：
     
-    * status（订单状态）
+    * status（int，订单状态）
+    * startId（int，开始Id）
+    * count（int，数量）
     
     返回：
     
