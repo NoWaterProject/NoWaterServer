@@ -308,16 +308,16 @@
     * -3：预订单状态，订单未确认
     * -2：已退款取消订单（专为广告设计）
     * -1：订单已取消（用户未付款手动取消），或者超时未付款（超时时间为1小时）
-    *  0：订单已确认，待付款
-    *  1：用户已付款，待管理员确认付款
-    *  2：管理员已确认付款，待发货
+    *  0：**用于all order**
+    *  1：订单已确认，待付款
+    *  2：已付款，待发货
     *  3：店家已发货，待收货
     *  4：待评价（一天后跳到订单完成）
     *  5：订单完成；
 
 * **order/prepare**         （进入测试阶段）
 
-    用于生成待确认的订单。比如用于点了**立即购买**，或者在购物车中点了**结算**，或者申请广告界面点了申请
+    用于生成待确认的订单。比如用于点了**立即购买**，或者在购物车中点了**结算**，或者申请广告界面点了申请。此时状态为-3。
 
     所需参数：
 
@@ -331,26 +331,15 @@
     * 状态码（status）：
         * 200（成功）
         * 300（**前端不用考虑**，用户未登录）
-    * data：
-        * orderId（int，订单Id）
-        * orderType（int，订单类型）
-        * productId（int，商品Id）
-        * time（string，生成预订单时间）
-        * initiatorId（int，发起者Id）
-        * targetId（int，目标店铺Id）
-        * address（string，地址）
-        * num（int，数量）
-        * price（float，单价）
-        * sumPrice（float，总价）
-        * status（int，状态，这时状态为-3）
+    * orderIdList（JSON数组）
+    
+* **order/confirm**     （进入测试状态）
 
-* **order/confirm**     （未开始）
-
-    订单确认，跳到付款界面。
+    订单确认，跳到付款界面。状态由-3到1。
 
     所需参数：
 
-    * orderId（int，订单Id）
+    * orderIdList（JSON数组，订单Id）
 
     返回：
 
@@ -359,11 +348,10 @@
         * 300（**前端不用考虑**，用户未登录）
         * 400（**前端不用考虑**，orderId不存在）
         * 500（**前端不用考虑**，orderId和用户对不上）
-    * sumPrice（float，如果需要的话，返回总金额）
 
-* **order/price**       （未开始）
+* **order/price**       （进入测试状态）
 
-    订单付款接口，用于付款界面。
+    订单付款接口，用于付款界面。状态由1到2。
 
     所需参数：
 
@@ -376,6 +364,64 @@
         * 200（成功）
         * 300（**前端不用考虑**，用户未登录）
         * 400（**前端不用考虑**，用户和orderId对应不上）
+        
+* **order/taken/delivery**
+    
+    确认收货。状态由3到4。
+    
+    所需参数：
+    
+    * orderId（int，订单Id）
+    
+    返回：
+    
+    * 状态码（status）：
+        * 200（成功）
+        * 300（用户未登录）
+        * 400（订单错误）
+        
+* **order/list**
+
+    用于展示各个状态的order。
+    
+    所需参数：
+    
+    * status（订单状态）
+    
+    返回：
+    
+    * 状态码（status）：
+        * 200（成功）
+        * 300（用户未登录）
+    * data（数组）：
+        * orderId（int，订单Id）
+        * orderType（int，订单类型）
+        * productId（int，商品Id）
+        * time（string，生成预订单时间）
+        * initiatorId（int，发起者Id）
+        * targetId（int，目标店铺Id）
+        * address（string，地址）
+        * express（String，快递名称）
+        * expressCode（String，邮单号）
+        * num（int，数量）
+        * price（float，单价）
+        * sumPrice（float，总价）
+        * status（int，状态）
+        
+* **order/cancel**
+    
+    用于取消订单。状态由1到-1。
+    
+    所需参数：
+    
+    * orderId（int，订单Id）
+    
+    返回：
+    
+    * 状态码（status）：
+        * 200（成功）
+        * 300（用户未登录）
+        * 400（订单错误）
 
 ### 店铺/商品展示相关
 
@@ -534,6 +580,25 @@
         * 500（商品名重复）
         * 1010、1020、1030、1040（服务器错误）
 
+### Shop Owner Order
+
+* **shop-owner/order/delivery**
+
+    用于确认发货。状态由2到3。
+    
+    所需参数：
+    
+    * express（string，快递公司）
+    * expressCode（string，邮单号）
+    * orderId（int，订单Id）
+    
+    返回：
+    
+    * 状态码（status）：
+        * 200（成功）
+        * 300（用户未登录）
+        * 400（订单不存在）
+
 * **photo_type**
     * 0 店铺广告照片
     * 2 商品详情照片
@@ -581,7 +646,11 @@
 
     用于展示商家列表
 
-    所需参数：无
+    所需参数：
+    
+    * shopType（int，如果为1，则为正常店家，如果为-1，则为黑名单商家）
+    * count（int，数量）
+    * startId（int，开始的Id，非必须，默认为0）
 
     返回：
 
@@ -600,7 +669,11 @@
 
     用于展示customer列表
 
-    所需参数：无
+    所需参数：
+    
+    * customerType（int，用户类型，1为正常用户，-1为黑名单用户）
+    * count（int，数量）
+    * startId（int，开始的Id，非必须，默认为0）
 
     返回：
 
@@ -618,3 +691,41 @@
         * firstName（string）
         * lastName（string）
         * status（int）
+
+* **admin/customer/blacklist/adding**
+    
+    加入黑名单的用户，不能登录，马上强制退出。如果开了店铺，则关闭店铺（处于已回绝状态）。
+
+    所需参数：
+    
+    * userId（int，需要加入黑名单的用户的Id）
+    
+    返回：
+    
+    * 状态码（status）：
+        * 200（成功）
+        * 300（管理员未登录）
+        * 400（该用户已删除）
+
+* **admin/customer/delete**
+
+* **admin/customer/blacklist/deleting**
+
+* **admin/shop/blacklist/adding**
+
+    加入黑名单的商家，关闭店铺（处于已回绝状态）。不允许下单
+
+    所需参数：
+    
+    * shopId（int，需要加入黑名单的店铺的Id）
+    
+    返回：
+    
+    * 状态码（status）：
+        * 200（成功）
+        * 300（管理员未登录）
+        * 400（该店铺已删除）
+
+* **admin/shop/delete**
+
+* **admin/shop/blacklist/deleting**

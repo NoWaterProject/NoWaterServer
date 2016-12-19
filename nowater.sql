@@ -52,6 +52,8 @@ CREATE TABLE `order` (
   `target_id` int(11) NOT NULL,
 
   `address` varchar(1024) DEFAULT NULL,
+  `express` varchar(1024) DEFAULT NULL,
+  `express_code` varchar(1024) DEFAULT NULL,
 
   `num` int(11) NOT NULL,
   `price` float(15, 6) NOT NULL,
