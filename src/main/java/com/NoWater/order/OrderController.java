@@ -253,9 +253,14 @@ public class OrderController {
             return jsonObject;
         }
 
+        StringBuffer stringBuffer = new StringBuffer();
+        stringBuffer.append("(");
+
         JSONArray jsonArray = JSONArray.fromObject(orderIdList);
         for (int i = 0; i < jsonArray.size(); i++) {
             int orderId = jsonArray.getInt(i);
+
+            stringBuffer.append(orderId);
 
             int statusConfirmOrder = OrderUtil.confirmOrderUserId(orderId, userId, status);
 
@@ -265,10 +270,10 @@ public class OrderController {
                 return jsonObject;
             }
         }
+        stringBuffer.append(")");
 
-        String getOrderDetailSQL = "select * from `order` where `order_id` in ? and ``";
+        String getOrderDetailSQL = "select * from `order` where `order_id` in " + stringBuffer.toString();
         List<Object> getOrderDetailList = new ArrayList<>();
-        getOrderDetailList.add(orderIdList);
 
         JSONArray orderDetail = OrderUtil.getOrderDetail(getOrderDetailSQL, getOrderDetailList);
 

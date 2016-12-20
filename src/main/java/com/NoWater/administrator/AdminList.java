@@ -24,9 +24,9 @@ public class AdminList {
 
     @RequestMapping("/admin/shop/list")
     public JSONObject adminShopList(@RequestParam(value = "shopType", defaultValue = "/") int shopType,
-                                         @RequestParam(value = "count", defaultValue = "/") int count,
-                                         @RequestParam(value = "startId", defaultValue = "0") int startId,
-                                         HttpServletRequest request, HttpServletResponse response) throws Exception{
+                                    @RequestParam(value = "count", defaultValue = "/") int count,
+                                    @RequestParam(value = "startId", defaultValue = "0") int startId,
+                                    HttpServletRequest request, HttpServletResponse response) throws Exception {
         response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
         response.setHeader("Access-Control-Allow-Credentials", "true");
         JSONObject jsonObject = new JSONObject();
@@ -46,14 +46,15 @@ public class AdminList {
         List<Object> list = new ArrayList<>();
         String sql = "select * from shop where status = ?";
         list.add(shopType);
-        List<Shop> shopList = db.queryInfo(sql,list,Shop.class);
+        List<Shop> shopList = db.queryInfo(sql, list, Shop.class);
 
-        if(shopList.size() == 0) {
-            jsonObject.put("status",200);
-            jsonObject.put("data","");
+        if (shopList.size() == 0) {
+            jsonObject.put("status", 200);
+            jsonObject.put("data", "[]");
+            jsonObject.put("endId", -1);
             LogHelper.info(String.format("[/admin/shop/list] %s", jsonObject.toString()));
             return jsonObject;
-        }   else {
+        } else {
             if (shopList.size() - startId > count) {
                 endId = startId + count;
                 actualCount = count;
@@ -69,8 +70,8 @@ public class AdminList {
                 jsonArray.add(jsonObject1);
             }
 
-            jsonObject.put("status",200);
-            jsonObject.put("data",jsonArray);
+            jsonObject.put("status", 200);
+            jsonObject.put("data", jsonArray);
             LogHelper.info(String.format("[/admin/shop/list] %s", jsonObject.toString()));
         }
 
@@ -79,9 +80,9 @@ public class AdminList {
 
     @RequestMapping("/admin/customer/list")
     public JSONObject adminCustomerList(@RequestParam(value = "customerType", defaultValue = "/") int customerType,
-                                         @RequestParam(value = "count", defaultValue = "/") int count,
-                                         @RequestParam(value = "startId", defaultValue = "0") int startId,
-                                         HttpServletRequest request, HttpServletResponse response) throws Exception{
+                                        @RequestParam(value = "count", defaultValue = "/") int count,
+                                        @RequestParam(value = "startId", defaultValue = "0") int startId,
+                                        HttpServletRequest request, HttpServletResponse response) throws Exception {
         response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
         response.setHeader("Access-Control-Allow-Credentials", "true");
         JSONObject jsonObject = new JSONObject();
@@ -101,14 +102,15 @@ public class AdminList {
         List<Object> list = new ArrayList<>();
         String sql = "select * from user where status = ?";
         list.add(customerType);
-        List<User> userList = db.queryInfo(sql,list,User.class);
+        List<User> userList = db.queryInfo(sql, list, User.class);
 
-        if(userList.size() == 0) {
-            jsonObject.put("status",200);
-            jsonObject.put("data","");
+        if (userList.size() == 0) {
+            jsonObject.put("status", 200);
+            jsonObject.put("data", "[]");
+            jsonObject.put("endId", -1);
             LogHelper.info(String.format("[/admin/customer/list] %s", jsonObject.toString()));
             return jsonObject;
-        }   else {
+        } else {
             if (userList.size() - startId > count) {
                 endId = startId + count;
                 jsonObject.put("endId", endId);
@@ -124,8 +126,8 @@ public class AdminList {
                 jsonArray.add(jsonObject1);
             }
 
-            jsonObject.put("status",200);
-            jsonObject.put("data",jsonArray);
+            jsonObject.put("status", 200);
+            jsonObject.put("data", jsonArray);
             LogHelper.info(String.format("[/admin/customer/list] %s", jsonObject.toString()));
         }
 
