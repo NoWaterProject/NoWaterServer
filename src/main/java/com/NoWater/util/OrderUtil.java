@@ -30,7 +30,7 @@ public final class OrderUtil {
 
         double price = ProductItem.get(0).getPrice();
 
-        String insertOrderSQL = "insert into order (order_type, product_id, time, initiator_id, target_id, address, num, price, sum_price) values (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String insertOrderSQL = "insert into `order` (`order_type`, `product_id`, `time`, `initiator_id`, `target_id`, `address`, `num`, `price`, `sum_price`) values (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         List<Object> insertList = new ArrayList<>();
         insertList.add(order_type);
         insertList.add(productId);
@@ -44,7 +44,7 @@ public final class OrderUtil {
 
         db.insertUpdateDeleteExute(insertOrderSQL, insertList);
 
-        String getOrderIdSQL = "select order_id from order where order_type = ? and initiator_id = ? and time = ?";
+        String getOrderIdSQL = "select `order_id` from `order` where `order_type` = ? and `initiator_id` = ? and `time` = ?";
         List<Object> orderIdList = new ArrayList<>();
         orderIdList.add(order_type);
         orderIdList.add(user_id);
@@ -63,7 +63,7 @@ public final class OrderUtil {
     public static int confirmOrderUserId(int orderId, String userId, int status) {
         List<Object> getConfirmOrderId = new ArrayList<>();
         getConfirmOrderId.add(orderId);
-        String confirmOrderId = "select * from `order` where `orderId` = ? and `status` = ?";
+        String confirmOrderId = "select * from `order` where `order_id` = ? and `status` = ?";
         getConfirmOrderId.add(status);
 
         DBUtil db = new DBUtil();
@@ -108,8 +108,6 @@ public final class OrderUtil {
             int shopId = orderDetail.get(i).getTargetId();
             JSONObject product = ProductShopUtil.GetProductDetail(productId);
             orderItem.put("product", product);
-            JSONObject shop = ProductShopUtil.GetShopDetail(shopId);
-            orderItem.put("shop", shop);
             jsonArray.add(orderItem);
         }
 

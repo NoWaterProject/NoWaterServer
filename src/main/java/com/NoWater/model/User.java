@@ -7,11 +7,11 @@ public class User {
     private Integer user_id;
     private String name;
     private String password;
-    private String phone;
+    private String telephone;
     private String address1;
     private String address2;
     private String address3;
-    private int post_code;
+    private String post_code;
     private int status;
 
     public int getStatus() {
@@ -22,7 +22,7 @@ public class User {
         this.status = status;
     }
 
-    public void setPostCode(int post_code) {
+    public void setPostCode(String post_code) {
         this.post_code = post_code;
     }
 
@@ -34,7 +34,7 @@ public class User {
         this.last_name = last_name;
     }
 
-    public int getPostCode() {
+    public String getPostCode() {
         return post_code;
     }
 
@@ -63,7 +63,7 @@ public class User {
     }
 
     public String getPhone() {
-        return phone;
+        return telephone;
     }
 
     public String getAddress1() {
@@ -95,7 +95,7 @@ public class User {
     }
 
     public void setPhone(String phone) {
-        this.phone = phone;
+        this.telephone = phone;
     }
 
     public void setAddress1(String address1) {

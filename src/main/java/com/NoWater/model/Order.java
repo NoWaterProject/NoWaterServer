@@ -16,6 +16,24 @@ public class Order {
     private float sum_price;
     private int payment_id;
     private int status;
+    private String express;
+    private String express_code;
+
+    public String getExpress() {
+        return express;
+    }
+
+    public String getExpressCode() {
+        return express_code;
+    }
+
+    public void setExpress(String express) {
+        this.express = express;
+    }
+
+    public void setExpress_code(String express_code) {
+        this.express_code = express_code;
+    }
 
     public void setOrder_id(int order_id) {
         this.order_id = order_id;

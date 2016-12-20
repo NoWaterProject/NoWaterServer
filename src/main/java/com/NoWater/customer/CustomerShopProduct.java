@@ -3,10 +3,7 @@ package com.NoWater.customer;
 import com.NoWater.model.Photo;
 import com.NoWater.model.Product;
 import com.NoWater.model.Shop;
-import com.NoWater.util.CookieUtil;
-import com.NoWater.util.DBUtil;
-import com.NoWater.util.LogHelper;
-import com.NoWater.util.NoWaterProperties;
+import com.NoWater.util.*;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -85,55 +82,15 @@ public class CustomerShopProduct {
 
         LogHelper.info(String.format("[customer/product/show] [param] [product_id: %s]", productId));
 
-        DBUtil db = new DBUtil();
-        List<Object> list = new ArrayList<>();
-        String productExistSQL = "select * from products where product_id = ?";
-        list.add(productId);
-        List<Product> getProductExist;
-        try {
-            getProductExist = db.queryInfo(productExistSQL, list, Product.class);
-        } catch (Exception e) {
-            e.printStackTrace();
-            LogHelper.error(e.toString());
-            jsonObject.put("status", 400);
-            return jsonObject;
-        }
-
-        // can't find product
-        if (getProductExist.size() == 0) {
+        JSONObject product = ProductShopUtil.GetProductDetail(productId);
+        if (product.has("status")) {
             jsonObject.put("status", 400);
             LogHelper.error(String.format("[customer/product/show] %s", jsonObject));
             return jsonObject;
         }
 
-        if (getProductExist.get(0).getIsDel() == 1) {
-            jsonObject.put("status", 500);
-        } else {
-            jsonObject.put("status", 200);
-        }
-
-        JSONObject jsonObject1 = JSONObject.fromObject(getProductExist);
-
-        int shopId = getProductExist.get(0).getShopId();
-
-        List<Object> getShopInfo = new ArrayList<>();
-        String shopInfoSQL = "select * from shop where shop_id = ?";
-        getShopInfo.add(shopId);
-        List<Shop> ShopInfo;
-        try {
-            ShopInfo = db.queryInfo(shopInfoSQL, getShopInfo, Shop.class);
-        } catch (Exception e) {
-            e.printStackTrace();
-            jsonObject.put("status", 600);
-            LogHelper.error(String.format("[customer/product/show] %s", jsonObject));
-            return jsonObject;
-        }
-
-        JSONObject jsonObject2 = JSONObject.fromObject(ShopInfo);
-        JSONObject jsonObject3 = new JSONObject();
-        jsonObject3.put("shop", jsonObject2);
-        jsonObject3.put("product", jsonObject1);
-        jsonObject.put("data", jsonObject3);
+        jsonObject.put("status", 200);
+        jsonObject.put("data", product);
 
         LogHelper.error(String.format("[customer/product/show] %s", jsonObject));
         return jsonObject;

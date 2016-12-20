@@ -53,7 +53,7 @@ public class CookieUtil {
                 return null;
             } else {
                 String realToken = jedis.get(userId);
-                if (realToken.equals(uuid)) {
+                if (uuid.equals(realToken)) {
                     return userId;
                 } else {
                     return null;

@@ -5,6 +5,7 @@ import com.NoWater.model.Product;
 import com.NoWater.model.Shop;
 import com.NoWater.util.CookieUtil;
 import com.NoWater.util.DBUtil;
+import com.NoWater.util.LogHelper;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,7 +46,7 @@ public class CustomerClassProduct {
             List<Object> getShopExist = new ArrayList<>();
             String getShopExistSQL = "select * from shop where shop_id = ?";
             getShopExist.add(shopId);
-            List<Product> getShopList = db.queryInfo(getShopExistSQL, getShopExist, Product.class);
+            List<Shop> getShopList = db.queryInfo(getShopExistSQL, getShopExist, Shop.class);
             if (getShopList.size() == 0) {
                 jsonObject.put("status", 500);
                 return jsonObject;
@@ -56,17 +57,17 @@ public class CustomerClassProduct {
         List<Object> getProductSQLlist = new ArrayList<>();
         if (shopId == 0) {                  //  全局搜索
             if (classId == 0) {             //  全部类别
-                getProductSQL.append("select * from products");
+                getProductSQL.append("select * from products where is_del = 0");
             } else {                        //  个别类别
-                getProductSQL.append("select * from products where class_id = ?");
+                getProductSQL.append("select * from products where is_del = 0 and class_id = ?");
                 getProductSQLlist.add(classId);
             }
         } else {                            //  某个店铺搜素
             if (classId == 0) {
-                getProductSQL.append("select * from products where shop_id = ?");
+                getProductSQL.append("select * from products where is_del = 0 and shop_id = ?");
                 getProductSQLlist.add(shopId);
             } else {
-                getProductSQL.append("select * from products where shop_id = ? and class_id = ?");
+                getProductSQL.append("select * from products where is_del = 0 and shop_id = ? and class_id = ?");
                 getProductSQLlist.add(shopId);
                 getProductSQLlist.add(classId);
             }
@@ -77,9 +78,8 @@ public class CustomerClassProduct {
             getProductSQLlist.add(startId);
         }
 
-        getProductSQL.append(" and is_del = 0");
-
         DBUtil db = new DBUtil();
+        LogHelper.info("[customer/class/product] " + getProductSQL.toString());
         List<Product> productList = db.queryInfo(getProductSQL.toString(), getProductSQLlist, Product.class);
 
         int actualCount;
