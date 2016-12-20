@@ -1,5 +1,6 @@
 package com.NoWater.administrator;
 
+import com.NoWater.model.Shop;
 import com.NoWater.model.User;
 import com.NoWater.util.CookieUtil;
 import com.NoWater.util.DBUtil;
@@ -43,13 +44,13 @@ public class AdminBlackList {
         List<Object> list = new ArrayList<>();
         String sql = "select * from user where user_id = ?";
         list.add(userId);
-        List<User> userList = db.queryInfo(sql,list,User.class);
+        List<User> userList = db.queryInfo(sql, list, User.class);
 
-        if (userList.size() == 0 ){
+        if (userList.size() == 0) {
             jsonObject.put("status", 400);
             LogHelper.info(String.format("[admin/customer/blacklist/adding] %s", jsonObject.toString()));
             return jsonObject;
-        }   else {
+        } else {
             List<Object> param = new ArrayList<>();
             sql = "UPDATE user SET status = -1 WHERE user_id = ?";
             param.add(userId);
@@ -85,13 +86,13 @@ public class AdminBlackList {
         List<Object> list = new ArrayList<>();
         String sql = "select * from user where user_id = ?";
         list.add(userId);
-        List<User> userList = db.queryInfo(sql,list,User.class);
+        List<User> userList = db.queryInfo(sql, list, User.class);
 
-        if (userList.size() == 0 ){
+        if (userList.size() == 0) {
             jsonObject.put("status", 400);
             LogHelper.info(String.format("[admin/customer/blacklist/deleting] %s", jsonObject.toString()));
             return jsonObject;
-        }   else {
+        } else {
             List<Object> param = new ArrayList<>();
             sql = "UPDATE user SET status = 1 WHERE user_id = ?";
             param.add(userId);
@@ -124,15 +125,15 @@ public class AdminBlackList {
         List<Object> list = new ArrayList<>();
         String sql = "select * from shop where shop_id = ?";
         list.add(shopId);
-        List<User> userList = db.queryInfo(sql,list,User.class);
+        List<Shop> userList = db.queryInfo(sql, list, Shop.class);
 
-        if (userList.size() == 0 ){
+        if (userList.size() == 0) {
             jsonObject.put("status", 400);
             LogHelper.info(String.format("[admin/shop/blacklist/adding] %s", jsonObject.toString()));
             return jsonObject;
-        }   else {
+        } else {
             List<Object> param = new ArrayList<>();
-            sql = "UPDATE shop SET status = -1 WHERE user_id = ?";
+            sql = "UPDATE `shop` SET status = -1 WHERE `shop_id` = ?";
             param.add(shopId);
             db.insertUpdateDeleteExute(sql, param);
             jsonObject.put("status", 200);
@@ -163,13 +164,13 @@ public class AdminBlackList {
         List<Object> list = new ArrayList<>();
         String sql = "select * from shop where shop_id = ?";
         list.add(shopId);
-        List<User> userList = db.queryInfo(sql,list,User.class);
+        List<Shop> userList = db.queryInfo(sql, list, Shop.class);
 
-        if (userList.size() == 0 ){
+        if (userList.size() == 0) {
             jsonObject.put("status", 400);
             LogHelper.info(String.format("[admin/shop/blacklist/deleting] %s", jsonObject.toString()));
             return jsonObject;
-        }   else {
+        } else {
             List<Object> param = new ArrayList<>();
             sql = "UPDATE shop SET status = 1 WHERE shop_id = ?";
             param.add(shopId);

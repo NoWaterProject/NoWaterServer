@@ -184,7 +184,7 @@ public class ShopOwnerApply {
             String confirmCode = Uuid.getUuid();
             jedis.set(user_id + "email", confirmCode);
             jedis.expire(user_id + "email", 86400);
-            SendEmail.send(email, "Please confirm your email in 24 hours：http://123.206.100.98:16120/shop-owner/email/confirming?confirmCode="
+            SendEmail.send(email, "Please confirm your email in 24 hours：http://123.206.100.98/customer/checkApply.html?confirmCode="
                     + confirmCode + "&userId=" + user_id);
 
             List<Object> list1 = new ArrayList<>();
