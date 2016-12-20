@@ -45,9 +45,10 @@ public class ShopOwnerOrder {
             return jsonObject;
         }
 
-        String getOrderDetailSQL = "select * from `order` where `targetId` = ?";
+        String getOrderDetailSQL = "select * from `order` where `target_id` = ? and `status` = ?";
         List<Object> getOrderDetailList = new ArrayList<>();
         getOrderDetailList.add(shopId);
+        getOrderDetailList.add(status);
         jsonObject.put("status", 200);
         jsonObject.put("data", OrderUtil.getOrderDetail(getOrderDetailSQL, getOrderDetailList, status));
         LogHelper.info(String.format("[/shop-owner/order/list] %s", jsonObject.toString()));
@@ -91,6 +92,7 @@ public class ShopOwnerOrder {
         List<Object> updateOrderList = new ArrayList<>();
         updateOrderList.add(express);
         updateOrderList.add(expressCode);
+        updateOrderList.add(orderId);
         db.insertUpdateDeleteExute(updateOrder, updateOrderList);
         jsonObject.put("status", 200);
         return jsonObject;

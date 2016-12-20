@@ -325,4 +325,40 @@ public class OrderController {
         return jsonObject;
     }
 
+    @RequestMapping("order/confirm/receipt")
+    public JSONObject orderConfirmReceipt(@RequestParam(value = "orderId") int orderId,
+                                          HttpServletRequest request, HttpServletResponse response) {
+        response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+        JSONObject jsonObject = new JSONObject();
+        DBUtil db = new DBUtil();
+
+        LogHelper.info(String.format("[order/confirm/receipt] [param] [orderId: %s]", orderId));
+
+        String token = CookieUtil.getCookieValueByName(request, "token");
+        String userId = CookieUtil.confirmUser(token);
+
+        if (userId == null) {
+            jsonObject.put("status", 300);
+            LogHelper.info(String.format("[order/confirm/receipt] %s", jsonObject.toString()));
+            return jsonObject;
+        }
+
+        int statusConfirmOrder = OrderUtil.confirmOrderUserId(orderId, userId, 3, 1);
+
+        if (statusConfirmOrder != 200) {
+            jsonObject.put("status", statusConfirmOrder);
+            LogHelper.info(String.format("[order/confirm/receipt] %s", jsonObject.toString()));
+            return jsonObject;
+        }
+
+        String updateSQL = "update `order` set `status` = 4 where `order_id` = ?";
+        List<Object> list = new ArrayList<>();
+        list.add(orderId);
+        db.insertUpdateDeleteExute(updateSQL, list);
+
+        jsonObject.put("status", 200);
+        LogHelper.info(String.format("[order/confirm/receipt] %s", jsonObject.toString()));
+        return jsonObject;
+    }
 }

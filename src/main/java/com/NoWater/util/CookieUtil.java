@@ -69,7 +69,7 @@ public class CookieUtil {
 
     public static int confirmShop(String userId) {
         DBUtil db = new DBUtil();
-        String getShopIdSQL = "select * from `shop` where `owner_id` = ?";
+        String getShopIdSQL = "select * from `shop` where `owner_id` = ? and `status` = 1";
         List<Object> list = new ArrayList<>();
         list.add(Integer.parseInt(userId));
         List<Shop> getShop;
