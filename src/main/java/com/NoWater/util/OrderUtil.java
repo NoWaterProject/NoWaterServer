@@ -62,10 +62,15 @@ public final class OrderUtil {
 
     public static int confirmOrderUserId(int orderId, String userId, int status, int userType) {
         List<Object> getConfirmOrderId = new ArrayList<>();
-
-        String confirmOrderId = "select * from `order` where `order_id` = ? and `status` = ?";
-        getConfirmOrderId.add(orderId);
-        getConfirmOrderId.add(status);
+        String confirmOrderId;
+        if (status != 0) {
+            confirmOrderId = "select * from `order` where `order_id` = ? and `status` = ?";
+            getConfirmOrderId.add(orderId);
+            getConfirmOrderId.add(status);
+        } else {
+            confirmOrderId = "select * from `order` where `order_id` = ?";
+            getConfirmOrderId.add(orderId);
+        }
 
         DBUtil db = new DBUtil();
 
@@ -90,7 +95,7 @@ public final class OrderUtil {
         return 200;
     }
 
-    public static JSONArray getOrderDetail(String getOrderDetailSQL, List<Object> getOrderDetailList, int orderStatus) {
+    public static JSONArray getOrderDetail(String getOrderDetailSQL, List<Object> getOrderDetailList) {
         DBUtil db = new DBUtil();
         List<Order> orderDetail;
         JSONArray jsonArray = new JSONArray();
@@ -107,7 +112,7 @@ public final class OrderUtil {
 
         for (int i = 0; i < orderDetail.size(); i++) {
             JSONObject orderItem = JSONObject.fromObject(orderDetail.get(i));
-            if (orderStatus == 1)
+            if (orderDetail.get(i).getStatus() == 1)
                 orderItem.put("countdown", timeUtil.timeCountdown(orderDetail.get(i).getTime(), 1));
             else
                 orderItem.put("countdown", timeUtil.timeCountdown(orderDetail.get(i).getTime(), 7));

@@ -9,6 +9,7 @@ import com.NoWater.model.*;
 import com.NoWater.util.CookieUtil;
 import com.NoWater.util.DBUtil;
 import com.NoWater.util.OrderUtil;
+import com.sun.org.apache.xpath.internal.operations.Or;
 import net.sf.json.JSONArray;
 import org.apache.commons.logging.Log;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -156,6 +157,8 @@ public class OrderController {
         }
 
         JSONArray jsonArray = JSONArray.fromObject(orderIdList);
+        ArrayList<Integer> productList = new ArrayList<>();
+        ArrayList<Integer> numList = new ArrayList<>();
         for (int i = 0; i < jsonArray.size(); i++) {
             int orderId = jsonArray.getInt(i);
 
@@ -177,6 +180,46 @@ public class OrderController {
                 db.insertUpdateDeleteExute(deleteCartSQL, deleteCartList);
             }
 
+            String getProductId = "select * from `order` where `order_id` = ?";
+            List<Object> list = new ArrayList<>();
+            list.add(orderId);
+            List<Order> getOrderItem;
+            try {
+                getOrderItem = db.queryInfo(getProductId, list, Order.class);
+            } catch (Exception e) {
+                e.printStackTrace();
+                jsonObject.put("status", 1100);
+                return jsonObject;
+            }
+
+            productList.add(getOrderItem.get(0).getProductId());
+            numList.add(getOrderItem.get(0).getNum());
+
+            String confirmStockSQL = "select * from products where product_id = ?";
+            List<Object> confirmStockList = new ArrayList<>();
+            confirmStockList.add(getOrderItem.get(0).getProductId());
+            try {
+                List<Product> confirmStock = db.queryInfo(confirmStockSQL, confirmStockList, Product.class);
+                if (confirmStock.get(0).getQuantityStock() < getOrderItem.get(0).getNum()) {
+                    jsonObject.put("status", 1220);
+                    return jsonObject;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                jsonObject.put("status", 1100);
+                return jsonObject;
+            }
+        }
+
+        for (int i = 0; i < jsonArray.size(); i++) {
+            int orderId = jsonArray.getInt(i);
+
+            String updateProduct = "update `products` set `quantity_stock` = `quantity_stock` - ? where `product_id` = ?";
+            List<Object> updateProductList = new ArrayList<>();
+            updateProductList.add(numList.get(i));
+            updateProductList.add(productList.get(i));
+            db.insertUpdateDeleteExute(updateProduct, updateProductList);
+
             String pat = "yyyy-MM-dd HH:mm:ss";
             SimpleDateFormat sdf = new SimpleDateFormat(pat);
             String currentTime = sdf.format(new Date());
@@ -187,10 +230,63 @@ public class OrderController {
 
             String updateConfirm = "update `order` set `status` = 1, `time` = ? where `order_id` = ?";
             db.insertUpdateDeleteExute(updateConfirm, getConfirmOrderId);
-
-            jsonObject.put("status", 200);
-            LogHelper.info(String.format("[order/confirm] %s", jsonObject.toString()));
         }
+
+        jsonObject.put("status", 200);
+        LogHelper.info(String.format("[order/confirm] %s", jsonObject.toString()));
+
+        return jsonObject;
+    }
+
+    @RequestMapping("order/cancel")
+    public JSONObject orderCancel(@RequestParam(value = "orderId") int orderId,
+                                  HttpServletRequest request, HttpServletResponse response) {
+        response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+        JSONObject jsonObject = new JSONObject();
+        DBUtil db = new DBUtil();
+
+        LogHelper.info(String.format("[order/cancel] [param] [orderId: %s]", orderId));
+
+        String token = CookieUtil.getCookieValueByName(request, "token");
+        String userId = CookieUtil.confirmUser(token);
+
+        if (userId == null) {
+            jsonObject.put("status", 300);
+            LogHelper.info(String.format("[order/cancel] %s", jsonObject.toString()));
+            return jsonObject;
+        }
+
+        int confirmOrder = OrderUtil.confirmOrderUserId(orderId, userId, 1, 1);
+
+        if (confirmOrder != 200) {
+            jsonObject.put("status", confirmOrder);
+            LogHelper.info(String.format("[order/cancel] %s", jsonObject.toString()));
+            return jsonObject;
+        }
+
+        String getProductId = "select * from `order` where `order_id` = ?";
+        List<Object> list = new ArrayList<>();
+        list.add(orderId);
+        try {
+            List<Order> getOrderItem = db.queryInfo(getProductId, list, Order.class);
+            int num = getOrderItem.get(0).getNum();
+            String updateProduct = "update `products` set `quantity_stock` = `quantity_stock` + ? where `product_id` = ?";
+            List<Object> updateProductList = new ArrayList<>();
+            updateProductList.add(num);
+            updateProductList.add(getOrderItem.get(0).getProductId());
+            db.insertUpdateDeleteExute(updateProduct, updateProductList);
+
+            List<Object> cancelList = new ArrayList<>();
+            cancelList.add(orderId);
+            String cancelOrderSQL = "update `order` set `status` = 10 where `order_id` = ?";
+            db.insertUpdateDeleteExute(cancelOrderSQL, cancelList);
+        } catch (Exception e) {
+            e.printStackTrace();
+            jsonObject.put("status", 1100);
+            return jsonObject;
+        }
+        jsonObject.put("status", 200);
         return jsonObject;
     }
 
@@ -239,19 +335,17 @@ public class OrderController {
             updateList.add(orderId);
             db.insertUpdateDeleteExute(updatePaymentSQL, updateList);
         }
-        jsonObject.put("stauts", 200);
+        jsonObject.put("status", 200);
         LogHelper.info(String.format("[order/price] %s", jsonObject.toString()));
         return jsonObject;
     }
 
     @RequestMapping("order/detail")
     public JSONObject orderDetail(@RequestParam(value = "orderIdList") String orderIdList,
-                                  @RequestParam(value = "status") int status,
                                   HttpServletRequest request, HttpServletResponse response) {
         response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
         response.setHeader("Access-Control-Allow-Credentials", "true");
         JSONObject jsonObject = new JSONObject();
-        DBUtil db = new DBUtil();
 
         LogHelper.info(String.format("[order/detail] [param] [orderIdList: %s]", orderIdList));
 
@@ -273,7 +367,7 @@ public class OrderController {
 
             stringBuffer.append(orderId);
 
-            int statusConfirmOrder = OrderUtil.confirmOrderUserId(orderId, userId, status, 1);
+            int statusConfirmOrder = OrderUtil.confirmOrderUserId(orderId, userId, 0, 1);
 
             if (statusConfirmOrder != 200) {
                 jsonObject.put("status", statusConfirmOrder);
@@ -286,7 +380,7 @@ public class OrderController {
         String getOrderDetailSQL = "select * from `order` where `order_id` in " + stringBuffer.toString();
         List<Object> getOrderDetailList = new ArrayList<>();
 
-        JSONArray orderDetail = OrderUtil.getOrderDetail(getOrderDetailSQL, getOrderDetailList, status);
+        JSONArray orderDetail = OrderUtil.getOrderDetail(getOrderDetailSQL, getOrderDetailList);
 
         jsonObject.put("data", orderDetail);
         jsonObject.put("status", 200);
@@ -313,12 +407,18 @@ public class OrderController {
             return jsonObject;
         }
 
-        String getOrderList = "select * from `order` where `initiator_id` = ? and `status` = ?";
+        String getOrderList;
         List<Object> list = new ArrayList<>();
-        list.add(userId);
-        list.add(status);
+        if (status == 0) {
+            getOrderList = "select * from `order` where `initiator_id` = ? and `status` != -3 order by `status`";
+            list.add(userId);
+        } else {
+            getOrderList = "select * from `order` where `initiator_id` = ? and `status` = ?";
+            list.add(userId);
+            list.add(status);
+        }
 
-        JSONArray jsonArray = OrderUtil.getOrderDetail(getOrderList, list, status);
+        JSONArray jsonArray = OrderUtil.getOrderDetail(getOrderList, list);
         jsonObject.put("status", 200);
         jsonObject.put("data", jsonArray);
         LogHelper.info(String.format("[order/list] %s", jsonObject.toString()));

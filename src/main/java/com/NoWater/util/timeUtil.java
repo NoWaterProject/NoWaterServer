@@ -23,9 +23,9 @@ public class timeUtil {
             long day = (time1 - time2) / (1000 * 24 * 3600);
             long hour = ((time1 - time2) - (day * 24 * 3600 * 1000)) / (1000 * 3600);
             if (count == 1) {
-                return "Have" + day + " Days " + hour + " Hours to pay for product";
+                return "Leave " + hour + " Hours";
             } else {
-                return "Have" + day + " Days " + hour + " Hours to confirm receipt";
+                return "Leave " + day + " Days " + hour + " Hours";
             }
         } catch (ParseException e) {
             e.printStackTrace();
