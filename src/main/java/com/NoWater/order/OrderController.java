@@ -177,10 +177,15 @@ public class OrderController {
                 db.insertUpdateDeleteExute(deleteCartSQL, deleteCartList);
             }
 
+            String pat = "yyyy-MM-dd HH:mm:ss";
+            SimpleDateFormat sdf = new SimpleDateFormat(pat);
+            String currentTime = sdf.format(new Date());
+
             List<Object> getConfirmOrderId = new ArrayList<>();
+            getConfirmOrderId.add(currentTime);
             getConfirmOrderId.add(orderId);
 
-            String updateConfirm = "update `order` set `status` = 1 where `order_id` = ?";
+            String updateConfirm = "update `order` set `status` = 1, `time` = ? where `order_id` = ?";
             db.insertUpdateDeleteExute(updateConfirm, getConfirmOrderId);
 
             jsonObject.put("status", 200);
@@ -221,11 +226,16 @@ public class OrderController {
             }
         }
 
+        String pat = "yyyy-MM-dd HH:mm:ss";
+        SimpleDateFormat sdf = new SimpleDateFormat(pat);
+        String currentTime = sdf.format(new Date());
+
         for (int i = 0; i < jsonArray.size(); i++) {
             int orderId = jsonArray.getInt(i);
 
-            String updatePaymentSQL = "update `order` set `status` = 2 where `order_id` = ?";
+            String updatePaymentSQL = "update `order` set `status` = 2, `time` = ? where `order_id` = ?";
             List<Object> updateList = new ArrayList<>();
+            updateList.add(currentTime);
             updateList.add(orderId);
             db.insertUpdateDeleteExute(updatePaymentSQL, updateList);
         }
@@ -276,7 +286,7 @@ public class OrderController {
         String getOrderDetailSQL = "select * from `order` where `order_id` in " + stringBuffer.toString();
         List<Object> getOrderDetailList = new ArrayList<>();
 
-        JSONArray orderDetail = OrderUtil.getOrderDetail(getOrderDetailSQL, getOrderDetailList);
+        JSONArray orderDetail = OrderUtil.getOrderDetail(getOrderDetailSQL, getOrderDetailList, status);
 
         jsonObject.put("data", orderDetail);
         jsonObject.put("status", 200);
@@ -308,7 +318,7 @@ public class OrderController {
         list.add(userId);
         list.add(status);
 
-        JSONArray jsonArray = OrderUtil.getOrderDetail(getOrderList, list);
+        JSONArray jsonArray = OrderUtil.getOrderDetail(getOrderList, list, status);
         jsonObject.put("status", 200);
         jsonObject.put("data", jsonArray);
         LogHelper.info(String.format("[order/list] %s", jsonObject.toString()));

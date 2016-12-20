@@ -82,15 +82,15 @@ public final class OrderUtil {
         }
 
         if (userType == 1 && confirmOrder.get(0).getInitiatorId() != Integer.parseInt(userId)) {
-            return 500;
+            return 600;
         } else if (userType == 2 && confirmOrder.get(0).getTargetId() != Integer.parseInt(userId)) {
-            return 500;
+            return 600;
         }
 
         return 200;
     }
 
-    public static JSONArray getOrderDetail(String getOrderDetailSQL, List<Object> getOrderDetailList) {
+    public static JSONArray getOrderDetail(String getOrderDetailSQL, List<Object> getOrderDetailList, int orderStatus) {
         DBUtil db = new DBUtil();
         List<Order> orderDetail;
         JSONArray jsonArray = new JSONArray();
@@ -107,6 +107,10 @@ public final class OrderUtil {
 
         for (int i = 0; i < orderDetail.size(); i++) {
             JSONObject orderItem = JSONObject.fromObject(orderDetail.get(i));
+            if (orderStatus == 1)
+                orderItem.put("countdown", timeUtil.timeCountdown(orderDetail.get(i).getTime(), 1));
+            else
+                orderItem.put("countdown", timeUtil.timeCountdown(orderDetail.get(i).getTime(), 7));
             int productId = orderDetail.get(i).getProductId();
             int shopId = orderDetail.get(i).getTargetId();
             JSONObject product = ProductShopUtil.GetProductDetail(productId);

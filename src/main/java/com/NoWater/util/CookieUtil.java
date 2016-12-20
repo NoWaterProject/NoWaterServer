@@ -1,10 +1,13 @@
 package com.NoWater.util;
 
+import com.NoWater.model.Shop;
 import redis.clients.jedis.Jedis;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -62,5 +65,24 @@ public class CookieUtil {
         } else {
             return null;
         }
+    }
+
+    public static int confirmShop(String userId) {
+        DBUtil db = new DBUtil();
+        String getShopIdSQL = "select * from `shop` where `owner_id` = ?";
+        List<Object> list = new ArrayList<>();
+        list.add(Integer.parseInt(userId));
+        List<Shop> getShop;
+        try {
+            getShop = db.queryInfo(getShopIdSQL, list, Shop.class);
+            if (getShop.size() == 0) {
+                return -1;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -2;
+        }
+
+        return getShop.get(0).getShopId();
     }
 }
