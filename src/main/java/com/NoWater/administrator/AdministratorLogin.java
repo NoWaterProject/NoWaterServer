@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.NoWater.model.Admin;
 import com.NoWater.model.Status;
+import com.NoWater.util.CookieUtil;
 import com.NoWater.util.DBUtil;
 import com.NoWater.util.LogHelper;
 import com.NoWater.util.Uuid;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import redis.clients.jedis.Jedis;
 
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.sf.json.JSONObject;
@@ -62,6 +64,44 @@ public class AdministratorLogin {
             LogHelper.error(e.toString());
             jsonObject.put("status", 400);
         }
+        return jsonObject;
+    }
+
+    @RequestMapping("/admin/status")
+    public JSONObject adminStatus(HttpServletRequest request, HttpServletResponse response) {
+        response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+        JSONObject jsonObject = new JSONObject();
+
+        String token = CookieUtil.getCookieValueByName(request, "admin_token");
+        String admin = CookieUtil.confirmUser(token);
+
+        if (admin == null) {
+            jsonObject.put("status", 300);
+            return jsonObject;
+        } else {
+            jsonObject.put("status", 200);
+            return jsonObject;
+        }
+    }
+
+    @RequestMapping("/admin/logout")
+    public JSONObject adminLogout(HttpServletRequest request, HttpServletResponse response) {
+        response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+        JSONObject jsonObject = new JSONObject();
+
+        String token = CookieUtil.getCookieValueByName(request, "admin_token");
+        String admin = CookieUtil.confirmUser(token);
+
+        if (admin == null) {
+            jsonObject.put("status", 300);
+            return jsonObject;
+        }
+
+        jedis.del(admin);
+        jedis.del(token);
+        jsonObject.put("status", 200);
         return jsonObject;
     }
 }

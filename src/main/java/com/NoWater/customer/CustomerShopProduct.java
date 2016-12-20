@@ -46,28 +46,10 @@ public class CustomerShopProduct {
         }
 
         jsonObject.put("status", 200);
-        jsonObject = JSONObject.fromObject(getShopExist.get(0));
 
-        String queryClass = "select distinct class_id from products where shop_id = ? order by class_id";
-        List<Product> getProductClass = db.queryInfo(queryClass, list, Product.class);
+        jsonObject.put("data", ProductShopUtil.GetShopDetail(shopId));
 
-        String[] classNameList = NoWaterProperties.getClassName();
-
-        if (getProductClass.size() == 0) {
-            jsonObject.put("classList", "[]");
-        } else {
-            JSONArray jsonArray = new JSONArray();
-            for (int i = 0; i < getProductClass.size(); i++) {
-                String className = classNameList[getProductClass.get(i).getClassId()];
-                JSONObject jsonObject1 = new JSONObject();
-                jsonObject1.put("classId", getProductClass.get(i).getClassId());
-                jsonObject1.put("className", className);
-                jsonArray.add(jsonObject1);
-            }
-            jsonObject.put("classList", jsonArray);
-        }
-
-        LogHelper.info(String.format("[customer/shop/class/list] %s", jsonObject.toString()));
+        LogHelper.info(String.format("[customer/shop/info] %s", jsonObject.toString()));
         return jsonObject;
     }
 

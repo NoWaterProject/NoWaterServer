@@ -60,10 +60,11 @@ public final class OrderUtil {
         return orderItem.get(0).getOrderId();
     }
 
-    public static int confirmOrderUserId(int orderId, String userId, int status) {
+    public static int confirmOrderUserId(int orderId, String userId, int status, int userType) {
         List<Object> getConfirmOrderId = new ArrayList<>();
-        getConfirmOrderId.add(orderId);
+
         String confirmOrderId = "select * from `order` where `order_id` = ? and `status` = ?";
+        getConfirmOrderId.add(orderId);
         getConfirmOrderId.add(status);
 
         DBUtil db = new DBUtil();
@@ -80,7 +81,9 @@ public final class OrderUtil {
             return 400;
         }
 
-        if (confirmOrder.get(0).getInitiatorId() != Integer.parseInt(userId)) {
+        if (userType == 1 && confirmOrder.get(0).getInitiatorId() != Integer.parseInt(userId)) {
+            return 500;
+        } else if (userType == 2 && confirmOrder.get(0).getTargetId() != Integer.parseInt(userId)) {
             return 500;
         }
 

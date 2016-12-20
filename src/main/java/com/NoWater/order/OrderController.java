@@ -10,6 +10,7 @@ import com.NoWater.util.CookieUtil;
 import com.NoWater.util.DBUtil;
 import com.NoWater.util.OrderUtil;
 import net.sf.json.JSONArray;
+import org.apache.commons.logging.Log;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -158,10 +159,10 @@ public class OrderController {
         for (int i = 0; i < jsonArray.size(); i++) {
             int orderId = jsonArray.getInt(i);
 
-            int status = OrderUtil.confirmOrderUserId(orderId, userId, -3);
+            int status = OrderUtil.confirmOrderUserId(orderId, userId, -3, 1);
 
             if (status != 200) {
-                jsonObject.put("status", 200);
+                jsonObject.put("status", status);
                 LogHelper.info(String.format("[order/confirm] %s", jsonObject.toString()));
                 return jsonObject;
             }
@@ -211,7 +212,7 @@ public class OrderController {
         for (int i = 0; i < jsonArray.size(); i++) {
             int orderId = jsonArray.getInt(i);
 
-            int status = OrderUtil.confirmOrderUserId(orderId, userId, 1);
+            int status = OrderUtil.confirmOrderUserId(orderId, userId, 1, 1);
 
             if (status != 200) {
                 jsonObject.put("status", status);
@@ -262,7 +263,7 @@ public class OrderController {
 
             stringBuffer.append(orderId);
 
-            int statusConfirmOrder = OrderUtil.confirmOrderUserId(orderId, userId, status);
+            int statusConfirmOrder = OrderUtil.confirmOrderUserId(orderId, userId, status, 1);
 
             if (statusConfirmOrder != 200) {
                 jsonObject.put("status", statusConfirmOrder);
@@ -279,6 +280,7 @@ public class OrderController {
 
         jsonObject.put("data", orderDetail);
         jsonObject.put("status", 200);
+        LogHelper.info(String.format("[order/detail] %s", jsonObject.toString()));
         return jsonObject;
     }
 
@@ -309,6 +311,7 @@ public class OrderController {
         JSONArray jsonArray = OrderUtil.getOrderDetail(getOrderList, list);
         jsonObject.put("status", 200);
         jsonObject.put("data", jsonArray);
+        LogHelper.info(String.format("[order/list] %s", jsonObject.toString()));
         return jsonObject;
     }
 

@@ -78,13 +78,15 @@ public class CustomerClassProduct {
             getProductSQLlist.add(startId);
         }
 
+        getProductSQL.append(" order by `product_id` desc");
+
         DBUtil db = new DBUtil();
         LogHelper.info("[customer/class/product] " + getProductSQL.toString());
         List<Product> productList = db.queryInfo(getProductSQL.toString(), getProductSQLlist, Product.class);
 
         int actualCount;
         int nextStartId;
-        if (productList.size() < count) {
+        if (productList.size() <= count) {
             actualCount = productList.size();
             nextStartId = -1;
         } else {
