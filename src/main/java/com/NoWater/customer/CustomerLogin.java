@@ -41,7 +41,7 @@ public class CustomerLogin {
         List<Object> list = new ArrayList<>();
         DBUtil db = new DBUtil();
         StringBuffer sql = new StringBuffer();
-        sql.append("select password, user_id from user where name = ? and `status` != -1");
+        sql.append("select password, user_id from user where name = ? and `status` != -1 and `status` != -2");
         list.add(name);
         List<User> userList = db.queryInfo(sql.toString(), list, User.class);
         if (userList.size() == 0) {

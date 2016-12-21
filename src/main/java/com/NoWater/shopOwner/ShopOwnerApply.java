@@ -51,7 +51,7 @@ public class ShopOwnerApply {
                 jsonObject.put("status", 500);  //正在审查
             } else if (status == 1) {
                 jsonObject.put("status", 200);  //已成为卖家
-            } else if (status == -1) {
+            } else if (status == -1 || status == -2) {
                 jsonObject.put("status", 600);  //已拒绝
             } else if (status == 2) {
                 Jedis jedis = new Jedis("127.0.0.1", 6379);

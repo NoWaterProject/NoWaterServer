@@ -8,6 +8,7 @@ import net.sf.json.JSONObject;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import redis.clients.jedis.Jedis;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -41,6 +42,7 @@ public class AdminDelete {
         String sql = "select * from user where user_id = ?";
         list.add(userId);
         List<User> userList = db.queryInfo(sql,list,User.class);
+        Jedis jedis = new Jedis("127.0.0.1", 6379);
 
         if (userList.size() == 0 ){
             jsonObject.put("status", 400);
@@ -51,6 +53,7 @@ public class AdminDelete {
             sql = "UPDATE user SET status = -2 WHERE user_id = ?";
             param.add(userId);
             db.insertUpdateDeleteExute(sql, param);
+            jedis.del(String.valueOf(userId));
             jsonObject.put("status", 200);
             LogHelper.info(String.format("[admin/customer/delete] %s", jsonObject.toString()));
         }
