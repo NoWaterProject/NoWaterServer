@@ -17,6 +17,15 @@ public class Cart {
     private int product_id;
     private int num;
     private long cartNum;
+    private int is_del;
+
+    public int getIsDel() {
+        return is_del;
+    }
+
+    public void setIs_del(int is_del) {
+        this.is_del = is_del;
+    }
 
     public int getProductId() {
         return product_id;
@@ -71,7 +80,7 @@ public class Cart {
             JSONObject userInformation = new JSONObject();
             userInformation.put("name", name);
             userInformation.put("cartNum", cartList1.size());
-            return jsonObject;
+            return userInformation;
         } catch (Exception e) {
             e.printStackTrace();
             jsonObject.put("status", 1100);
