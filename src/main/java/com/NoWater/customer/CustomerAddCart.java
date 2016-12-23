@@ -174,7 +174,7 @@ public class CustomerAddCart {
         String getCartSQL;
         List<Object> params = new ArrayList<>();
         params.add(Integer.parseInt(userId));
-        if (startId != 0) {
+        if (startId == 0) {
             getCartSQL = "select * from `cart` where `user_id` = ? order by `cart_id` desc";
         } else {
             getCartSQL = "select * from `cart` where `user_id` = ? and `cart_id` <= ? order by `cart_id` desc";
