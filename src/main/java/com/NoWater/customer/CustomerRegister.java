@@ -88,6 +88,30 @@ public class CustomerRegister {
                             jsonObject.put("status", 1000);
                             return jsonObject;
                         }
+
+                        String address = firstName + " " + lastName + ", "
+                                + telephone + ", " + postCode + ", "
+                                + address1 + " " + address2 + " "
+                                + address3;
+
+                        String getUserId = "select * from `user` where `name` = ?";
+                        List<Object> getUserIdList = new ArrayList<>();
+                        getUserIdList.add(name);
+                        try {
+                            List<User> userList1 = db.queryInfo(getUserId, getUserIdList, User.class);
+                            int userId = userList1.get(0).getUserId();
+                            String insertAddress = "insert into `address` (`address`, `user_id`, `default`) values (?, ?, ?)";
+                            List<Object> objectList = new ArrayList<>();
+                            objectList.add(address);
+                            objectList.add(userId);
+                            objectList.add(1);
+                            db.insertUpdateDeleteExute(insertAddress, objectList);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            jsonObject.put("status", 1100);
+                            return jsonObject;
+                        }
+
                         status = 200;
                         jsonObject.put("status", status);
                         LogHelper.info("register: name=" + name + "password=" + password + "telephone=" + telephone + "address1=" + address1 + "address2=" + address2 + "addres3=" + address3);

@@ -12,9 +12,7 @@ import java.util.List;
  * Created by Koprvhdix on 2016/12/18.
  */
 public final class OrderUtil {
-    public static int insertOrder(int order_type, int productId,
-                                  String time, int user_id,
-                                  String address, int num) {
+    public static int insertOrder(int order_type, int productId, String time, int user_id, int num) {
         DBUtil db = new DBUtil();
 
         String getProductSQL = "select * from products where product_id = ?";
@@ -30,14 +28,13 @@ public final class OrderUtil {
 
         double price = ProductItem.get(0).getPrice();
 
-        String insertOrderSQL = "insert into `order` (`order_type`, `product_id`, `time`, `initiator_id`, `target_id`, `address`, `num`, `price`, `sum_price`) values (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String insertOrderSQL = "insert into `order` (`order_type`, `product_id`, `time`, `initiator_id`, `target_id`, `num`, `price`, `sum_price`) values (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         List<Object> insertList = new ArrayList<>();
         insertList.add(order_type);
         insertList.add(productId);
         insertList.add(time);
         insertList.add(user_id);
         insertList.add(ProductItem.get(0).getShopId());
-        insertList.add(address);
         insertList.add(num);
         insertList.add(price);
         insertList.add(num * price);

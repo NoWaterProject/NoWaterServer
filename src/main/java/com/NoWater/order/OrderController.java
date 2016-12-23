@@ -55,32 +55,9 @@ public class OrderController {
             return jsonObject;
         }
 
-        // get address
-        int user_id = Integer.parseInt(userId);
-        String getAddressSQL = "select * from user where user_id = ?";
-        List<Object> getAddressList = new ArrayList<>();
-        getAddressList.add(user_id);
-        List<User> userInfo;
-        try {
-            userInfo = db.queryInfo(getAddressSQL, getAddressList, User.class);
-        } catch (Exception e) {
-            e.printStackTrace();
-            jsonObject.put("status", 1100);
-            LogHelper.info(String.format("[order/prepare] %s", jsonObject.toString()));
-            return jsonObject;
-        }
-
         String pat = "yyyy-MM-dd HH:mm:ss";
         SimpleDateFormat sdf = new SimpleDateFormat(pat);
         String currentTime = sdf.format(new Date());
-
-        String address = userInfo.get(0).getFirstName() + " "
-                + userInfo.get(0).getLastName() + ", "
-                + userInfo.get(0).getPhone() + ", "
-                + userInfo.get(0).getPostCode() + ", "
-                + userInfo.get(0).getAddress1() + ", "
-                + userInfo.get(0).getAddress2() + ", "
-                + userInfo.get(0).getAddress3();
 
         JSONArray orderList = new JSONArray();
 
@@ -121,13 +98,13 @@ public class OrderController {
 
             for (int i = 0; i < cartList.size(); i++) {
                 int orderId = OrderUtil.insertOrder(3, cartList.get(i).getProductId(),
-                        currentTime, user_id, address, cartList.get(i).getNum());
+                        currentTime, Integer.parseInt(userId), cartList.get(i).getNum());
                 orderList.add(orderId);
                 Jedis jedis = new Jedis("127.0.0.1", 6379);
                 jedis.set("orderId:" + String.valueOf(orderId), String.valueOf(cartList.get(i).getCartId()));
             }
         } else {
-            int orderId = OrderUtil.insertOrder(orderType, productId, currentTime, user_id, address, num);
+            int orderId = OrderUtil.insertOrder(orderType, productId, currentTime, Integer.parseInt(userId), num);
             orderList.add(orderId);
         }
         jsonObject.put("status", 200);
@@ -138,6 +115,7 @@ public class OrderController {
 
     @RequestMapping("order/confirm")
     public JSONObject orderConfirm(@RequestParam(value = "orderIdList") String orderIdList,
+                                   @RequestParam(value = "addressId", defaultValue = "0") int addressId,
                                    HttpServletRequest request, HttpServletResponse response) {
 
         response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");

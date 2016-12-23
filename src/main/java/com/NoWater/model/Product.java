@@ -1,5 +1,8 @@
 package com.NoWater.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by qingpeng on 2016/12/4.
  */
@@ -77,4 +80,19 @@ public class Product {
         this.class_id = class_id;
     }
 
+    public static Boolean confirmStock(int num, int productId) {
+
+    }
+
+    public static Boolean decreaseStock(int num, int productId) {
+
+    }
+
+    public static Boolean increaseStock(int num, int productId) {
+        String updateProduct = "update `products` set `quantity_stock` = `quantity_stock` + ? where `product_id` = ?";
+        List<Object> updateProductList = new ArrayList<>();
+        updateProductList.add(num);
+        updateProductList.add(productId);
+        db.insertUpdateDeleteExute(updateProduct, updateProductList);
+    }
 }

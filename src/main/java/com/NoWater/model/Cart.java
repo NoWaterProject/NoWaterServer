@@ -70,7 +70,7 @@ public class Cart {
     public static JSONObject getUserCartNum(int userId) {
         List<Object> list1 = new ArrayList<>();
         DBUtil db1 = new DBUtil();
-        String getUserCartSQL = "select * from `cart` where user_id = ?";
+        String getUserCartSQL = "select * from `cart` where user_id = ? and `is_del` = 0";
         list1.add(userId);
         JSONObject jsonObject = new JSONObject();
         try {

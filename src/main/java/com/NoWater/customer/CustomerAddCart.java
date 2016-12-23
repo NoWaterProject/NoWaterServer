@@ -71,7 +71,7 @@ public class CustomerAddCart {
             return jsonObject;
         }
 
-        String sql = "select * from `cart` where `user_id` = ? and `product_id` = ?";
+        String sql = "select * from `cart` where `user_id` = ? and `product_id` = ? and `is_del` = 0";
         List<Object> params = new ArrayList<>();
         params.add(Integer.parseInt(userId));
         params.add(productId);
@@ -123,7 +123,7 @@ public class CustomerAddCart {
             return jsonObject;
         }
 
-        String sql = "select * from `cart` where `user_id` = ? and `cart_id` = ?";
+        String sql = "select * from `cart` where `user_id` = ? and `cart_id` = ? and `is_del` = 0";
         List<Object> params = new ArrayList<>();
         params.add(Integer.parseInt(userId));
         params.add(cartId);
@@ -175,9 +175,9 @@ public class CustomerAddCart {
         List<Object> params = new ArrayList<>();
         params.add(Integer.parseInt(userId));
         if (startId == 0) {
-            getCartSQL = "select * from `cart` where `user_id` = ? order by `cart_id` desc";
+            getCartSQL = "select * from `cart` where `is_del` = 0 and `user_id` = ? order by `cart_id` desc";
         } else {
-            getCartSQL = "select * from `cart` where `user_id` = ? and `cart_id` <= ? order by `cart_id` desc";
+            getCartSQL = "select * from `cart` where `is_del` = 0 and `user_id` = ? and `cart_id` <= ? order by `cart_id` desc";
             params.add(startId);
         }
 
