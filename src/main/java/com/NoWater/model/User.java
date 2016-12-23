@@ -1,5 +1,11 @@
 package com.NoWater.model;
 
+import com.NoWater.util.DBUtil;
+import net.sf.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by 李鹏飞 on 2016/11/25 0025.
  */
@@ -114,4 +120,19 @@ public class User {
         this.cart_pd_num = cart_pd_num;
     }
 
+    public static String getUserName(int userId) {
+        List<Object> list = new ArrayList<>();
+        DBUtil db = new DBUtil();
+        StringBuffer sql = new StringBuffer();
+        sql.append("SELECT name FROM `user` WHERE user_id = ?");
+        list.add(userId);
+        try {
+            List<User> nameList = db.queryInfo(sql.toString(), list, User.class);
+            String name = nameList.get(0).getName();
+            return name;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

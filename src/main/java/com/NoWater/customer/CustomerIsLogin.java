@@ -39,25 +39,7 @@ public class CustomerIsLogin {
 
         jsonObject.put("status", 200);
 
-        List<Object> list = new ArrayList<>();
-        DBUtil db = new DBUtil();
-        StringBuffer sql = new StringBuffer();
-        sql.append("SELECT name FROM `user` WHERE user_id = ?");
-        list.add(user_id);
-        List<User> nameList = db.queryInfo(sql.toString(), list, User.class);
-        String name = nameList.get(0).getName();
-
-        List<Object> list1 = new ArrayList<>();
-        DBUtil db1 = new DBUtil();
-        StringBuffer sql1 = new StringBuffer();
-        sql1.append("SELECT COUNT(1) cartNum FROM cart WHERE user_id = ? ");
-        list1.add(user_id);
-        List<Cart> cartList1 = db1.queryInfo(sql1.toString(), list1, Cart.class);
-        int cartNum = (int) cartList1.get(0).getCartNum();
-
-        JSONObject userInformation = new JSONObject();
-        userInformation.put("name", name);
-        userInformation.put("cartNum", cartNum);
+        JSONObject userInformation = Cart.getUserCartNum(Integer.parseInt(user_id));
         JSONArray jsonArray = new JSONArray();
         jsonArray.add(0, userInformation);
         jsonObject.put("userInformation", jsonArray);

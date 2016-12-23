@@ -1,5 +1,12 @@
 package com.NoWater.model;
 
+import com.NoWater.util.DBUtil;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by 李鹏飞 on 2016/11/28 0028.
  */
@@ -51,5 +58,24 @@ public class Cart {
         return num;
     }
 
+    public static JSONObject getUserCartNum(int userId) {
+        List<Object> list1 = new ArrayList<>();
+        DBUtil db1 = new DBUtil();
+        String getUserCartSQL = "select * from `cart` where user_id = ?";
+        list1.add(userId);
+        JSONObject jsonObject = new JSONObject();
+        try {
+            List<Cart> cartList1 = db1.queryInfo(getUserCartSQL, list1, Cart.class);
+            String name = User.getUserName(userId);
 
+            JSONObject userInformation = new JSONObject();
+            userInformation.put("name", name);
+            userInformation.put("cartNum", cartList1.size());
+            return jsonObject;
+        } catch (Exception e) {
+            e.printStackTrace();
+            jsonObject.put("status", 1100);
+        }
+        return jsonObject;
+    }
 }

@@ -119,4 +119,11 @@ CREATE TABLE `user` (
   PRIMARY KEY (`user_id`)
 );
 
-
+DROP TABLE IF EXISTS `address`;
+CREATE TABLE `address` (
+  `address_id` int(11) NOT NULL AUTO_INCREMENT,
+  `address` varchar(1024) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `default` int(11) DEFAULT 0,
+  PRIMARY KEY (`address_id`)
+);
