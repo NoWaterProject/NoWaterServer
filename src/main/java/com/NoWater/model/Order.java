@@ -1,5 +1,12 @@
 package com.NoWater.model;
 
+import com.NoWater.util.DBUtil;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by Koprvhdix on 2016/12/17.
  */
@@ -18,14 +25,23 @@ public class Order {
     private int status;
     private String express;
     private String express_code;
-    private int photo_id;
+    private String photo;
+    private String show_time;
 
-    public int getPhotoId() {
-        return photo_id;
+    public String getShowTime() {
+        return show_time;
     }
 
-    public void setPhoto_id(int photo_id) {
-        this.photo_id = photo_id;
+    public void setShow_time(String show_time) {
+        this.show_time = show_time;
+    }
+
+    public String getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(String photo) {
+        this.photo = photo;
     }
 
     public String getExpress() {
@@ -139,4 +155,36 @@ public class Order {
     public int getStatus() {
         return status;
     }
+
+    public static JSONArray getShopAdOrder(String getOrderSQL, List<Object> objectList) {
+        DBUtil db = new DBUtil();
+        List<Order> orderList;
+        JSONArray jsonArray = new JSONArray();
+        try {
+            orderList = db.queryInfo(getOrderSQL, objectList, Order.class);
+            for (int i = 0; i < orderList.size(); i++) {
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("orderId", orderList.get(i).getOrderId());
+                jsonObject.put("time", orderList.get(i).getTime());
+                jsonObject.put("showTime", orderList.get(i).getShowTime());
+                jsonObject.put("shopId", orderList.get(i).getTargetId());
+                jsonObject.put("price", orderList.get(i).getPrice());
+                jsonObject.put("photo", orderList.get(i).getPhoto());
+                jsonObject.put("status", orderList.get(i).getStatus());
+
+                jsonArray.add(jsonObject);
+            }
+            return jsonArray;
+        } catch (Exception e) {
+            e.printStackTrace();
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("statusOrder", 1100);
+            jsonArray.add(jsonObject);
+            return jsonArray;
+        }
+    }
+
+//    public static JSONObject getProductAdOrder() {
+//
+//    }
 }

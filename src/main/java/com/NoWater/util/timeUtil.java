@@ -31,6 +31,40 @@ public class timeUtil {
             e.printStackTrace();
         }
         return "";
+    }
 
+    public static boolean timeLimit() {
+        String pat = "yyyy-MM-dd";
+        SimpleDateFormat sdf = new SimpleDateFormat(pat);
+        String currentDate = sdf.format(new Date());
+
+        // add y m d
+        String limitTime = NoWaterProperties.getApplyLimitTime();
+        limitTime = currentDate + " " + limitTime;
+        Date limitDate;
+        SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            limitDate = sdf1.parse(limitTime);
+            Calendar limitCalendar = Calendar.getInstance();
+            limitCalendar.setTime(limitDate);
+
+            if (Calendar.getInstance().after(limitCalendar)) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static String getShowTime() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DATE, 1);
+        String YMDPat = "yyyy-MM-dd";
+        SimpleDateFormat YMDFormat = new SimpleDateFormat(YMDPat);
+        String showTime = YMDFormat.format(calendar.getTime());
+        return showTime;
     }
 }

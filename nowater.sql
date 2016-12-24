@@ -60,7 +60,8 @@ CREATE TABLE `order` (
   `sum_price` float(15, 6) NOT NULL,
 
   `payment_id` int(11) DEFAULT -1,
-  `photo_id` int(11) DEFAULT 0,
+  `photo` varchar(1024) DEFAULT 0,
+  `show_time` varchar(1024) DEFAULT NULL,
 
   `status` int(11) DEFAULT -3,
   PRIMARY KEY (`order_id`)

@@ -20,6 +20,7 @@ public final class NoWaterProperties {
             {"Chek Lap Kok", "Chinese University", "Clear Water Bay", "Discovery Bay", "Fairview Park", "Fanling", "Fo Tan", "HKUST", "Kwai Chung", "Long Ping", "Ma On Shan", "Ma Wan", "Pat Heung", "Sai Kung (North)", "Sai Kung (South)", "Science Park", "Sha Tin", "Sheung Shui", "Siu Lek Yuen", "Tai Po", "Tai Wai", "Tin Shui Wai", "Tseung Kwan O", "Tsing Yi", "Tsuen Wan", "Tuen Mun", "Tung Chung", "Wu Kai Sha", "Yuen Long"},
             {"Aberdeen", "Admiralty", "Ap Lei Chau", "Big Wave Bay", "Causeway Bay", "Central", "Central Sheung Wan", "Central South", "Chai Wan", "Gloucester Road", "Happy Valley", "Harbour Road", "Jardine's Lookout", "Kennedy Town", "Lai Tak Tsuen", "Mid-Levels", "Mid-Levels West", "North Point", "Pok Fu Lam", "Quarry Bay", "Sai Wan", "Shau Kei Wan", "Shek O", "Sheung Wan West", "Siu Sai Wan", "So Kon Po", "Southern District", "Stanley", "Tai Hang Road", "The Peak", "Tim Mei Ave", "Tin Hau", "Wah Fu", "Wan Chai", "Wong Chuk Hang"}
     };
+    private static String applyLimitTime;
 
     private static String[] className = {
             "TV& Home Theater",
@@ -45,6 +46,10 @@ public final class NoWaterProperties {
         return className;
     }
 
+    public static String getApplyLimitTime() {
+        return applyLimitTime;
+    }
+
     static {
         Properties prop = new Properties();
         File propertiesFile;
@@ -67,6 +72,7 @@ public final class NoWaterProperties {
             db_user = prop.getProperty("database.user").trim();
             db_password = prop.getProperty("database.password").trim();
             db_url = prop.getProperty("database.url").trim();
+            applyLimitTime = prop.getProperty("applyTimeLimit").trim();
         } catch (IOException e) {
             e.printStackTrace();
         }

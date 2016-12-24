@@ -4,6 +4,7 @@ import com.NoWater.util.DBUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by qingpeng on 2016/12/4.
@@ -120,5 +121,24 @@ public class Product {
         updateProductList.add(num);
         updateProductList.add(productId);
         db.insertUpdateDeleteExute(updateProduct, updateProductList);
+    }
+
+    public static boolean confirmProductShop(int shopId, int productId) {
+        DBUtil db = new DBUtil();
+        String confirmSQL = "select * from `products` where `product_id` = ? and `shop_id` = ?";
+        List<Object> objectList = new ArrayList<>();
+        objectList.add(productId);
+        objectList.add(shopId);
+        try {
+            List<Product> productList = db.queryInfo(confirmSQL, objectList, Product.class);
+            if (productList.size() == 0) {
+                return false;
+            } else {
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }

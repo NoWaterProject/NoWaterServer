@@ -48,8 +48,8 @@ public class ShopOwnerProductHandle {
         StringBuffer Sql = new StringBuffer();
         Sql.append("select shop_id from shop where owner_id = ?");
         Param.add(userId);
-        DBUtil Db = new DBUtil();
-        List<Shop> list = Db.queryInfo(Sql.toString(), Param, Shop.class);
+        DBUtil db = new DBUtil();
+        List<Shop> list = db.queryInfo(Sql.toString(), Param, Shop.class);
 
         if (list.size() == 0) {
             jsonObject.put("status", 400);                  //用户不是商家
@@ -63,7 +63,6 @@ public class ShopOwnerProductHandle {
         param.add(product_name);
         param.add(price);
         param.add(quantity_stock);
-        DBUtil db = new DBUtil();
 
         ArrayList<String> addFileNameList = FileUpload.jsonToArrayList(detail_photo_list);
         LogHelper.info("add:" + addFileNameList.toString());
@@ -121,6 +120,12 @@ public class ShopOwnerProductHandle {
             status = FileUpload.DeleteFileCOS(deleteFileList);
             if (status == -2) {
                 jsonObject.put("status", 1020);
+                return jsonObject;
+            }
+
+            boolean hasProduct = Product.confirmProductShop(shop_id, product_id);
+            if (!hasProduct) {
+                jsonObject.put("status", 2400);
                 return jsonObject;
             }
 
