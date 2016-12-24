@@ -19,8 +19,9 @@ import java.util.List;
  */
 @RestController
 public class ShopAd {
-    @RequestMapping("/shop-owner/ad")
-    public JSONObject shopOwnerAd(@RequestParam(value = "filename") String filename,
+    @RequestMapping("/shop-owner/shop/ad/apply")
+    public JSONObject shopOwnerShopAdApply(@RequestParam(value = "filename") String filename,
+                                  @RequestParam(value = "price") double price,
                                   HttpServletRequest request, HttpServletResponse response) {
         response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
         response.setHeader("Access-Control-Allow-Credentials", "true");
@@ -34,31 +35,16 @@ public class ShopAd {
             return jsonObject;
         }
 
-        String getShopIdSQL = "select * from `shop` where `owner_id` = ?";
-        List<Object> getShopId = new ArrayList<>();
-        getShopId.add(Integer.parseInt(userId));
-        List<Shop> ShopList;
-        try {
-            ShopList = db.queryInfo(getShopIdSQL, getShopId, Shop.class);
-        } catch (Exception e) {
-            e.printStackTrace();
-            jsonObject.put("status", 1100);
+        int shopId = CookieUtil.confirmShop(userId);
+
+        if (shopId == -1) {
+            jsonObject.put("status", 500);      // not shop owner
             return jsonObject;
         }
-
-        if (ShopList.size() == 0) {
-            jsonObject.put("status", 400);
-            return jsonObject;
-        }
-
-        String deleteSQL = "update `photo` set `is_del` = 1 where `belong_id` = ? and `photo_type` = 0 and `is_del` = 0";
-        List<Object> deleteList = new ArrayList<>();
-        deleteList.add(ShopList.get(0).getShopId());
-        db.insertUpdateDeleteExute(deleteSQL, deleteList);
 
         ArrayList<String> addFileNameList = new ArrayList<>();
         addFileNameList.add(filename);
-        int status = FileUpload.UploadToCOS(addFileNameList, userId, String.valueOf(ShopList.get(0).getShopId()), 0);
+        int status = FileUpload.UploadToCOS(addFileNameList, userId, String.valueOf(shopId), 0);
         if (status == -1) {
             jsonObject.put("status", 1010);
             return jsonObject;
@@ -66,5 +52,20 @@ public class ShopAd {
 
         jsonObject.put("status", 200);
         return jsonObject;
+    }
+
+    @RequestMapping("/shop-owner/shop/ad/list")
+    public JSONObject shopOwnerShopAdList(HttpServletRequest request, HttpServletResponse response) {
+
+    }
+
+    @RequestMapping("/shop-owner/product/ad/apply")
+    public JSONObject shopOwnerProductAdApply(HttpServletRequest request, HttpServletResponse response) {
+
+    }
+
+    @RequestMapping("/shop-owner/product/ad/list")
+    public JSONObject shopOwnerProductAdList(HttpServletRequest request, HttpServletResponse response) {
+
     }
 }

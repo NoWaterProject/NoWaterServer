@@ -18,6 +18,15 @@ public class Order {
     private int status;
     private String express;
     private String express_code;
+    private int photo_id;
+
+    public int getPhotoId() {
+        return photo_id;
+    }
+
+    public void setPhoto_id(int photo_id) {
+        this.photo_id = photo_id;
+    }
 
     public String getExpress() {
         return express;

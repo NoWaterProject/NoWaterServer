@@ -58,7 +58,9 @@ CREATE TABLE `order` (
   `num` int(11) NOT NULL,
   `price` float(15, 6) NOT NULL,
   `sum_price` float(15, 6) NOT NULL,
+
   `payment_id` int(11) DEFAULT -1,
+  `photo_id` int(11) DEFAULT 0,
 
   `status` int(11) DEFAULT -3,
   PRIMARY KEY (`order_id`)
