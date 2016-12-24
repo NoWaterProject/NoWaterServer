@@ -41,11 +41,12 @@ public final class OrderUtil {
 
         db.insertUpdateDeleteExute(insertOrderSQL, insertList);
 
-        String getOrderIdSQL = "select `order_id` from `order` where `order_type` = ? and `initiator_id` = ? and `time` = ?";
+        String getOrderIdSQL = "select `order_id` from `order` where `order_type` = ? and `initiator_id` = ? and `time` = ? and `product_id` = ?";
         List<Object> orderIdList = new ArrayList<>();
         orderIdList.add(order_type);
         orderIdList.add(user_id);
         orderIdList.add(time);
+        orderIdList.add(productId);
         List<Order> orderItem;
         try {
             orderItem = db.queryInfo(getOrderIdSQL, orderIdList, Order.class);

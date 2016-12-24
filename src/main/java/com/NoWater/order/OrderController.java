@@ -344,13 +344,16 @@ public class OrderController {
         }
 
         StringBuffer stringBuffer = new StringBuffer();
-        stringBuffer.append("(");
+        stringBuffer.append("( ");
 
         JSONArray jsonArray = JSONArray.fromObject(orderIdList);
         for (int i = 0; i < jsonArray.size(); i++) {
             int orderId = jsonArray.getInt(i);
 
             stringBuffer.append(orderId);
+            if (i != jsonArray.size() - 1) {
+                stringBuffer.append(", ");
+            }
 
             int statusConfirmOrder = OrderUtil.confirmOrderUserId(orderId, userId, 0, 1);
 
