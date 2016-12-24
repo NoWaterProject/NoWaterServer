@@ -161,13 +161,4 @@ public class ShopOwnerOrder {
         return jsonObject;
     }
 
-//    @RequestMapping("/shop-owner/order/ad/applying")
-//    public JSONObject shopOwnerOrderAdApplying() {
-//
-//    }
-//
-//    @RequestMapping("/shop-owner/order/ad/list")
-//    public JSONObject shopOwnerAdList() {
-//
-//    }
 }

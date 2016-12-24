@@ -1,5 +1,7 @@
 package com.NoWater.model;
 
+import com.NoWater.util.DBUtil;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -80,15 +82,39 @@ public class Product {
         this.class_id = class_id;
     }
 
-    public static Boolean confirmStock(int num, int productId) {
+    public static int confirmStock(int num, int productId) {
+        DBUtil db = new DBUtil();
+        String getProductId = "select * from `products` where `product_id` = ?";
+        List<Object> objectList = new ArrayList<>();
+        objectList.add(productId);
+        try {
+            List<Product> productList = db.queryInfo(getProductId, objectList, Product.class);
+            if (productList.size() == 0) {
+                return 2400;
+            }
 
+            if (productList.get(0).getQuantityStock() < num) {
+                return 2500;
+            } else {
+                return 200;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 1100;
+        }
     }
 
-    public static Boolean decreaseStock(int num, int productId) {
-
+    public static void decreaseStock(int num, int productId) {
+        DBUtil db = new DBUtil();
+        String updateProduct = "update `products` set `quantity_stock` = `quantity_stock` - ? where `product_id` = ?";
+        List<Object> updateProductList = new ArrayList<>();
+        updateProductList.add(num);
+        updateProductList.add(productId);
+        db.insertUpdateDeleteExute(updateProduct, updateProductList);
     }
 
-    public static Boolean increaseStock(int num, int productId) {
+    public static void increaseStock(int num, int productId) {
+        DBUtil db = new DBUtil();
         String updateProduct = "update `products` set `quantity_stock` = `quantity_stock` + ? where `product_id` = ?";
         List<Object> updateProductList = new ArrayList<>();
         updateProductList.add(num);

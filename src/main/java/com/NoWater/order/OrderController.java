@@ -33,7 +33,6 @@ public class OrderController {
     @RequestMapping("/order/prepare")
     public JSONObject orderPrepare(@RequestParam(value = "orderType", defaultValue = "3") int orderType,
                                    @RequestParam(value = "productId", defaultValue = "0") int productId,
-                                   @RequestParam(value = "price", defaultValue = "0.0") float price,
                                    @RequestParam(value = "num", defaultValue = "0") int num,
                                    @RequestParam(value = "cartIdList", defaultValue = "[]") String cartIdList,
                                    HttpServletRequest request, HttpServletResponse response) {
@@ -43,8 +42,8 @@ public class OrderController {
         JSONObject jsonObject = new JSONObject();
         DBUtil db = new DBUtil();
 
-        LogHelper.info(String.format("[order/prepare] [param] [orderType: %s, productId: %s, price: %s, num: %s, cartIdList: %s]",
-                orderType, productId, price, num, cartIdList));
+        LogHelper.info(String.format("[order/prepare] [param] [orderType: %s, productId: %s, num: %s, cartIdList: %s]",
+                orderType, productId, num, cartIdList));
 
         String token = CookieUtil.getCookieValueByName(request, "token");
         String userId = CookieUtil.confirmUser(token);
@@ -52,6 +51,11 @@ public class OrderController {
         if (userId == null) {
             jsonObject.put("status", 300);
             LogHelper.info(String.format("[order/prepare] %s", jsonObject.toString()));
+            return jsonObject;
+        }
+
+        if (orderType != 3 && orderType != 0) {
+            jsonObject.put("status", 1300);
             return jsonObject;
         }
 
@@ -77,10 +81,10 @@ public class OrderController {
                     getCart += ", ";
             }
             getCart += ")";
-            String getCartSQL = "select * from `cart` where `cart_id` in ? and `is_del` = 0";
+            String getCartSQL = "select * from `cart` where `cart_id` in " + getCart + " and `is_del` = 0";
             List<Object> getCartList = new ArrayList<>();
-            getCartList.add(getCart);
             List<Cart> cartList;
+            LogHelper.info("getCartSQL: " + getCartSQL);
             try {
                 cartList = db.queryInfo(getCartSQL, getCartList, Cart.class);
             } catch (Exception e) {
@@ -90,10 +94,20 @@ public class OrderController {
                 return jsonObject;
             }
 
+            // cartList error
             if (cartList.size() != jsonArray.size()) {
                 jsonObject.put("status", 400);
                 LogHelper.info(String.format("[order/prepare] %s", jsonObject.toString()));
                 return jsonObject;
+            }
+
+            for (int i = 0; i < cartList.size(); i++) {
+                int confirmStock = Product.confirmStock(cartList.get(i).getNum(), cartList.get(i).getProductId());
+                if (confirmStock != 200) {
+                    jsonObject.put("status", confirmStock);
+                    LogHelper.info(String.format("[order/prepare] %s", jsonObject.toString()));
+                    return jsonObject;
+                }
             }
 
             for (int i = 0; i < cartList.size(); i++) {
@@ -104,7 +118,15 @@ public class OrderController {
                 jedis.set("orderId:" + String.valueOf(orderId), String.valueOf(cartList.get(i).getCartId()));
             }
         } else {
-            int orderId = OrderUtil.insertOrder(orderType, productId, currentTime, Integer.parseInt(userId), num);
+            int confirmStock = Product.confirmStock(num, productId);
+
+            if (confirmStock != 200) {
+                jsonObject.put("status", confirmStock);
+                LogHelper.info(String.format("[order/prepare] %s", jsonObject.toString()));
+                return jsonObject;
+            }
+
+            int orderId = OrderUtil.insertOrder(0, productId, currentTime, Integer.parseInt(userId), num);
             orderList.add(orderId);
         }
         jsonObject.put("status", 200);
@@ -148,16 +170,6 @@ public class OrderController {
                 return jsonObject;
             }
 
-            Jedis jedis = new Jedis("127.0.0.1", 6379);
-            String cartId = jedis.get("orderId:" + String.valueOf(orderId));
-
-            if (cartId != null) {
-                String deleteCartSQL = "update `cart` set `is_del` = 1 where `cart_id` = ?";
-                List<Object> deleteCartList = new ArrayList<>();
-                deleteCartList.add(Integer.parseInt(cartId));
-                db.insertUpdateDeleteExute(deleteCartSQL, deleteCartList);
-            }
-
             String getProductId = "select * from `order` where `order_id` = ?";
             List<Object> list = new ArrayList<>();
             list.add(orderId);
@@ -173,30 +185,28 @@ public class OrderController {
             productList.add(getOrderItem.get(0).getProductId());
             numList.add(getOrderItem.get(0).getNum());
 
-            String confirmStockSQL = "select * from products where product_id = ?";
-            List<Object> confirmStockList = new ArrayList<>();
-            confirmStockList.add(getOrderItem.get(0).getProductId());
-            try {
-                List<Product> confirmStock = db.queryInfo(confirmStockSQL, confirmStockList, Product.class);
-                if (confirmStock.get(0).getQuantityStock() < getOrderItem.get(0).getNum()) {
-                    jsonObject.put("status", 1220);
-                    return jsonObject;
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                jsonObject.put("status", 1100);
+            // 检查库存
+            int confirmStock = Product.confirmStock(getOrderItem.get(0).getNum(), getOrderItem.get(0).getProductId());
+            if (confirmStock != 200) {
+                jsonObject.put("status", confirmStock);
+                LogHelper.info(String.format("[order/confirm] %s", jsonObject.toString()));
                 return jsonObject;
             }
         }
 
         for (int i = 0; i < jsonArray.size(); i++) {
             int orderId = jsonArray.getInt(i);
+            Jedis jedis = new Jedis("127.0.0.1", 6379);
+            String cartId = jedis.get("orderId:" + String.valueOf(orderId));
 
-            String updateProduct = "update `products` set `quantity_stock` = `quantity_stock` - ? where `product_id` = ?";
-            List<Object> updateProductList = new ArrayList<>();
-            updateProductList.add(numList.get(i));
-            updateProductList.add(productList.get(i));
-            db.insertUpdateDeleteExute(updateProduct, updateProductList);
+            if (cartId != null) {
+                String deleteCartSQL = "update `cart` set `is_del` = 1 where `cart_id` = ?";
+                List<Object> deleteCartList = new ArrayList<>();
+                deleteCartList.add(Integer.parseInt(cartId));
+                db.insertUpdateDeleteExute(deleteCartSQL, deleteCartList);
+            }
+
+            Product.decreaseStock(numList.get(i), productList.get(i));
 
             String pat = "yyyy-MM-dd HH:mm:ss";
             SimpleDateFormat sdf = new SimpleDateFormat(pat);
@@ -249,11 +259,8 @@ public class OrderController {
         try {
             List<Order> getOrderItem = db.queryInfo(getProductId, list, Order.class);
             int num = getOrderItem.get(0).getNum();
-            String updateProduct = "update `products` set `quantity_stock` = `quantity_stock` + ? where `product_id` = ?";
-            List<Object> updateProductList = new ArrayList<>();
-            updateProductList.add(num);
-            updateProductList.add(getOrderItem.get(0).getProductId());
-            db.insertUpdateDeleteExute(updateProduct, updateProductList);
+            int productId = getOrderItem.get(0).getProductId();
+            Product.increaseStock(num, productId);
 
             List<Object> cancelList = new ArrayList<>();
             cancelList.add(orderId);
