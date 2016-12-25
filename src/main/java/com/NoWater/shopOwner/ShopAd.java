@@ -4,10 +4,7 @@ import com.NoWater.model.Order;
 import com.NoWater.model.Photo;
 import com.NoWater.model.Product;
 import com.NoWater.model.Shop;
-import com.NoWater.util.CookieUtil;
-import com.NoWater.util.DBUtil;
-import com.NoWater.util.FileUpload;
-import com.NoWater.util.timeUtil;
+import com.NoWater.util.*;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -48,7 +45,7 @@ public class ShopAd {
             return jsonObject;
         }
 
-        if (timeUtil.timeLimit()) {
+        if (timeUtil.timeLimit() < 0) {
             jsonObject.put("allow", 0);
         } else {
             String showTime = timeUtil.getShowTime();
@@ -64,7 +61,7 @@ public class ShopAd {
         String getOrderSQL = "select * from `order` where `order_type` = 2 and `target_id` = ? order by `order_id` desc";
         List<Object> objectList = new ArrayList<>();
         objectList.add(shopId);
-        Order.getShopAdOrder(getOrderSQL, objectList, jsonObject, 0);
+        Order.getShopAdOrder(getOrderSQL, objectList, jsonObject, 0, false);
         return jsonObject;
     }
 
@@ -91,7 +88,7 @@ public class ShopAd {
             return jsonObject;
         }
 
-        if (timeUtil.timeLimit()) {
+        if (timeUtil.timeLimit() < 0) {
             jsonObject.put("status", 600);      // 超时
             return jsonObject;
         } else {
@@ -130,27 +127,10 @@ public class ShopAd {
         SimpleDateFormat sdf = new SimpleDateFormat(pat);
         String currentTime = sdf.format(new Date());
 
-        String showTime = timeUtil.getShowTime();
-
-        String insertOrder = "insert into `order` (`order_type`, `time`, `initiator_id`, `target_id`, `num`, `price`, `sum_price`, `photo`, `show_time`, `status`) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        objectList.clear();
-        objectList.add(2);
-        objectList.add(currentTime);
-        objectList.add(Integer.parseInt(userId));
-        objectList.add(shopId);
-        objectList.add(1);
-        objectList.add(price);
-        objectList.add(price);
-        objectList.add("http://koprvhdix117-10038234.file.myqcloud.com/" + filename);
-        objectList.add(showTime);
-        objectList.add(1);
-        db.insertUpdateDeleteExute(insertOrder, objectList);
-
-        Jedis jedis = new Jedis("127.0.0.1", 6379);
-        jedis.set(showTime + String.valueOf(shopId), "true");
-        jedis.expire(showTime + String.valueOf(shopId), 86400);
+        int orderId = OrderUtil.insertOrderAd(2, currentTime, userId, shopId, price, filename, 0);
 
         jsonObject.put("status", 200);
+        jsonObject.put("orderId", orderId);
         return jsonObject;
     }
 
@@ -187,13 +167,14 @@ public class ShopAd {
         }
         getShopOwnerAdList.append(" order by `order_id` desc");
 
-        Order.getShopAdOrder(getShopOwnerAdList.toString(), objectList, jsonObject, count);
+        Order.getShopAdOrder(getShopOwnerAdList.toString(), objectList, jsonObject, count, false);
 
         return jsonObject;
     }
 
     @RequestMapping("/shop-owner/product/ad/apply")
     public JSONObject shopOwnerProductAdApply(@RequestParam(value = "productId") int productId,
+                                              @RequestParam(value = "price") double price,
                                               HttpServletRequest request, HttpServletResponse response) {
         response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
         response.setHeader("Access-Control-Allow-Credentials", "true");
@@ -218,6 +199,14 @@ public class ShopAd {
             return jsonObject;
         }
 
+        String pat = "yyyy-MM-dd HH:mm:ss";
+        SimpleDateFormat sdf = new SimpleDateFormat(pat);
+        String currentTime = sdf.format(new Date());
+
+        int orderId = OrderUtil.insertOrderAd(1, currentTime, userId, shopId, price, "", productId);
+
+        jsonObject.put("status", 200);
+        jsonObject.put("orderId", orderId);
         return new JSONObject();
     }
 
@@ -225,6 +214,35 @@ public class ShopAd {
     public JSONObject shopOwnerProductAdList(@RequestParam(value = "startId", defaultValue = "0") int startId,
                                              @RequestParam(value = "count") int count,
                                              HttpServletRequest request, HttpServletResponse response) {
-        return new JSONObject();
+        response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+        JSONObject jsonObject = new JSONObject();
+        String token = CookieUtil.getCookieValueByName(request, "token");
+        String userId = CookieUtil.confirmUser(token);
+
+        if (userId == null) {
+            jsonObject.put("status", 300);
+            return jsonObject;
+        }
+
+        int shopId = CookieUtil.confirmShop(userId);
+        if (shopId == -1) {
+            jsonObject.put("status", 500);      // not shop owner
+            return jsonObject;
+        }
+
+        List<Object> objectList = new ArrayList<>();
+        StringBuffer getShopOwnerAdList = new StringBuffer();
+        getShopOwnerAdList.append("select * from `order` where `order_type` = 1 and `target_id` = ?");
+        objectList.add(shopId);
+        if (startId != 0) {
+            getShopOwnerAdList.append(" and `order_id` <= ?");
+            objectList.add(startId);
+        }
+        getShopOwnerAdList.append(" order by `order_id` desc");
+
+        Order.getProductAdOrder(getShopOwnerAdList.toString(), objectList, jsonObject, count, false);
+
+        return jsonObject;
     }
 }

@@ -398,10 +398,10 @@ public class OrderController {
         String getOrderList;
         List<Object> list = new ArrayList<>();
         if (status == 0) {
-            getOrderList = "select * from `order` where `initiator_id` = ? and `status` != -3 order by `status`";
+            getOrderList = "select * from `order` where `order_type` in (0, 3) and `initiator_id` = ? and `status` != -3 order by `status`";
             list.add(userId);
         } else {
-            getOrderList = "select * from `order` where `initiator_id` = ? and `status` = ?";
+            getOrderList = "select * from `order` where `order_type` in (0, 3) and `initiator_id` = ? and `status` = ?";
             list.add(userId);
             list.add(status);
         }

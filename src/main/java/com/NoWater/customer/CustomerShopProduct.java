@@ -47,7 +47,7 @@ public class CustomerShopProduct {
 
         jsonObject.put("status", 200);
 
-        jsonObject.put("data", ProductShopUtil.GetShopDetail(shopId));
+        jsonObject.put("data", ProductShopUtil.GetShopDetail(shopId, false));
 
         LogHelper.info(String.format("[customer/shop/info] %s", jsonObject.toString()));
         return jsonObject;
@@ -64,7 +64,7 @@ public class CustomerShopProduct {
 
         LogHelper.info(String.format("[customer/product/show] [param] [product_id: %s]", productId));
 
-        JSONObject product = ProductShopUtil.GetProductDetail(productId);
+        JSONObject product = ProductShopUtil.GetProductDetail(productId, true);
         if (product.has("status")) {
             jsonObject.put("status", 400);
             LogHelper.error(String.format("[customer/product/show] %s", jsonObject));

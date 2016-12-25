@@ -4,6 +4,7 @@ import com.NoWater.model.Order;
 import com.NoWater.model.Product;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import redis.clients.jedis.Jedis;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -116,7 +117,7 @@ public final class OrderUtil {
                 orderItem.put("countdown", timeUtil.timeCountdown(orderDetail.get(i).getTime(), 7));
             int productId = orderDetail.get(i).getProductId();
             int shopId = orderDetail.get(i).getTargetId();
-            JSONObject product = ProductShopUtil.GetProductDetail(productId);
+            JSONObject product = ProductShopUtil.GetProductDetail(productId, true);
             orderItem.put("product", product);
             jsonArray.add(orderItem);
         }
@@ -124,12 +125,13 @@ public final class OrderUtil {
         return jsonArray;
     }
 
-    public static void rejectAllOrder(int orderType, int status) {
+    public static void rejectAllOrder(int orderType, int status, String showTime) {
         DBUtil db = new DBUtil();
-        String rejectAllOrderSQL = "update `order` set `status` = -2 where `status` = ? and `order_type` = ?";
+        String rejectAllOrderSQL = "update `order` set `status` = -2 where `status` = ? and `order_type` = ? and `show_time` = ?";
         List<Object> objectList = new ArrayList<>();
         objectList.add(status);
         objectList.add(orderType);
+        objectList.add(showTime);
         db.insertUpdateDeleteExute(rejectAllOrderSQL, objectList);
     }
 
@@ -139,5 +141,59 @@ public final class OrderUtil {
         List<Object> objectList = new ArrayList<>();
         objectList.add(orderId);
         db.insertUpdateDeleteExute(approveOrder, objectList);
+    }
+
+    public static int insertOrderAd(int orderType, String time, String userId, int shopId, double price, String filename, int productId) {
+        DBUtil db = new DBUtil();
+
+        String showTime = timeUtil.getShowTime();
+        String redisKey;
+        String getOrderIdSQL;
+        List<Object> objectList1 = new ArrayList<>();
+
+        // for orderId
+        objectList1.add(orderType);
+        objectList1.add(userId);
+        objectList1.add(time);
+
+        List<Object> objectList = new ArrayList<>();
+        String insertOrder;
+        objectList.clear();
+        objectList.add(orderType);
+        objectList.add(time);
+        objectList.add(Integer.parseInt(userId));
+        objectList.add(shopId);
+        objectList.add(1);
+        objectList.add(price);
+        objectList.add(price);
+        if (filename.length() != 0) {
+            insertOrder = "insert into `order` (`order_type`, `time`, `initiator_id`, `target_id`, `num`, `price`, `sum_price`, `photo`, `show_time`, `status`) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            objectList.add("http://koprvhdix117-10038234.file.myqcloud.com/" + filename);
+            redisKey = showTime + String.valueOf(shopId);
+
+            getOrderIdSQL = "select `order_id` from `order` where `order_type` = ? and `initiator_id` = ? and `time` = ?";
+        } else {
+            insertOrder = "insert into `order` (`order_type`, `time`, `initiator_id`, `target_id`, `num`, `price`, `sum_price`, `product_id`, `show_time`, `status`) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            objectList.add(productId);
+            redisKey = "product" + showTime + String.valueOf(productId);
+
+            getOrderIdSQL = "select `order_id` from `order` where `order_type` = ? and `initiator_id` = ? and `time` = ? and `product_id` = ?";
+            objectList1.add(productId);
+        }
+        objectList.add(showTime);
+        objectList.add(1);
+        db.insertUpdateDeleteExute(insertOrder, objectList);
+
+        Jedis jedis = new Jedis("127.0.0.1", 6379);
+        jedis.set(redisKey, "true");
+        jedis.expire(redisKey, 86400);
+
+        try {
+            List<Order> orderList = db.queryInfo(getOrderIdSQL, objectList1, Order.class);
+            return orderList.get(0).getOrderId();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1;
+        }
     }
 }

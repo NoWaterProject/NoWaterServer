@@ -197,7 +197,7 @@ public class CustomerAddCart {
 
                 int productId = cartList.get(i).getProductId();
 
-                JSONObject productDetail = ProductShopUtil.GetProductDetail(productId);
+                JSONObject productDetail = ProductShopUtil.GetProductDetail(productId, true);
                 jsonObject1.put("product", productDetail);
                 jsonArray.add(jsonObject1);
             }

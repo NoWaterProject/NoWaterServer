@@ -49,10 +49,10 @@ public class ShopOwnerOrder {
         List<Object> getOrderDetailList = new ArrayList<>();
         String getOrderDetailSQL;
         if (status == 0) {
-            getOrderDetailSQL = "select * from `order` where `target_id` = ? and `status` != -3 order by `status`";
+            getOrderDetailSQL = "select * from `order` where `order_type` in (0, 3) and `target_id` = ? and `status` != -3 order by `status`";
             getOrderDetailList.add(shopId);
         } else {
-            getOrderDetailSQL = "select * from `order` where `target_id` = ? and `status` = ?";
+            getOrderDetailSQL = "select * from `order` where `order_type` in (0, 3) and `target_id` = ? and `status` = ?";
             getOrderDetailList.add(shopId);
             getOrderDetailList.add(status);
         }

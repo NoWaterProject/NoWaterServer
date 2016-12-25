@@ -14,7 +14,7 @@ import java.util.List;
  * Created by Koprvhdix on 2016/12/19.
  */
 public final class ProductShopUtil {
-    public static JSONObject GetProductDetail(int productId) {
+    public static JSONObject GetProductDetail(int productId, boolean hasShop) {
         JSONObject jsonObject = new JSONObject();
         DBUtil db = new DBUtil();
         String getProduct = "select * from `products` where `product_id` = ?";
@@ -34,14 +34,16 @@ public final class ProductShopUtil {
             return jsonObject;
         }
 
-        jsonObject = JSONObject.fromObject(productList.get(0));
-        jsonObject.put("shop", GetShopDetail(productList.get(0).getShopId()));
-        String getPhotoSQL = "select * from photo where belong_id = ? and photo_type = ? and is_del = 0";
-        jsonObject.put("photo", JSONArray.fromObject(Photo.getPhotoURL(getPhotoSQL, productId, 2)));
+        if (hasShop) {
+            jsonObject = JSONObject.fromObject(productList.get(0));
+            jsonObject.put("shop", GetShopDetail(productList.get(0).getShopId(), false));
+            String getPhotoSQL = "select * from photo where belong_id = ? and photo_type = ? and is_del = 0";
+            jsonObject.put("photo", JSONArray.fromObject(Photo.getPhotoURL(getPhotoSQL, productId, 2)));
+        }
         return jsonObject;
     }
 
-    public static JSONObject GetShopDetail(int shopId) {
+    public static JSONObject GetShopDetail(int shopId, boolean hasPhoto) {
         JSONObject jsonObject = new JSONObject();
         DBUtil db = new DBUtil();
         String getShopSQL = "select * from `shop` where `shop_id` = ?";
@@ -51,6 +53,11 @@ public final class ProductShopUtil {
         try {
             ShopList = db.queryInfo(getShopSQL, list, Shop.class);
             jsonObject = JSONObject.fromObject(ShopList.get(0));
+
+            if (hasPhoto) {
+                String getPhotoSQL = "select * from photo where belong_id = ? and photo_type = ? and is_del = 0";
+                jsonObject.put("photo", JSONArray.fromObject(Photo.getPhotoURL(getPhotoSQL, ShopList.get(0).getOwnerId(), 3)));
+            }
 
             ArrayList<Integer> classList = GetClassDetail(shopId);
 

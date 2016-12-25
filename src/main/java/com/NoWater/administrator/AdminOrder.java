@@ -49,7 +49,7 @@ public class AdminOrder {
             return jsonObject;
         }
 
-        if (!timeUtil.timeLimit()) {
+        if (timeUtil.timeLimit() > 0) {
             jsonObject.put("status", 600);
             LogHelper.info(String.format("[admin/shop/ad/approve] %s", jsonObject.toString()));
             return jsonObject;
@@ -95,7 +95,7 @@ public class AdminOrder {
         jedis.set("prepareShopAd", jsonArray.toString());
 
         if (jsonArray.size() == 5) {
-            OrderUtil.rejectAllOrder(2, 1);
+            OrderUtil.rejectAllOrder(2, 1, timeUtil.getShowTime());
         }
 
         jsonObject.put("status", 200);

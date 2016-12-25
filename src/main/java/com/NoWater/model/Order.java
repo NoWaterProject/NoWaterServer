@@ -1,6 +1,7 @@
 package com.NoWater.model;
 
 import com.NoWater.util.DBUtil;
+import com.NoWater.util.ProductShopUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -156,19 +157,21 @@ public class Order {
         return status;
     }
 
-    public static void getShopAdOrder(String getOrderSQL, List<Object> objectList, JSONObject jsonObject, int count) {
+    public static void getShopAdOrder(String getOrderSQL, List<Object> objectList, JSONObject jsonObject, int count, boolean hasShopOwnerPhoto) {
         DBUtil db = new DBUtil();
         List<Order> orderList;
         JSONArray jsonArray = new JSONArray();
         try {
             orderList = db.queryInfo(getOrderSQL, objectList, Order.class);
+            // count = 0 for 申请界面
             if (count == 0 || count >= orderList.size()) {
                 for (int i = 0; i < orderList.size(); i++) {
                     JSONObject jsonObject1 = new JSONObject();
                     jsonObject1.put("orderId", orderList.get(i).getOrderId());
                     jsonObject1.put("time", orderList.get(i).getTime());
                     jsonObject1.put("showTime", orderList.get(i).getShowTime());
-                    jsonObject1.put("shopId", orderList.get(i).getTargetId());
+                    if (hasShopOwnerPhoto)
+                        jsonObject1.put("shop", ProductShopUtil.GetShopDetail(orderList.get(i).getTargetId(), true));
                     jsonObject1.put("price", orderList.get(i).getPrice());
                     jsonObject1.put("photo", orderList.get(i).getPhoto());
                     jsonObject1.put("status", orderList.get(i).getStatus());
@@ -180,7 +183,8 @@ public class Order {
                     JSONObject jsonObject1 = new JSONObject();
                     jsonObject1.put("orderId", orderList.get(i).getOrderId());
                     jsonObject1.put("time", orderList.get(i).getTime());
-                    jsonObject1.put("shopId", orderList.get(i).getTargetId());
+                    if (hasShopOwnerPhoto)
+                        jsonObject1.put("shop", ProductShopUtil.GetShopDetail(orderList.get(i).getTargetId(), true));
                     jsonObject1.put("price", orderList.get(i).getPrice());
                     jsonObject1.put("photo", orderList.get(i).getPhoto());
                     jsonObject1.put("status", orderList.get(i).getStatus());
@@ -196,7 +200,45 @@ public class Order {
         }
     }
 
-//    public static JSONObject getProductAdOrder() {
-//
-//    }
+    public static void getProductAdOrder(String getOrderSQL, List<Object> objectList, JSONObject jsonObject, int count, boolean hasShopOwnerPhoto) {
+        DBUtil db = new DBUtil();
+        List<Order> orderList;
+        JSONArray jsonArray = new JSONArray();
+        try {
+            orderList = db.queryInfo(getOrderSQL, objectList, Order.class);
+            if (count >= orderList.size()) {
+                jsonObject.put("startId", -1);
+                for (int i = 0; i < orderList.size(); i++) {
+                    JSONObject jsonObject1 = new JSONObject();
+                    jsonObject1.put("orderId", orderList.get(i).getOrderId());
+                    jsonObject1.put("time", orderList.get(i).getTime());
+                    if (hasShopOwnerPhoto)
+                        jsonObject1.put("shop", ProductShopUtil.GetShopDetail(orderList.get(i).getTargetId(), true));
+                    jsonObject1.put("price", orderList.get(i).getPrice());
+                    jsonObject1.put("product", ProductShopUtil.GetProductDetail(orderList.get(i).getProductId(), false));
+                    jsonObject1.put("status", orderList.get(i).getStatus());
+                    jsonObject1.put("showTime", orderList.get(i).getShowTime());
+                    jsonArray.add(jsonObject1);
+                }
+            } else {
+                jsonObject.put("startId", orderList.get(count).getOrderId());
+                for (int i = 0; i < count; i++) {
+                    JSONObject jsonObject1 = new JSONObject();
+                    jsonObject1.put("orderId", orderList.get(i).getOrderId());
+                    if (hasShopOwnerPhoto)
+                        jsonObject1.put("shop", ProductShopUtil.GetShopDetail(orderList.get(i).getTargetId(), true));
+                    jsonObject1.put("price", orderList.get(i).getPrice());
+                    jsonObject1.put("product", ProductShopUtil.GetProductDetail(orderList.get(i).getProductId(), false));
+                    jsonObject1.put("status", orderList.get(i).getStatus());
+                    jsonObject1.put("showTime", orderList.get(i).getShowTime());
+                    jsonObject1.put("time", orderList.get(i).getTime());
+                    jsonArray.add(jsonObject1);
+                }
+            }
+            jsonObject.put("data", jsonArray);
+        } catch (Exception e) {
+            e.printStackTrace();
+            jsonObject.put("statusOrderProduct", 1100);
+        }
+    }
 }
