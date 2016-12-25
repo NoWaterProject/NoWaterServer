@@ -45,7 +45,7 @@ public class ShopAd {
             return jsonObject;
         }
 
-        if (timeUtil.timeLimit() < 0) {
+        if (timeUtil.timeLimit()) {
             jsonObject.put("allow", 0);
         } else {
             String showTime = timeUtil.getShowTime();
@@ -88,7 +88,7 @@ public class ShopAd {
             return jsonObject;
         }
 
-        if (timeUtil.timeLimit() < 0) {
+        if (timeUtil.timeLimit()) {
             jsonObject.put("status", 600);      // 超时
             return jsonObject;
         } else {
@@ -199,6 +199,21 @@ public class ShopAd {
             return jsonObject;
         }
 
+        if (timeUtil.timeLimit()) {
+            jsonObject.put("status", 600);      // 超时
+            return jsonObject;
+        } else {
+            String showTime = timeUtil.getShowTime();
+            Jedis jedis = new Jedis("127.0.0.1", 6379);
+            String hasApply = jedis.get("product" + showTime + String.valueOf(productId));
+            if (hasApply != null) {
+                jsonObject.put("status", 700);
+                return jsonObject;
+            }
+        }
+
+        LogHelper.info("test1");
+
         String pat = "yyyy-MM-dd HH:mm:ss";
         SimpleDateFormat sdf = new SimpleDateFormat(pat);
         String currentTime = sdf.format(new Date());
@@ -207,7 +222,7 @@ public class ShopAd {
 
         jsonObject.put("status", 200);
         jsonObject.put("orderId", orderId);
-        return new JSONObject();
+        return jsonObject;
     }
 
     @RequestMapping("/shop-owner/product/ad/list")
@@ -243,6 +258,7 @@ public class ShopAd {
 
         Order.getProductAdOrder(getShopOwnerAdList.toString(), objectList, jsonObject, count, false);
 
+        jsonObject.put("status", 200);
         return jsonObject;
     }
 }

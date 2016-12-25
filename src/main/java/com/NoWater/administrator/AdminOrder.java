@@ -49,7 +49,7 @@ public class AdminOrder {
             return jsonObject;
         }
 
-        if (timeUtil.timeLimit() > 0) {
+        if (!timeUtil.timeLimit()) {
             jsonObject.put("status", 600);
             LogHelper.info(String.format("[admin/shop/ad/approve] %s", jsonObject.toString()));
             return jsonObject;

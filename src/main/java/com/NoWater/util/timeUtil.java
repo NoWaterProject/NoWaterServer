@@ -33,7 +33,7 @@ public class timeUtil {
         return "";
     }
 
-    public static long timeLimit() {
+    public static boolean timeLimit() {
         String pat = "yyyy-MM-dd";
         SimpleDateFormat sdf = new SimpleDateFormat(pat);
         String currentDate = sdf.format(new Date());
@@ -48,10 +48,14 @@ public class timeUtil {
             Calendar limitCalendar = Calendar.getInstance();
             limitCalendar.setTime(limitDate);
 
-            return Calendar.getInstance().getTimeInMillis() - limitCalendar.getTimeInMillis();
+            if (Calendar.getInstance().after(limitCalendar)) {
+                return true;
+            } else {
+                return false;
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            return 0;
+            return false;
         }
     }
 

@@ -153,7 +153,7 @@ public final class OrderUtil {
 
         // for orderId
         objectList1.add(orderType);
-        objectList1.add(userId);
+        objectList1.add(Integer.parseInt(userId));
         objectList1.add(time);
 
         List<Object> objectList = new ArrayList<>();
@@ -190,6 +190,7 @@ public final class OrderUtil {
 
         try {
             List<Order> orderList = db.queryInfo(getOrderIdSQL, objectList1, Order.class);
+            LogHelper.info(String.valueOf(orderList.get(0).getOrderId()));
             return orderList.get(0).getOrderId();
         } catch (Exception e) {
             e.printStackTrace();
