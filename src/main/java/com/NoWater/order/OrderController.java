@@ -1,28 +1,26 @@
 package com.NoWater.order;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import com.NoWater.model.*;
+import com.NoWater.model.Cart;
+import com.NoWater.model.Order;
+import com.NoWater.model.Product;
+import com.NoWater.model.User;
 import com.NoWater.util.CookieUtil;
 import com.NoWater.util.DBUtil;
+import com.NoWater.util.LogHelper;
 import com.NoWater.util.OrderUtil;
-import com.sun.org.apache.xpath.internal.operations.Or;
 import net.sf.json.JSONArray;
-import org.apache.commons.logging.Log;
+import net.sf.json.JSONObject;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.NoWater.util.LogHelper;
-
-import net.sf.json.JSONObject;
 import redis.clients.jedis.Jedis;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 
 /**
@@ -447,6 +445,74 @@ public class OrderController {
 
         jsonObject.put("status", 200);
         LogHelper.info(String.format("[order/confirm/receipt] %s", jsonObject.toString()));
+        return jsonObject;
+    }
+
+    @RequestMapping("order/comment")
+    public JSONObject orderComment(@RequestParam(value = "orderId") int orderId,
+                                   @RequestParam(value = "comment") String comment,
+                                   HttpServletRequest request, HttpServletResponse response) {
+        response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+        JSONObject jsonObject = new JSONObject();
+        DBUtil db = new DBUtil();
+
+        LogHelper.info(String.format("[order/comment] [param] [orderId: %s]", orderId));
+
+        String token = CookieUtil.getCookieValueByName(request, "token");
+        String userId = CookieUtil.confirmUser(token);
+
+        if (userId == null) {
+            jsonObject.put("status", 300);
+            LogHelper.info(String.format("[order/comment] %s", jsonObject.toString()));
+            return jsonObject;
+        }
+
+        int statusConfirmOrder = OrderUtil.confirmOrderUserId(orderId, userId, 5, 1);
+
+        if (statusConfirmOrder != 200) {
+            jsonObject.put("status", statusConfirmOrder);
+            LogHelper.info(String.format("[order/comment] %s", jsonObject.toString()));
+            return jsonObject;
+        }
+
+        String sql = "select * from `user` where user user_id=? ";
+        List<Object> list = new ArrayList<>();
+        list.add(userId);
+        List<User> user;
+        try {
+            user = db.queryInfo(sql, list, User.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+            jsonObject.put("status", 1100);
+            return jsonObject;
+        }
+        String userName = user.get(0).getName().substring(0, 1) + "*****";
+
+        sql="select * from `order` where `order_id`=? ";
+        list.clear();
+        list.add(orderId);
+        List<Order> order;
+        try {
+            order = db.queryInfo(sql, list, Order.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+            jsonObject.put("OrderStatus", 1100);
+            return jsonObject;
+        }
+        int productId = order.get(0).getProductId();
+
+        sql = "insert into `comment`(`comment_content`,`user_id`,`user_name`,`order_id`,`product_id`) values(?,?,?,?,?) ";
+        list.clear();
+        list.add(comment);
+        list.add(userId);
+        list.add(userName);
+        list.add(orderId);
+        list.add(productId);
+        db.insertUpdateDeleteExute(sql, list);
+        jsonObject.put("status", 200);
+        LogHelper.info(String.format("[order/comment] %s", jsonObject.toString()));
+
         return jsonObject;
     }
 }
