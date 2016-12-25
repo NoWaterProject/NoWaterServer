@@ -156,31 +156,43 @@ public class Order {
         return status;
     }
 
-    public static JSONArray getShopAdOrder(String getOrderSQL, List<Object> objectList) {
+    public static void getShopAdOrder(String getOrderSQL, List<Object> objectList, JSONObject jsonObject, int count) {
         DBUtil db = new DBUtil();
         List<Order> orderList;
         JSONArray jsonArray = new JSONArray();
         try {
             orderList = db.queryInfo(getOrderSQL, objectList, Order.class);
-            for (int i = 0; i < orderList.size(); i++) {
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("orderId", orderList.get(i).getOrderId());
-                jsonObject.put("time", orderList.get(i).getTime());
-                jsonObject.put("showTime", orderList.get(i).getShowTime());
-                jsonObject.put("shopId", orderList.get(i).getTargetId());
-                jsonObject.put("price", orderList.get(i).getPrice());
-                jsonObject.put("photo", orderList.get(i).getPhoto());
-                jsonObject.put("status", orderList.get(i).getStatus());
-
-                jsonArray.add(jsonObject);
+            if (count == 0 || count >= orderList.size()) {
+                for (int i = 0; i < orderList.size(); i++) {
+                    JSONObject jsonObject1 = new JSONObject();
+                    jsonObject1.put("orderId", orderList.get(i).getOrderId());
+                    jsonObject1.put("time", orderList.get(i).getTime());
+                    jsonObject1.put("showTime", orderList.get(i).getShowTime());
+                    jsonObject1.put("shopId", orderList.get(i).getTargetId());
+                    jsonObject1.put("price", orderList.get(i).getPrice());
+                    jsonObject1.put("photo", orderList.get(i).getPhoto());
+                    jsonObject1.put("status", orderList.get(i).getStatus());
+                    jsonArray.add(jsonObject1);
+                }
+                jsonObject.put("startId", -1);
+            } else {
+                for (int i = 0; i < count; i++) {
+                    JSONObject jsonObject1 = new JSONObject();
+                    jsonObject1.put("orderId", orderList.get(i).getOrderId());
+                    jsonObject1.put("time", orderList.get(i).getTime());
+                    jsonObject1.put("shopId", orderList.get(i).getTargetId());
+                    jsonObject1.put("price", orderList.get(i).getPrice());
+                    jsonObject1.put("photo", orderList.get(i).getPhoto());
+                    jsonObject1.put("status", orderList.get(i).getStatus());
+                    jsonObject1.put("showTime", orderList.get(i).getShowTime());
+                    jsonArray.add(jsonObject1);
+                }
+                jsonObject.put("startId", orderList.get(count).getOrderId());
             }
-            return jsonArray;
+            jsonObject.put("data", jsonArray);
         } catch (Exception e) {
             e.printStackTrace();
-            JSONObject jsonObject = new JSONObject();
             jsonObject.put("statusOrder", 1100);
-            jsonArray.add(jsonObject);
-            return jsonArray;
         }
     }
 

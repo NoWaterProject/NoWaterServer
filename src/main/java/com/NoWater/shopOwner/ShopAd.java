@@ -35,7 +35,6 @@ public class ShopAd {
         JSONObject jsonObject = new JSONObject();
         String token = CookieUtil.getCookieValueByName(request, "token");
         String userId = CookieUtil.confirmUser(token);
-        DBUtil db = new DBUtil();
 
         if (userId == null) {
             jsonObject.put("status", 300);
@@ -65,8 +64,7 @@ public class ShopAd {
         String getOrderSQL = "select * from `order` where `order_type` = 2 and `target_id` = ? order by `order_id` desc";
         List<Object> objectList = new ArrayList<>();
         objectList.add(shopId);
-        JSONArray jsonArray = Order.getShopAdOrder(getOrderSQL, objectList);
-        jsonObject.put("data", jsonArray);
+        Order.getShopAdOrder(getOrderSQL, objectList, jsonObject, 0);
         return jsonObject;
     }
 
@@ -96,14 +94,36 @@ public class ShopAd {
         if (timeUtil.timeLimit()) {
             jsonObject.put("status", 600);      // 超时
             return jsonObject;
+        } else {
+            String showTime = timeUtil.getShowTime();
+            Jedis jedis = new Jedis("127.0.0.1", 6379);
+            String hasApply = jedis.get(showTime + String.valueOf(shopId));
+            if (hasApply != null) {
+                jsonObject.put("status", 700);
+                return jsonObject;
+            }
         }
 
-        ArrayList<String> addFileNameList = new ArrayList<>();
-        addFileNameList.add(filename);
-        int status = FileUpload.UploadToCOS(addFileNameList, userId, String.valueOf(shopId), 0);
-        if (status == -1) {
-            jsonObject.put("status", 1010);
+        String hasFile = "select * from `photo` where `file_name` = ?";
+        List<Object> objectList = new ArrayList<>();
+        objectList.add(filename);
+        List<Photo> photoList;
+        try {
+            photoList = db.queryInfo(hasFile, objectList, Photo.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+            jsonObject.put("status", 1100);
             return jsonObject;
+        }
+
+        if (photoList.size() == 0) {
+            ArrayList<String> addFileNameList = new ArrayList<>();
+            addFileNameList.add(filename);
+            int status = FileUpload.UploadToCOS(addFileNameList, userId, String.valueOf(shopId), 0);
+            if (status == -1) {
+                jsonObject.put("status", 1010);
+                return jsonObject;
+            }
         }
 
         String pat = "yyyy-MM-dd HH:mm:ss";
@@ -112,8 +132,8 @@ public class ShopAd {
 
         String showTime = timeUtil.getShowTime();
 
-        String insertOrder = "insert into `order` (`order_type`, `time`, `initiator_id`, `target_id`, `num`, `price`, `sum_price`, `photo_id`, `show_time`, `status`) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        List<Object> objectList = new ArrayList<>();
+        String insertOrder = "insert into `order` (`order_type`, `time`, `initiator_id`, `target_id`, `num`, `price`, `sum_price`, `photo`, `show_time`, `status`) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        objectList.clear();
         objectList.add(2);
         objectList.add(currentTime);
         objectList.add(Integer.parseInt(userId));
@@ -138,7 +158,38 @@ public class ShopAd {
     public JSONObject shopOwnerShopAdList(@RequestParam(value = "startId", defaultValue = "0") int startId,
                                           @RequestParam(value = "count") int count,
                                           HttpServletRequest request, HttpServletResponse response) {
-        return new JSONObject();
+        response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+        JSONObject jsonObject = new JSONObject();
+        String token = CookieUtil.getCookieValueByName(request, "token");
+        String userId = CookieUtil.confirmUser(token);
+
+        if (userId == null) {
+            jsonObject.put("status", 300);
+            return jsonObject;
+        }
+
+        int shopId = CookieUtil.confirmShop(userId);
+        if (shopId == -1) {
+            jsonObject.put("status", 500);      // not shop owner
+            return jsonObject;
+        }
+
+        jsonObject.put("status", 200);
+
+        List<Object> objectList = new ArrayList<>();
+        StringBuffer getShopOwnerAdList = new StringBuffer();
+        getShopOwnerAdList.append("select * from `order` where `order_type` = 2 and `target_id` = ?");
+        objectList.add(shopId);
+        if (startId != 0) {
+            getShopOwnerAdList.append(" and `order_id` <= ?");
+            objectList.add(startId);
+        }
+        getShopOwnerAdList.append(" order by `order_id` desc");
+
+        Order.getShopAdOrder(getShopOwnerAdList.toString(), objectList, jsonObject, count);
+
+        return jsonObject;
     }
 
     @RequestMapping("/shop-owner/product/ad/apply")
