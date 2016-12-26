@@ -2,7 +2,9 @@ package com.NoWater.administrator;
 
 import com.NoWater.model.Order;
 import com.NoWater.model.Product;
+import com.NoWater.model.Shop;
 import com.NoWater.util.*;
+import com.sun.org.apache.xpath.internal.operations.Or;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,9 +26,62 @@ public class AdminOrder {
     @RequestMapping("admin/order/list")
     public JSONObject paymentList(@RequestParam(value = "count") int count,
                                   @RequestParam(value = "startId", defaultValue = "0") int startId,
-                                  HttpServletRequest request, HttpServletResponse response) {
+                                  HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-        return new JSONObject();
+        response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+        JSONObject jsonObject = new JSONObject();
+        int actualCount;
+        int endId;
+
+        String token = CookieUtil.getCookieValueByName(request, "admin_token");
+        String admin = CookieUtil.confirmUser(token);
+
+        if (admin == null) {
+            jsonObject.put("status", 300);
+            return jsonObject;
+        }
+
+
+        DBUtil db = new DBUtil();
+        List<Object> list = new ArrayList<>();
+        String sql = "select * from `order` where `order_type` in (0,3) ORDER BY `order_id` DESC";
+        List<Order> orderList = db.queryInfo(sql, list, Order.class);
+
+        if (orderList.size() == 0) {
+            jsonObject.put("status", 200);
+            jsonObject.put("data", "[]");
+            jsonObject.put("endId", -1);
+            return jsonObject;
+        } else {
+            int start_num = 0;
+            for (int j = 0; j < orderList.size(); j++) {
+                if (orderList.get(j).getOrderId() == startId) {
+                    start_num = j;
+                    break;
+                }
+            }
+            if (orderList.size() - start_num > count) {
+                endId = orderList.get(start_num + count).getOrderId();
+                actualCount = count;
+                jsonObject.put("endId", endId);
+            } else {
+                actualCount = orderList.size() - start_num;
+                jsonObject.put("endId", -1);
+            }
+
+            JSONArray jsonArray = new JSONArray();
+            for (int i = 0; i < actualCount; i++) {
+                JSONObject jsonObject1 = JSONObject.fromObject(orderList.get(i + start_num));
+                jsonArray.add(jsonObject1);
+            }
+
+            jsonObject.put("status", 200);
+            jsonObject.put("data", jsonArray);
+
+        }
+        return jsonObject;
+
     }
 
     @RequestMapping("admin/product/ad/list")
@@ -70,7 +125,7 @@ public class AdminOrder {
         List<Object> objectList = new ArrayList<>();
         objectList.add(timeUtil.getShowTime());
         jsonObject.put("status", 200);
-        Order.getShopAdOrder(getOrderSQL,objectList, jsonObject, 0, true);
+        Order.getShopAdOrder(getOrderSQL, objectList, jsonObject, 0, true);
         return jsonObject;
     }
 
