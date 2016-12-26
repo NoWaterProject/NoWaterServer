@@ -68,6 +68,7 @@ public class Photo {
     }
 
     public static ArrayList<String> getPhotoURL (String getPhotoSQL, int belong_id, int photoType) {
+        getPhotoSQL += "order by `photo_id`";
         DBUtil db = new DBUtil();
         List<Object> getPhotoSQLList = new ArrayList<>();
         getPhotoSQLList.add(belong_id);

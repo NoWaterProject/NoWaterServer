@@ -184,7 +184,23 @@ public class AdminOrder {
         }
 
         int productId = orderList.get(0).getProductId();
-        JSONObject jsonObject1 = ProductShopUtil.GetProductDetail(productId, false);
+
+        String getProduct = "select * from `products` where `product_id` = ?";
+        List<Object> objectList1 = new ArrayList<>();
+        objectList1.add(productId);
+        JSONObject jsonObject1 = new JSONObject();
+        try {
+            List<Product> productList = db.queryInfo(getProduct, objectList1, Product.class);
+            jsonObject1.put("productId", productList.get(0).getProductId());
+            jsonObject1.put("productName", productList.get(0).getProductName());
+            jsonObject1.put("price", productList.get(0).getPrice());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            jsonObject.put("status", 1100);
+            return jsonObject;
+        }
+
         Jedis jedis = new Jedis("127.0.0.1", 6379);
         String prepareProductAd = jedis.get("prepareProductAd");
         JSONArray jsonArray = new JSONArray();

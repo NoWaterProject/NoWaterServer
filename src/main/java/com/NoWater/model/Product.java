@@ -18,6 +18,15 @@ public class Product {
     private long num;
     private double price;
     private int quantity_stock;
+    private String update_time;
+
+    public String getUpdateTime() {
+        return update_time;
+    }
+
+    public void setUpdate_time(String update_time) {
+        this.update_time = update_time;
+    }
 
     public int getIsDel() {
         return is_del;
@@ -85,7 +94,7 @@ public class Product {
 
     public static int confirmStock(int num, int productId) {
         DBUtil db = new DBUtil();
-        String getProductId = "select * from `products` where `product_id` = ?";
+        String getProductId = "select * from `products` where `product_id` = ? and `is_del` = 0";
         List<Object> objectList = new ArrayList<>();
         objectList.add(productId);
         try {

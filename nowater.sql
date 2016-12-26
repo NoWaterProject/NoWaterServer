@@ -25,6 +25,7 @@ CREATE TABLE `products` (
   `product_name` varchar(1024) NOT NULL,
   `price` double(15, 6) NOT NULL,
   `quantity_stock` int(11) NOT NULL,
+  `update_time` varchar(1024) NOT NULL,
   `is_del` int(11) DEFAULT 0,
   PRIMARY KEY (`product_id`)
 );

@@ -54,9 +54,8 @@ public class CustomerShopProduct {
     }
 
     @RequestMapping("customer/product/show")
-    public JSONObject customerProductShow(
-            @RequestParam(value = "productId", defaultValue = "0") int productId,
-            HttpServletRequest request, HttpServletResponse response) {
+    public JSONObject customerProductShow(@RequestParam(value = "productId", defaultValue = "0") int productId,
+                                          HttpServletRequest request, HttpServletResponse response) {
 
         response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
         response.setHeader("Access-Control-Allow-Credentials", "true");

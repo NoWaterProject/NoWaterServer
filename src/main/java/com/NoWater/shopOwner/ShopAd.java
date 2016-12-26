@@ -261,4 +261,10 @@ public class ShopAd {
         jsonObject.put("status", 200);
         return jsonObject;
     }
+
+    @RequestMapping("/shop-owner/ad/cancel")
+    public JSONObject shopOwnerAdCancel(@RequestParam(value = "orderId") int orderId,
+                                        HttpServletRequest request, HttpServletResponse response) {
+
+    }
 }
