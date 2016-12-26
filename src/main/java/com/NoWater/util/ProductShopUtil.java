@@ -34,10 +34,10 @@ public final class ProductShopUtil {
             return jsonObject;
         }
 
+        jsonObject = JSONObject.fromObject(productList.get(0));
         if (hasShop) {
             jsonObject.put("shop", GetShopDetail(productList.get(0).getShopId(), false));
         }
-        jsonObject = JSONObject.fromObject(productList.get(0));
         String getPhotoSQL = "select * from photo where belong_id = ? and photo_type = ? and is_del = 0";
         jsonObject.put("photo", JSONArray.fromObject(Photo.getPhotoURL(getPhotoSQL, productId, 2)));
         return jsonObject;
