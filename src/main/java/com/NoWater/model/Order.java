@@ -28,6 +28,15 @@ public class Order {
     private String express_code;
     private String photo;
     private String show_time;
+    private double commission;
+
+    public double getCommission() {
+        return commission;
+    }
+
+    public void setCommission(double commission) {
+        this.commission = commission;
+    }
 
     public String getShowTime() {
         return show_time;
@@ -206,7 +215,7 @@ public class Order {
         JSONArray jsonArray = new JSONArray();
         try {
             orderList = db.queryInfo(getOrderSQL, objectList, Order.class);
-            if (count >= orderList.size()) {
+            if (count == 0 || count >= orderList.size()) {
                 jsonObject.put("startId", -1);
                 for (int i = 0; i < orderList.size(); i++) {
                     JSONObject jsonObject1 = new JSONObject();

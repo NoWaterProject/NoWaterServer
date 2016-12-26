@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Koprvhdix on 2016/12/18.
+ * Created by wukai on 2016/12/18.
  */
 @RestController
 public class AdminOrder {
@@ -25,12 +25,53 @@ public class AdminOrder {
     public JSONObject paymentList(@RequestParam(value = "count") int count,
                                   @RequestParam(value = "startId", defaultValue = "0") int startId,
                                   HttpServletRequest request, HttpServletResponse response) {
+
         return new JSONObject();
     }
 
+    @RequestMapping("admin/product/ad/list")
+    public JSONObject adminProductAdList(HttpServletRequest request, HttpServletResponse response) {
+        response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+        JSONObject jsonObject = new JSONObject();
+
+        String token = CookieUtil.getCookieValueByName(request, "admin_token");
+        String admin = CookieUtil.confirmUser(token);
+
+        if (admin == null) {
+            jsonObject.put("status", 300);
+            LogHelper.info(String.format("[admin/product/ad/approve] %s", jsonObject.toString()));
+            return jsonObject;
+        }
+
+        String getOrderSQL = "select * from `order` where `order_type` = 1 and `show_time` = ? order by `price` desc";
+        List<Object> objectList = new ArrayList<>();
+        objectList.add(timeUtil.getShowTime());
+        Order.getProductAdOrder(getOrderSQL, objectList, jsonObject, 0, true);
+        return jsonObject;
+    }
+
     @RequestMapping("admin/shop/ad/list")
-    public JSONObject adminShopAdList() {
-        return new JSONObject();
+    public JSONObject adminShopAdList(HttpServletRequest request, HttpServletResponse response) {
+        response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+        JSONObject jsonObject = new JSONObject();
+
+        String token = CookieUtil.getCookieValueByName(request, "admin_token");
+        String admin = CookieUtil.confirmUser(token);
+
+        if (admin == null) {
+            jsonObject.put("status", 300);
+            LogHelper.info(String.format("[admin/product/ad/approve] %s", jsonObject.toString()));
+            return jsonObject;
+        }
+
+        String getOrderSQL = "select * from `order` where `order_type` = 2 and `show_time` = ? order by `price` desc";
+        List<Object> objectList = new ArrayList<>();
+        objectList.add(timeUtil.getShowTime());
+        jsonObject.put("status", 200);
+        Order.getShopAdOrder(getOrderSQL,objectList, jsonObject, 0, true);
+        return jsonObject;
     }
 
     @RequestMapping("admin/shop/ad/approve")

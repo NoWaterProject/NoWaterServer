@@ -26,10 +26,11 @@ public final class OrderUtil {
             e.printStackTrace();
             return -10;
         }
+        Jedis jedis = new Jedis("127.0.0.1", 6379);
 
         double price = ProductItem.get(0).getPrice();
 
-        String insertOrderSQL = "insert into `order` (`order_type`, `product_id`, `time`, `initiator_id`, `target_id`, `num`, `price`, `sum_price`) values (?, ?, ?, ?, ?, ?, ?, ?)";
+        String insertOrderSQL = "insert into `order` (`order_type`, `product_id`, `time`, `initiator_id`, `target_id`, `num`, `price`, `sum_price`, `commission`) values (?, ?, ?, ?, ?, ?, ?, ?)";
         List<Object> insertList = new ArrayList<>();
         insertList.add(order_type);
         insertList.add(productId);
@@ -39,6 +40,7 @@ public final class OrderUtil {
         insertList.add(num);
         insertList.add(price);
         insertList.add(num * price);
+        insertList.add(Double.valueOf(jedis.get("commission")));
 
         db.insertUpdateDeleteExute(insertOrderSQL, insertList);
 

@@ -62,6 +62,7 @@ CREATE TABLE `order` (
   `payment_id` int(11) DEFAULT -1,
   `photo` varchar(1024) DEFAULT 0,
   `show_time` varchar(1024) DEFAULT NULL,
+  `commission` float(15, 6) DEFAULT 0.02,
 
   `status` int(11) DEFAULT -3,
   PRIMARY KEY (`order_id`)
