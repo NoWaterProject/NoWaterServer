@@ -89,22 +89,24 @@ public class CustomerRegister {
                             return jsonObject;
                         }
 
-                        String address = firstName + ", " + lastName + ", "
-                                + telephone + ", " + postCode + ", "
-                                + address1 + ", " + address2 + ", "
-                                + address3;
-
                         String getUserId = "select * from `user` where `name` = ?";
                         List<Object> getUserIdList = new ArrayList<>();
                         getUserIdList.add(name);
                         try {
                             List<User> userList1 = db.queryInfo(getUserId, getUserIdList, User.class);
                             int userId = userList1.get(0).getUserId();
-                            String insertAddress = "insert into `address` (`address`, `user_id`, `default`) values (?, ?, ?)";
+                            String insertAddress = "insert into `address` (`telephone`, `address1`, `address2`,`address3`,`post_code`,`first_name`,`last_name`,`user_id`,`is_default`) values (?,?,?,?,?,?,?,?,?)";
                             List<Object> objectList = new ArrayList<>();
-                            objectList.add(address);
+                            objectList.add(telephone);
+                            objectList.add(address1);
+                            objectList.add(address2);
+                            objectList.add(address3);
+                            objectList.add(postCode);
+                            objectList.add(firstName);
+                            objectList.add(lastName);
                             objectList.add(userId);
                             objectList.add(1);
+
                             db.insertUpdateDeleteExute(insertAddress, objectList);
                         } catch (Exception e) {
                             e.printStackTrace();
