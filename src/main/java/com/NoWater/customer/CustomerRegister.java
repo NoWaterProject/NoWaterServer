@@ -89,9 +89,9 @@ public class CustomerRegister {
                             return jsonObject;
                         }
 
-                        String address = firstName + " " + lastName + ", "
+                        String address = firstName + ", " + lastName + ", "
                                 + telephone + ", " + postCode + ", "
-                                + address1 + " " + address2 + " "
+                                + address1 + ", " + address2 + ", "
                                 + address3;
 
                         String getUserId = "select * from `user` where `name` = ?";

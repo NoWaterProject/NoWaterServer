@@ -126,8 +126,14 @@ CREATE TABLE `user` (
 DROP TABLE IF EXISTS `address`;
 CREATE TABLE `address` (
   `address_id` int(11) NOT NULL AUTO_INCREMENT,
-  `address` varchar(1024) NOT NULL,
+  `telephone` varchar(1024) DEFAULT NULL,
+  `address1` varchar(1024) DEFAULT NULL,
+  `address2` varchar(1024) DEFAULT NULL,
+  `address3` varchar(1024) DEFAULT NULL,
+  `post_code` varchar(1024) DEFAULT NULL,
+  `first_name` varchar(1024) DEFAULT NULL,
+  `last_name` varchar(1024) DEFAULT NULL,
   `user_id` int(11) NOT NULL,
-  `default` int(11) DEFAULT 0,
+  `is_default` int(11) DEFAULT 0,
   PRIMARY KEY (`address_id`)
 );

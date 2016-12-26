@@ -4,9 +4,14 @@ import com.NoWater.model.Order;
 import com.NoWater.model.Product;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import net.sf.json.util.EnumMorpher;
 import redis.clients.jedis.Jedis;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -94,7 +99,8 @@ public final class OrderUtil {
         return 200;
     }
 
-    public static JSONArray getOrderDetail(String getOrderDetailSQL, List<Object> getOrderDetailList) {
+    public static JSONArray getOrderDetail(String getOrderDetailSQL, List<Object> getOrderDetailList, int timeFilter,
+                                           String beginTime, String endTime) throws Exception {
         DBUtil db = new DBUtil();
         List<Order> orderDetail;
         JSONArray jsonArray = new JSONArray();
@@ -110,7 +116,67 @@ public final class OrderUtil {
 
 
         for (int i = 0; i < orderDetail.size(); i++) {
-            JSONObject orderItem = JSONObject.fromObject(orderDetail.get(i));
+            JSONObject orderItem = new JSONObject();
+
+            //获取订单时间
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String getTime = orderDetail.get(i).getTime();
+
+            Date orderTime = sdf.parse(getTime);
+            Calendar orderDate = Calendar.getInstance();
+            orderDate.setTime(orderTime);
+
+            Calendar nowDate = Calendar.getInstance();
+
+            if (timeFilter == 0) {//0 不处理  1 每天 ； 2 每周 ； 3 每月 ；4 每年 ; 5处理时间段
+                orderItem = JSONObject.fromObject(orderDetail.get(i));
+            } else if (timeFilter == 1) {
+                nowDate.add(Calendar.DATE, -1);
+                if (orderDate.before(nowDate)) {
+                    continue;
+                } else {
+                    orderItem = JSONObject.fromObject(orderDetail.get(i));
+                }
+
+            } else if (timeFilter == 2) {
+                nowDate.add(Calendar.DATE, -7);
+                if (orderDate.before(nowDate)) {
+                    continue;
+                } else {
+                    orderItem = JSONObject.fromObject(orderDetail.get(i));
+                }
+
+            } else if (timeFilter == 3) {
+                nowDate.add(Calendar.MONTH, -1);
+                if (orderDate.before(nowDate)) {
+                    continue;
+                } else {
+                    orderItem = JSONObject.fromObject(orderDetail.get(i));
+                }
+
+            } else if (timeFilter == 4) {
+                nowDate.add(Calendar.YEAR, -1);
+                if (orderDate.before(nowDate)) {
+                    continue;
+                } else {
+                    orderItem = JSONObject.fromObject(orderDetail.get(i));
+                }
+
+            } else if (timeFilter == 5) {
+                Date begin = sdf.parse(beginTime);
+                Calendar beginDate = Calendar.getInstance();
+                beginDate.setTime(begin);
+                Date end = sdf.parse(endTime);
+                Calendar endDate = Calendar.getInstance();
+                endDate.setTime(end);
+
+                if (orderDate.before(beginDate) || orderDate.after(endDate)) {
+                    continue;
+                } else {
+                    orderItem = JSONObject.fromObject(orderDetail.get(i));
+                }
+            }
+
             if (orderDetail.get(i).getStatus() == 1)
                 orderItem.put("countdown", timeUtil.timeCountdown(orderDetail.get(i).getTime(), 1));
             else
