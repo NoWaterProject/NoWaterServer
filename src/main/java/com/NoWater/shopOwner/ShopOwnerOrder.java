@@ -60,10 +60,10 @@ public class ShopOwnerOrder {
         }
 
         if (status == 0) {
-            getOrderList.append(" `order_type` in (0, 3) and `target_id` = ? and `status` != -3 order by `status`";
+            getOrderList.append(" `order_type` in (0, 3) and `target_id` = ? and `status` != -3 order by `status`");
             getOrderDetailList.add(shopId);
         } else {
-            getOrderList.append(" `order_type` in (0, 3) and `target_id` = ? and `status` = ?";
+            getOrderList.append(" `order_type` in (0, 3) and `target_id` = ? and `status` = ?");
             getOrderDetailList.add(shopId);
             getOrderDetailList.add(status);
         }

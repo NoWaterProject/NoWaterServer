@@ -408,10 +408,10 @@ public class OrderController {
         }
 
         if (status == 0) {
-            getOrderList.append(" `order_type` in (0, 3) and `initiator_id` = ? and `status` != -3 order by `status`";
+            getOrderList.append(" `order_type` in (0, 3) and `initiator_id` = ? and `status` != -3 order by `status`");
             list.add(userId);
         } else {
-            getOrderList.append(" `order_type` in (0, 3) and `initiator_id` = ? and `status` = ?";
+            getOrderList.append(" `order_type` in (0, 3) and `initiator_id` = ? and `status` = ?");
             list.add(userId);
             list.add(status);
         }

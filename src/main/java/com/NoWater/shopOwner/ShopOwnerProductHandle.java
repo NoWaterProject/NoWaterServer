@@ -142,7 +142,7 @@ public class ShopOwnerProductHandle {
                 for (int i = 0; i < jsonArray.size(); i++) {
                     if (Integer.parseInt(jsonArray.getJSONObject(i).get("productId").toString()) == product_id) {
                         String getPhotoSQL = "select * from photo where belong_id = ? and photo_type = ? and is_del = 0";
-                        ArrayList<String> stringArrayList = Photo.getPhotoURL(getPhotoSQL, product_id, 2)
+                        ArrayList<String> stringArrayList = Photo.getPhotoURL(getPhotoSQL, product_id, 2);
                         jsonArray.getJSONObject(i).put("photoIdUrl", stringArrayList.get(0));
                         break;
                     }
@@ -154,7 +154,7 @@ public class ShopOwnerProductHandle {
             for (int i = 0; i < jsonArray.size(); i++) {
                 if (Integer.parseInt(jsonArray.getJSONObject(i).get("productId").toString()) == product_id) {
                     String getPhotoSQL = "select * from photo where belong_id = ? and photo_type = ? and is_del = 0";
-                    ArrayList<String> stringArrayList = Photo.getPhotoURL(getPhotoSQL, product_id, 2)
+                    ArrayList<String> stringArrayList = Photo.getPhotoURL(getPhotoSQL, product_id, 2);
                     jsonArray.getJSONObject(i).put("photoIdUrl",stringArrayList.get(0));
                 }
             }
