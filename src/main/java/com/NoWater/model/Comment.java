@@ -10,8 +10,26 @@ public class Comment {
     private String user_name;
     private int order_id;
     private int product_id;
+    private int star;
+    private String time;
 
-    public int getComment_id() {
+    public int getStar() {
+        return star;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setStar(int star) {
+        this.star = star;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
+    public int getCommentId() {
         return comment_id;
     }
 
@@ -19,7 +37,7 @@ public class Comment {
         this.comment_id = comment_id;
     }
 
-    public String getComment_content() {
+    public String getCommentContent() {
         return comment_content;
     }
 
@@ -27,7 +45,7 @@ public class Comment {
         this.comment_content = comment_content;
     }
 
-    public int getUser_id() {
+    public int getUserId() {
         return user_id;
     }
 
@@ -35,7 +53,7 @@ public class Comment {
         this.user_id = user_id;
     }
 
-    public String getUser_name() {
+    public String getUserName() {
         return user_name;
     }
 
@@ -43,7 +61,7 @@ public class Comment {
         this.user_name = user_name;
     }
 
-    public int getOrder_id() {
+    public int getOrderId() {
         return order_id;
     }
 
@@ -51,7 +69,7 @@ public class Comment {
         this.order_id = order_id;
     }
 
-    public int getProduct_id() {
+    public int getProductId() {
         return product_id;
     }
 

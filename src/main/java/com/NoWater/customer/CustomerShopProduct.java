@@ -63,7 +63,7 @@ public class CustomerShopProduct {
 
         LogHelper.info(String.format("[customer/product/show] [param] [product_id: %s]", productId));
 
-        JSONObject product = ProductShopUtil.GetProductDetail(productId, true);
+        JSONObject product = ProductShopUtil.GetProductDetail(productId, true, true, false);
         if (product.has("status")) {
             jsonObject.put("status", 400);
             LogHelper.error(String.format("[customer/product/show] %s", jsonObject));

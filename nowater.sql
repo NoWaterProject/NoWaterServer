@@ -103,8 +103,10 @@ CREATE TABLE `comment_product` (
   `comment_id` int(11) NOT NULL AUTO_INCREMENT,
   `comment_content` varchar(1024) NOT NULL,
   `user_id` int(11) NOT NULL,
-  `user_name` varchar(1024) NOT NULL
-  `order_id` int(11) NOT NULL;
+  `user_name` varchar(1024) NOT NULL,
+  `order_id` int(11) NOT NULL,
+  `time` varchar(1024) NOT NULL,
+  `star` int(11) NOT NULL,
   `product_id` int(11) NOT NULL,
   PRIMARY KEY (`comment_id`)
 );

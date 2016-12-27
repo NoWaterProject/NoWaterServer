@@ -1,5 +1,6 @@
 package com.NoWater.util;
 
+import com.NoWater.model.Comment;
 import com.NoWater.model.Photo;
 import com.NoWater.model.Product;
 import com.NoWater.model.Shop;
@@ -14,7 +15,7 @@ import java.util.List;
  * Created by Koprvhdix on 2016/12/19.
  */
 public final class ProductShopUtil {
-    public static JSONObject GetProductDetail(int productId, boolean hasShop) {
+    public static JSONObject GetProductDetail(int productId, boolean hasShop, boolean hasComment, boolean hasPhoto) {
         JSONObject jsonObject = new JSONObject();
         DBUtil db = new DBUtil();
         String getProduct = "select * from `products` where `product_id` = ?";
@@ -36,10 +37,37 @@ public final class ProductShopUtil {
 
         jsonObject = JSONObject.fromObject(productList.get(0));
         if (hasShop) {
-            jsonObject.put("shop", GetShopDetail(productList.get(0).getShopId(), false));
+            jsonObject.put("shop", GetShopDetail(productList.get(0).getShopId(), hasPhoto));
         }
         String getPhotoSQL = "select * from photo where belong_id = ? and photo_type = ? and is_del = 0";
         jsonObject.put("photo", JSONArray.fromObject(Photo.getPhotoURL(getPhotoSQL, productId, 2)));
+
+        if (hasComment) {
+            String getComment = "select * from `comment` where `product_id` = ?";
+            List<Object> objectList = new ArrayList<>();
+            objectList.add(productId);
+            try {
+                List<Comment> commentList = db.queryInfo(getComment, objectList, Comment.class);
+                JSONObject commentObject = new JSONObject();
+                if (commentList.size() == 0) {
+                    commentObject.put("avgPoint", 5);
+                } else {
+                    double avgPoint;
+                    int sum = 0;
+                    for (int i = 0; i < commentList.size(); i++) {
+                        sum += commentList.get(i).getStar();
+                    }
+                    avgPoint = (double) sum / commentList.size();
+                    commentObject.put("avgPoint", avgPoint);
+                    commentObject.put("commentList", JSONArray.fromObject(commentList));
+                }
+                jsonObject.put("comment", commentObject);
+            } catch (Exception e) {
+                e.printStackTrace();
+                jsonObject.put("status", 1100);
+            }
+        }
+
         return jsonObject;
     }
 

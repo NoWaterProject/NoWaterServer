@@ -1,17 +1,16 @@
 package com.NoWater.shopOwner;
 
+import com.NoWater.model.Photo;
 import com.NoWater.model.Product;
 import com.NoWater.model.Shop;
-import com.NoWater.util.CookieUtil;
-import com.NoWater.util.DBUtil;
-import com.NoWater.util.FileUpload;
-import com.NoWater.util.LogHelper;
+import com.NoWater.util.*;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.collections.ArrayStack;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import redis.clients.jedis.Jedis;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -69,7 +68,6 @@ public class ShopOwnerProductHandle {
         param.add(product_name);
         param.add(price);
         param.add(quantity_stock);
-        param.add(currentTime);
 
         ArrayList<String> addFileNameList = FileUpload.jsonToArrayList(detail_photo_list);
         LogHelper.info("add:" + addFileNameList.toString());
@@ -86,6 +84,7 @@ public class ShopOwnerProductHandle {
 
             StringBuffer sql = new StringBuffer();
             sql.append("insert into products(shop_id, class_id, product_name, price, quantity_stock, update_time) values(?,?,?,?,?)");
+            param.add(currentTime);
             db.insertUpdateDeleteExute(sql.toString(), param);
 
             int status = FileUpload.fileExists(userId, addFileNameList);
@@ -136,8 +135,33 @@ public class ShopOwnerProductHandle {
                 return jsonObject;
             }
 
+            Jedis jedis = new Jedis("127.0.0.1", 6379);
+            String productPrepareAd = jedis.get("prepareProductAd");
+            if (productPrepareAd != null) {
+                JSONArray jsonArray = JSONArray.fromObject(productPrepareAd);
+                for (int i = 0; i < jsonArray.size(); i++) {
+                    if (Integer.parseInt(jsonArray.getJSONObject(i).get("productId").toString()) == product_id) {
+                        String getPhotoSQL = "select * from photo where belong_id = ? and photo_type = ? and is_del = 0";
+                        ArrayList<String> stringArrayList = Photo.getPhotoURL(getPhotoSQL, product_id, 2)
+                        jsonArray.getJSONObject(i).put("photoIdUrl", stringArrayList.get(0));
+                        break;
+                    }
+                }
+                jedis.set("prepareProductAd", jsonArray.toString());
+            }
+            String productAd = jedis.get("ProductAd");
+            JSONArray jsonArray = JSONArray.fromObject(productAd);
+            for (int i = 0; i < jsonArray.size(); i++) {
+                if (Integer.parseInt(jsonArray.getJSONObject(i).get("productId").toString()) == product_id) {
+                    String getPhotoSQL = "select * from photo where belong_id = ? and photo_type = ? and is_del = 0";
+                    ArrayList<String> stringArrayList = Photo.getPhotoURL(getPhotoSQL, product_id, 2)
+                    jsonArray.getJSONObject(i).put("photoIdUrl",stringArrayList.get(0));
+                }
+            }
+            jedis.set("ProductAd", jsonArray.toString());
+
             StringBuffer sql = new StringBuffer();
-            sql.append("UPDATE products SET shop_id = ?, class_id = ?, product_name = ?, price = ?, quantity_stock = ?, update_time = ? WHERE product_id = ?");
+            sql.append("UPDATE products SET shop_id = ?, class_id = ?, product_name = ?, price = ?, quantity_stock = ? WHERE product_id = ?");
             param.add(product_id);
             db.insertUpdateDeleteExute(sql.toString(), param);
             jsonObject.put("status", 200);                  //修改商品成功

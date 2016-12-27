@@ -265,6 +265,35 @@ public class ShopAd {
     @RequestMapping("/shop-owner/ad/cancel")
     public JSONObject shopOwnerAdCancel(@RequestParam(value = "orderId") int orderId,
                                         HttpServletRequest request, HttpServletResponse response) {
+        response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+        JSONObject jsonObject = new JSONObject();
+        String token = CookieUtil.getCookieValueByName(request, "token");
+        String userId = CookieUtil.confirmUser(token);
+        DBUtil db = new DBUtil();
 
+        if (userId == null) {
+            jsonObject.put("status", 300);
+            return jsonObject;
+        }
+
+        int shopId = CookieUtil.confirmShop(userId);
+        if (shopId == -1) {
+            jsonObject.put("status", 500);      // not shop owner
+            return jsonObject;
+        }
+
+        int statusConfirmOrder = OrderUtil.confirmOrderUserId(orderId, userId, 1, 2);
+        if (statusConfirmOrder != 200) {
+            jsonObject.put("status", statusConfirmOrder);
+            return jsonObject;
+        }
+
+        String updateSQL = "update `order` set `status` = 10 where `order_id` = ?";
+        List<Object> objectList = new ArrayList<>();
+        objectList.add(orderId);
+        db.insertUpdateDeleteExute(updateSQL, objectList);
+        jsonObject.put("status", 200);
+        return jsonObject;
     }
 }

@@ -4,10 +4,7 @@ import com.NoWater.model.Cart;
 import com.NoWater.model.Order;
 import com.NoWater.model.Product;
 import com.NoWater.model.User;
-import com.NoWater.util.CookieUtil;
-import com.NoWater.util.DBUtil;
-import com.NoWater.util.LogHelper;
-import com.NoWater.util.OrderUtil;
+import com.NoWater.util.*;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -365,8 +362,13 @@ public class OrderController {
 
         String getOrderDetailSQL = "select * from `order` where `order_id` in " + stringBuffer.toString();
         List<Object> getOrderDetailList = new ArrayList<>();
-
-        JSONArray orderDetail = OrderUtil.getOrderDetail(getOrderDetailSQL, getOrderDetailList);
+        JSONArray orderDetail;
+        try {
+            orderDetail = OrderUtil.getOrderDetail(getOrderDetailSQL, getOrderDetailList, 0, "", "", false, 0);
+        } catch (Exception e) {
+            jsonObject.put("status", 1100);
+            return jsonObject;
+        }
 
         jsonObject.put("data", orderDetail);
         jsonObject.put("status", 200);
@@ -376,6 +378,10 @@ public class OrderController {
 
     @RequestMapping("order/list")
     public JSONObject orderList(@RequestParam(value = "status") int status,
+                                @RequestParam(value = "timeFilter", defaultValue = "0") int timeFilter,
+                                @RequestParam(value = "beginTime", defaultValue = "1970-01-01 00:00:00") String beginTime,
+                                @RequestParam(value = "endTime", defaultValue = "-1") String endTime,
+                                @RequestParam(value = "searchKey", defaultValue = "") String searchKey,
                                 HttpServletRequest request, HttpServletResponse response) {
         response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
         response.setHeader("Access-Control-Allow-Credentials", "true");
@@ -393,21 +399,38 @@ public class OrderController {
             return jsonObject;
         }
 
-        String getOrderList;
+        StringBuffer getOrderList = new StringBuffer("select * from `order` where");
         List<Object> list = new ArrayList<>();
+        if (!searchKey.isEmpty()) {
+            String searchResult = OrderUtil.searchProduct(searchKey);
+            getOrderList.append(" ((`order_id` = ?) or (`product_id` in ");
+            getOrderList.append(searchResult);
+            getOrderList.append(")) and");
+            list.add(searchKey);
+        }
+
         if (status == 0) {
-            getOrderList = "select * from `order` where `order_type` in (0, 3) and `initiator_id` = ? and `status` != -3 order by `status`";
+            getOrderList.append(" `order_type` in (0, 3) and `initiator_id` = ? and `status` != -3 order by `status`";
             list.add(userId);
         } else {
-            getOrderList = "select * from `order` where `order_type` in (0, 3) and `initiator_id` = ? and `status` = ?";
+            getOrderList.append(" `order_type` in (0, 3) and `initiator_id` = ? and `status` = ?";
             list.add(userId);
             list.add(status);
         }
 
-        JSONArray jsonArray = OrderUtil.getOrderDetail(getOrderList, list);
-        jsonObject.put("status", 200);
-        jsonObject.put("data", jsonArray);
-        LogHelper.info(String.format("[order/list] %s", jsonObject.toString()));
+        if (endTime == "-1") {
+            endTime = timeUtil.getShowTime() + " 23:59:59";
+        }
+
+        try {
+            JSONArray jsonArray = OrderUtil.getOrderDetail(getOrderList.toString(), list, timeFilter, beginTime, endTime, false, 0);
+            jsonObject.put("status", 200);
+            jsonObject.put("data", jsonArray);
+            LogHelper.info(String.format("[order/list] %s", jsonObject.toString()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            jsonObject.put("status", 1100);
+        }
         return jsonObject;
     }
 
@@ -451,6 +474,7 @@ public class OrderController {
     @RequestMapping("order/comment")
     public JSONObject orderComment(@RequestParam(value = "orderId") int orderId,
                                    @RequestParam(value = "comment") String comment,
+                                   @RequestParam(value = "star") int star,
                                    HttpServletRequest request, HttpServletResponse response) {
         response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
         response.setHeader("Access-Control-Allow-Credentials", "true");
@@ -489,7 +513,7 @@ public class OrderController {
         }
         String userName = user.get(0).getName().substring(0, 1) + "*****";
 
-        sql="select * from `order` where `order_id`=? ";
+        sql="select * from `order` where `order_id`=?";
         list.clear();
         list.add(orderId);
         List<Order> order;
@@ -502,13 +526,19 @@ public class OrderController {
         }
         int productId = order.get(0).getProductId();
 
-        sql = "insert into `comment`(`comment_content`,`user_id`,`user_name`,`order_id`,`product_id`) values(?,?,?,?,?) ";
+        String pat = "yyyy-MM-dd HH:mm:ss";
+        SimpleDateFormat sdf = new SimpleDateFormat(pat);
+        String currentTime = sdf.format(new Date());
+
+        sql = "insert into `comment` (`comment_content`, `user_id`, `user_name`, `order_id`, `product_id`, `time`, `star`) values(?, ?, ?, ?, ?, ?, ?)";
         list.clear();
         list.add(comment);
         list.add(userId);
         list.add(userName);
         list.add(orderId);
         list.add(productId);
+        list.add(currentTime);
+        list.add(star);
         db.insertUpdateDeleteExute(sql, list);
         jsonObject.put("status", 200);
         LogHelper.info(String.format("[order/comment] %s", jsonObject.toString()));

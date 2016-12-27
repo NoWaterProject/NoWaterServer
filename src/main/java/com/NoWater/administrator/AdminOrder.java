@@ -1,6 +1,7 @@
 package com.NoWater.administrator;
 
 import com.NoWater.model.Order;
+import com.NoWater.model.Photo;
 import com.NoWater.model.Product;
 import com.NoWater.model.Shop;
 import com.NoWater.util.*;
@@ -43,44 +44,44 @@ public class AdminOrder {
         }
 
 
-        DBUtil db = new DBUtil();
-        List<Object> list = new ArrayList<>();
-        String sql = "select * from `order` where `order_type` in (0,3) ORDER BY `order_id` DESC";
-        List<Order> orderList = db.queryInfo(sql, list, Order.class);
-
-        if (orderList.size() == 0) {
-            jsonObject.put("status", 200);
-            jsonObject.put("data", "[]");
-            jsonObject.put("endId", -1);
-            return jsonObject;
-        } else {
-            int start_num = 0;
-            for (int j = 0; j < orderList.size(); j++) {
-                if (orderList.get(j).getOrderId() == startId) {
-                    start_num = j;
-                    break;
-                }
-            }
-            if (orderList.size() - start_num > count) {
-                endId = orderList.get(start_num + count).getOrderId();
-                actualCount = count;
-                jsonObject.put("endId", endId);
-            } else {
-                actualCount = orderList.size() - start_num;
-                jsonObject.put("endId", -1);
-            }
-
-            JSONArray jsonArray = new JSONArray();
-            for (int i = 0; i < actualCount; i++) {
-                JSONObject jsonObject1 = JSONObject.fromObject(orderList.get(i + start_num));
-                jsonArray.add(jsonObject1);
-            }
-
-            jsonObject.put("status", 200);
-            jsonObject.put("data", jsonArray);
-
-        }
-        return jsonObject;
+//        DBUtil db = new DBUtil();
+//        List<Object> list = new ArrayList<>();
+//        String sql = "select * from `order` where `order_type` in (0,3) ORDER BY `order_id` DESC";
+//        List<Order> orderList = db.queryInfo(sql, list, Order.class);
+//
+//        if (orderList.size() == 0) {
+//            jsonObject.put("status", 200);
+//            jsonObject.put("data", "[]");
+//            jsonObject.put("endId", -1);
+//            return jsonObject;
+//        } else {
+//            int start_num = 0;
+//            for (int j = 0; j < orderList.size(); j++) {
+//                if (orderList.get(j).getOrderId() == startId) {
+//                    start_num = j;
+//                    break;
+//                }
+//            }
+//            if (orderList.size() - start_num > count) {
+//                endId = orderList.get(start_num + count).getOrderId();
+//                actualCount = count;
+//                jsonObject.put("endId", endId);
+//            } else {
+//                actualCount = orderList.size() - start_num;
+//                jsonObject.put("endId", -1);
+//            }
+//
+//            JSONArray jsonArray = new JSONArray();
+//            for (int i = 0; i < actualCount; i++) {
+//                JSONObject jsonObject1 = JSONObject.fromObject(orderList.get(i + start_num));
+//                jsonArray.add(jsonObject1);
+//            }
+//
+//            jsonObject.put("status", 200);
+//            jsonObject.put("data", jsonArray);
+//
+//        }
+//        return jsonObject;
 
     }
 
@@ -250,6 +251,11 @@ public class AdminOrder {
             jsonObject1.put("productName", productList.get(0).getProductName());
             jsonObject1.put("price", productList.get(0).getPrice());
 
+            String getPhotoSQL = "select * from photo where belong_id = ? and photo_type = ? and is_del = 0";
+
+            ArrayList<String> stringArrayList = Photo.getPhotoURL(getPhotoSQL, productId, 2);
+
+            jsonObject1.put("photoIdUrl", stringArrayList.get(0));
         } catch (Exception e) {
             e.printStackTrace();
             jsonObject.put("status", 1100);

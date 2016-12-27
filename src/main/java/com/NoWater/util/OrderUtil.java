@@ -7,6 +7,7 @@ import net.sf.json.JSONObject;
 import net.sf.json.util.EnumMorpher;
 import redis.clients.jedis.Jedis;
 
+import java.lang.reflect.Executable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -101,8 +102,7 @@ public final class OrderUtil {
         return 200;
     }
 
-    public static JSONArray getOrderDetail(String getOrderDetailSQL, List<Object> getOrderDetailList, int timeFilter,
-                                           String beginTime, String endTime) throws Exception {
+    public static JSONArray getOrderDetail(String getOrderDetailSQL, List<Object> getOrderDetailList, int timeFilter, String beginTime, String endTime, boolean hasPhoto, int count) throws Exception {
         DBUtil db = new DBUtil();
         List<Order> orderDetail;
         JSONArray jsonArray = new JSONArray();
@@ -116,8 +116,14 @@ public final class OrderUtil {
             return jsonArray;
         }
 
+        int actualCount;
+        if (count == 0 || orderDetail.size() <= count) {
+            actualCount = orderDetail.size();
+        } else {
+            actualCount = count;
+        }
 
-        for (int i = 0; i < orderDetail.size(); i++) {
+        for (int i = 0; i < actualCount; i++) {
             JSONObject orderItem = new JSONObject();
 
             //获取订单时间
@@ -130,7 +136,8 @@ public final class OrderUtil {
 
             Calendar nowDate = Calendar.getInstance();
 
-            if (timeFilter == 0) {//0 不处理  1 每天 ； 2 每周 ； 3 每月 ；4 每年 ; 5处理时间段
+            if (timeFilter == 0) {
+                //0 不处理  1 每天 ； 2 每周 ； 3 每月 ；4 每年 ; 5处理时间段
                 orderItem = JSONObject.fromObject(orderDetail.get(i));
             } else if (timeFilter == 1) {
                 nowDate.add(Calendar.DATE, -1);
@@ -184,8 +191,7 @@ public final class OrderUtil {
             else
                 orderItem.put("countdown", timeUtil.timeCountdown(orderDetail.get(i).getTime(), 7));
             int productId = orderDetail.get(i).getProductId();
-            int shopId = orderDetail.get(i).getTargetId();
-            JSONObject product = ProductShopUtil.GetProductDetail(productId, true);
+            JSONObject product = ProductShopUtil.GetProductDetail(productId, true, false, hasPhoto);
             orderItem.put("product", product);
             jsonArray.add(orderItem);
         }
@@ -263,6 +269,37 @@ public final class OrderUtil {
         } catch (Exception e) {
             e.printStackTrace();
             return -1;
+        }
+    }
+
+    public static String searchProduct(String keyWord) {
+        String[] keyWords = keyWord.split(" ");
+        StringBuffer sql = new StringBuffer("select * from products where ");
+
+        for (int i = 0; i < keyWords.length; i++) {
+            sql.append("product_name like '%");
+            sql.append(keyWords[i]);
+            if (i != keyWords.length - 1)
+                sql.append("%' and ");
+            else
+                sql.append("%'");
+        }
+
+        DBUtil db = new DBUtil();
+        try {
+            List<Product> productList = db.queryInfo(sql.toString(), new ArrayList<>(), Product.class);
+            StringBuffer stringBuffer = new StringBuffer(" (");
+            for (int i = 0; i < productList.size(); i++) {
+                stringBuffer.append(productList.get(i).getProductId());
+                if (i != productList.size() - 1)
+                    stringBuffer.append(", ");
+                else
+                    stringBuffer.append(") ");
+            }
+            return stringBuffer.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
         }
     }
 }

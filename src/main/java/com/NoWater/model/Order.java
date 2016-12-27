@@ -224,7 +224,7 @@ public class Order {
                     if (hasShopOwnerPhoto)
                         jsonObject1.put("shop", ProductShopUtil.GetShopDetail(orderList.get(i).getTargetId(), true));
                     jsonObject1.put("price", orderList.get(i).getPrice());
-                    jsonObject1.put("product", ProductShopUtil.GetProductDetail(orderList.get(i).getProductId(), false));
+                    jsonObject1.put("product", ProductShopUtil.GetProductDetail(orderList.get(i).getProductId(), false, false, false));
                     jsonObject1.put("status", orderList.get(i).getStatus());
                     jsonObject1.put("showTime", orderList.get(i).getShowTime());
                     jsonArray.add(jsonObject1);
@@ -237,7 +237,7 @@ public class Order {
                     if (hasShopOwnerPhoto)
                         jsonObject1.put("shop", ProductShopUtil.GetShopDetail(orderList.get(i).getTargetId(), true));
                     jsonObject1.put("price", orderList.get(i).getPrice());
-                    jsonObject1.put("product", ProductShopUtil.GetProductDetail(orderList.get(i).getProductId(), false));
+                    jsonObject1.put("product", ProductShopUtil.GetProductDetail(orderList.get(i).getProductId(), false, false, false));
                     jsonObject1.put("status", orderList.get(i).getStatus());
                     jsonObject1.put("showTime", orderList.get(i).getShowTime());
                     jsonObject1.put("time", orderList.get(i).getTime());
