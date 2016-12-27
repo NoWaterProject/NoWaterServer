@@ -515,7 +515,7 @@ public class OrderController {
             return jsonObject;
         }
 
-        String sql = "select * from `user` where user user_id = ?";
+        String sql = "select * from `user` where `user_id` = ?";
         List<Object> list = new ArrayList<>();
         list.add(Integer.parseInt(userId));
         List<User> user;

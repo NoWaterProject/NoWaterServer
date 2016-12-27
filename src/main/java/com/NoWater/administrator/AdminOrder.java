@@ -65,18 +65,19 @@ public class AdminOrder {
         getOrderList.append(" `order_type` in (0, 3) order by `order_id` desc");
 
         try {
-            JSONArray jsonArray = OrderUtil.getOrderDetail(getOrderDetailList.toString(), getOrderDetailList, timeFilter, beginTime, endTime, true, count);
+            JSONArray jsonArray = OrderUtil.getOrderDetail(getOrderList.toString(), getOrderDetailList, timeFilter, beginTime, endTime, true, count);
             if (jsonArray.size() == count + 1) {
                 jsonObject.put("startId", jsonArray.getJSONObject(count).get("order_id"));
+                jsonArray.remove(count);
             } else {
                 jsonObject.put("startId", -1);
             }
 
-            jsonArray.remove(count);
             jsonObject.put("status", 200);
             jsonObject.put("data", jsonArray);
             LogHelper.info(String.format("[admin/order/list] %s", jsonObject.toString()));
         } catch (Exception e) {
+            e.printStackTrace();
             jsonObject.put("status", 1100);
         }
         return jsonObject;
