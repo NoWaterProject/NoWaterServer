@@ -27,13 +27,15 @@ public class AdminOrder {
     @RequestMapping("admin/order/list")
     public JSONObject paymentList(@RequestParam(value = "count") int count,
                                   @RequestParam(value = "startId", defaultValue = "0") int startId,
+                                  @RequestParam(value = "timeFilter", defaultValue = "0") int timeFilter,
+                                  @RequestParam(value = "beginTime", defaultValue = "1970-01-01 00:00:00") String beginTime,
+                                  @RequestParam(value = "endTime", defaultValue = "-1") String endTime,
+                                  @RequestParam(value = "searchKey", defaultValue = "") String searchKey,
                                   HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
         response.setHeader("Access-Control-Allow-Credentials", "true");
         JSONObject jsonObject = new JSONObject();
-        int actualCount;
-        int endId;
 
         String token = CookieUtil.getCookieValueByName(request, "admin_token");
         String admin = CookieUtil.confirmUser(token);
@@ -43,46 +45,41 @@ public class AdminOrder {
             return jsonObject;
         }
 
+        if (endTime == "-1") {
+            endTime = timeUtil.getShowTime() + " 23:59:59";
+        }
 
-//        DBUtil db = new DBUtil();
-//        List<Object> list = new ArrayList<>();
-//        String sql = "select * from `order` where `order_type` in (0,3) ORDER BY `order_id` DESC";
-//        List<Order> orderList = db.queryInfo(sql, list, Order.class);
-//
-//        if (orderList.size() == 0) {
-//            jsonObject.put("status", 200);
-//            jsonObject.put("data", "[]");
-//            jsonObject.put("endId", -1);
-//            return jsonObject;
-//        } else {
-//            int start_num = 0;
-//            for (int j = 0; j < orderList.size(); j++) {
-//                if (orderList.get(j).getOrderId() == startId) {
-//                    start_num = j;
-//                    break;
-//                }
-//            }
-//            if (orderList.size() - start_num > count) {
-//                endId = orderList.get(start_num + count).getOrderId();
-//                actualCount = count;
-//                jsonObject.put("endId", endId);
-//            } else {
-//                actualCount = orderList.size() - start_num;
-//                jsonObject.put("endId", -1);
-//            }
-//
-//            JSONArray jsonArray = new JSONArray();
-//            for (int i = 0; i < actualCount; i++) {
-//                JSONObject jsonObject1 = JSONObject.fromObject(orderList.get(i + start_num));
-//                jsonArray.add(jsonObject1);
-//            }
-//
-//            jsonObject.put("status", 200);
-//            jsonObject.put("data", jsonArray);
-//
-//        }
-//        return jsonObject;
+        StringBuffer getOrderList = new StringBuffer("select * from `order` where");
+        List<Object> getOrderDetailList = new ArrayList<>();
+        if (!searchKey.isEmpty()) {
+            String searchResult = OrderUtil.searchProduct(searchKey);
+            getOrderList.append(searchResult);
+            getOrderDetailList.add(searchKey);
+        }
 
+        if (startId != 0) {
+            getOrderList.append(" `order_id` <= ? and ");
+            getOrderDetailList.add(startId);
+        }
+
+        getOrderList.append(" `order_type` in (0, 3) order by `order_id` desc");
+
+        try {
+            JSONArray jsonArray = OrderUtil.getOrderDetail(getOrderDetailList.toString(), getOrderDetailList, timeFilter, beginTime, endTime, true, count);
+            if (jsonArray.size() == count + 1) {
+                jsonObject.put("startId", jsonArray.getJSONObject(count).get("order_id"));
+            } else {
+                jsonObject.put("startId", -1);
+            }
+
+            jsonArray.remove(count);
+            jsonObject.put("status", 200);
+            jsonObject.put("data", jsonArray);
+            LogHelper.info(String.format("[admin/order/list] %s", jsonObject.toString()));
+        } catch (Exception e) {
+            jsonObject.put("status", 1100);
+        }
+        return jsonObject;
     }
 
     @RequestMapping("admin/product/ad/list")

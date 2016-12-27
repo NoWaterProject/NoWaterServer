@@ -1,10 +1,7 @@
 package com.NoWater.shopOwner;
 
 import com.NoWater.model.Shop;
-import com.NoWater.util.CookieUtil;
-import com.NoWater.util.DBUtil;
-import com.NoWater.util.LogHelper;
-import com.NoWater.util.OrderUtil;
+import com.NoWater.util.*;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +20,10 @@ import java.util.List;
 public class ShopOwnerOrder {
     @RequestMapping("/shop-owner/order/list")
     public JSONObject shopOwnerOrderList(@RequestParam(value = "status", defaultValue = "0") int status,
+                                         @RequestParam(value = "timeFilter", defaultValue = "0") int timeFilter,
+                                         @RequestParam(value = "beginTime", defaultValue = "1970-01-01 00:00:00") String beginTime,
+                                         @RequestParam(value = "endTime", defaultValue = "-1") String endTime,
+                                         @RequestParam(value = "searchKey", defaultValue = "") String searchKey,
                                          HttpServletRequest request, HttpServletResponse response) {
         response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
         response.setHeader("Access-Control-Allow-Credentials", "true");
@@ -46,19 +47,33 @@ public class ShopOwnerOrder {
             return jsonObject;
         }
 
+        if (endTime == "-1") {
+            endTime = timeUtil.getShowTime() + " 23:59:59";
+        }
+
+        StringBuffer getOrderList = new StringBuffer("select * from `order` where");
         List<Object> getOrderDetailList = new ArrayList<>();
-        String getOrderDetailSQL;
+        if (!searchKey.isEmpty()) {
+            String searchResult = OrderUtil.searchProduct(searchKey);
+            getOrderList.append(searchResult);
+            getOrderDetailList.add(searchKey);
+        }
+
         if (status == 0) {
-            getOrderDetailSQL = "select * from `order` where `order_type` in (0, 3) and `target_id` = ? and `status` != -3 order by `status`";
+            getOrderList.append(" `order_type` in (0, 3) and `target_id` = ? and `status` != -3 order by `status`";
             getOrderDetailList.add(shopId);
         } else {
-            getOrderDetailSQL = "select * from `order` where `order_type` in (0, 3) and `target_id` = ? and `status` = ?";
+            getOrderList.append(" `order_type` in (0, 3) and `target_id` = ? and `status` = ?";
             getOrderDetailList.add(shopId);
             getOrderDetailList.add(status);
         }
-        jsonObject.put("status", 200);
-        jsonObject.put("data", OrderUtil.getOrderDetail(getOrderDetailSQL, getOrderDetailList));
-        LogHelper.info(String.format("[/shop-owner/order/list] %s", jsonObject.toString()));
+        try {
+            jsonObject.put("status", 200);
+            jsonObject.put("data", OrderUtil.getOrderDetail(getOrderList.toString(), getOrderDetailList, timeFilter, beginTime, endTime, false, 0));
+            LogHelper.info(String.format("[/shop-owner/order/list] %s", jsonObject.toString()));
+        } catch (Exception e) {
+            jsonObject.put("status", 1100);
+        }
         return jsonObject;
     }
 
@@ -152,12 +167,15 @@ public class ShopOwnerOrder {
         String getOrderDetailSQL = "select * from `order` where `order_id` in " + stringBuffer.toString();
         List<Object> getOrderDetailList = new ArrayList<>();
 
-        JSONArray orderDetail = OrderUtil.getOrderDetail(getOrderDetailSQL, getOrderDetailList);
+        try {
+            JSONArray orderDetail = OrderUtil.getOrderDetail(getOrderDetailSQL, getOrderDetailList, 0, "", "", false, 0);
 
-        jsonObject.put("data", orderDetail);
-        jsonObject.put("status", 200);
-        LogHelper.info(String.format("[/shop-owner/order/detail] %s", jsonObject.toString()));
-
+            jsonObject.put("data", orderDetail);
+            jsonObject.put("status", 200);
+            LogHelper.info(String.format("[/shop-owner/order/detail] %s", jsonObject.toString()));
+        } catch (Exception e) {
+            jsonObject.put("status", 1100);
+        }
         return jsonObject;
     }
 

@@ -403,9 +403,7 @@ public class OrderController {
         List<Object> list = new ArrayList<>();
         if (!searchKey.isEmpty()) {
             String searchResult = OrderUtil.searchProduct(searchKey);
-            getOrderList.append(" ((`order_id` = ?) or (`product_id` in ");
             getOrderList.append(searchResult);
-            getOrderList.append(")) and");
             list.add(searchKey);
         }
 

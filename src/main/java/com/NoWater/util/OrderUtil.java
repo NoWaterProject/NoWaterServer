@@ -120,7 +120,8 @@ public final class OrderUtil {
         if (count == 0 || orderDetail.size() <= count) {
             actualCount = orderDetail.size();
         } else {
-            actualCount = count;
+            // 加一是为了把下一个startId带出去。。。。我实在是想不到更好的办法了。。。
+            actualCount = count + 1;
         }
 
         for (int i = 0; i < actualCount; i++) {
@@ -288,7 +289,8 @@ public final class OrderUtil {
         DBUtil db = new DBUtil();
         try {
             List<Product> productList = db.queryInfo(sql.toString(), new ArrayList<>(), Product.class);
-            StringBuffer stringBuffer = new StringBuffer(" (");
+            StringBuffer stringBuffer = new StringBuffer();
+            stringBuffer.append(" ((`order_id` = ?) or (`product_id` in (");
             for (int i = 0; i < productList.size(); i++) {
                 stringBuffer.append(productList.get(i).getProductId());
                 if (i != productList.size() - 1)
@@ -296,6 +298,8 @@ public final class OrderUtil {
                 else
                     stringBuffer.append(") ");
             }
+            stringBuffer.append(")) and");
+
             return stringBuffer.toString();
         } catch (Exception e) {
             e.printStackTrace();
