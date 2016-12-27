@@ -36,7 +36,7 @@ public final class OrderUtil {
 
         double price = ProductItem.get(0).getPrice();
 
-        String insertOrderSQL = "insert into `order` (`order_type`, `product_id`, `time`, `initiator_id`, `target_id`, `num`, `price`, `sum_price`, `commission`) values (?, ?, ?, ?, ?, ?, ?, ?)";
+        String insertOrderSQL = "insert into `order` (`order_type`, `product_id`, `time`, `initiator_id`, `target_id`, `num`, `price`, `sum_price`, `commission`) values (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         List<Object> insertList = new ArrayList<>();
         insertList.add(order_type);
         insertList.add(productId);

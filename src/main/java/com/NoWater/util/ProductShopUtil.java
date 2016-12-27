@@ -43,7 +43,7 @@ public final class ProductShopUtil {
         jsonObject.put("photo", JSONArray.fromObject(Photo.getPhotoURL(getPhotoSQL, productId, 2)));
 
         if (hasComment) {
-            String getComment = "select * from `comment` where `product_id` = ?";
+            String getComment = "select * from `comment_product` where `product_id` = ?";
             List<Object> objectList = new ArrayList<>();
             objectList.add(productId);
             try {
@@ -51,6 +51,7 @@ public final class ProductShopUtil {
                 JSONObject commentObject = new JSONObject();
                 if (commentList.size() == 0) {
                     commentObject.put("avgPoint", 5);
+                    commentObject.put("commentList", "[]");
                 } else {
                     double avgPoint;
                     int sum = 0;

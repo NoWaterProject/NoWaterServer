@@ -158,7 +158,7 @@ public class CustomerAddress {
         for (int i = 0; i < addressList.size(); i++) {
             String address = addressList.get(i).getFirstName() + " " + addressList.get(i).getLastName() + ", "
                     + addressList.get(i).getTelephone() + ", " + addressList.get(i).getPostCode() + ", "
-                    + addressList.get(i).getAddress1() + ", " + addressList.get(i).getAddress2() + ", "
+                    + addressList.get(i).getAddress1() + " " + addressList.get(i).getAddress2() + " "
                     + addressList.get(i).getAddress3();
             JSONObject jsonObject1 = new JSONObject();
             jsonObject1.put("address",address);

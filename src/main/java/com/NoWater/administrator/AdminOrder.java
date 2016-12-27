@@ -152,7 +152,7 @@ public class AdminOrder {
 
         List<Object> objectList = new ArrayList<>();
         objectList.add(orderId);
-        String getOrder = "select * from `order` where `order_id` = ? and `order_type` = 2 and `status` = 1";
+        String getOrder = "select * from `order` where `order_id` = ? and `order_type` = 2 and `status` = 2";
         List<Order> orderList;
         try {
             orderList = db.queryInfo(getOrder, objectList, Order.class);
@@ -222,7 +222,7 @@ public class AdminOrder {
 
         List<Object> objectList = new ArrayList<>();
         objectList.add(orderId);
-        String getOrder = "select * from `order` where `order_id` = ? and `order_type` = 1 and `status` = 1";
+        String getOrder = "select * from `order` where `order_id` = ? and `order_type` = 1 and `status` = 2";
         List<Order> orderList;
         try {
             orderList = db.queryInfo(getOrder, objectList, Order.class);

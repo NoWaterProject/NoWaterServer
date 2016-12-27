@@ -83,7 +83,7 @@ public class ShopOwnerProductHandle {
             }
 
             StringBuffer sql = new StringBuffer();
-            sql.append("insert into products(shop_id, class_id, product_name, price, quantity_stock, update_time) values(?,?,?,?,?)");
+            sql.append("insert into products(shop_id, class_id, product_name, price, quantity_stock, update_time) values(?, ?, ?, ?, ?, ?)");
             param.add(currentTime);
             db.insertUpdateDeleteExute(sql.toString(), param);
 

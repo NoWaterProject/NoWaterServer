@@ -1,9 +1,6 @@
 package com.NoWater.order;
 
-import com.NoWater.model.Cart;
-import com.NoWater.model.Order;
-import com.NoWater.model.Product;
-import com.NoWater.model.User;
+import com.NoWater.model.*;
 import com.NoWater.util.*;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -211,7 +208,27 @@ public class OrderController {
             getConfirmOrderId.add(currentTime);
             getConfirmOrderId.add(orderId);
 
-            String updateConfirm = "update `order` set `status` = 1, `time` = ? where `order_id` = ?";
+            if (addressId != 0) {
+                String getAddressSQL = "select * from `address` where `address_id` = ?";
+                try {
+                    List<Object> objectList = new ArrayList<>();
+                    objectList.add(addressId);
+
+                    List<Address> addressList = db.queryInfo(getAddressSQL, objectList, Address.class);
+                    String address = addressList.get(0).getFirstName() + " " + addressList.get(0).getLastName() + ", "
+                            + addressList.get(0).getTelephone() + ", " + addressList.get(0).getPostCode() + ", "
+                            + addressList.get(0).getAddress1() + " " + addressList.get(0).getAddress2() + " "
+                            + addressList.get(0).getAddress3();
+                    getConfirmOrderId.add(address);
+                } catch (Exception e) {
+                    jsonObject.put("status", 1100);
+                    return jsonObject;
+                }
+            } else {
+                getConfirmOrderId.add("");
+            }
+
+            String updateConfirm = "update `order` set `status` = 1, `time` = ?, `address` = ? where `order_id` = ?";
             db.insertUpdateDeleteExute(updateConfirm, getConfirmOrderId);
         }
 
@@ -490,7 +507,7 @@ public class OrderController {
             return jsonObject;
         }
 
-        int statusConfirmOrder = OrderUtil.confirmOrderUserId(orderId, userId, 5, 1);
+        int statusConfirmOrder = OrderUtil.confirmOrderUserId(orderId, userId, 4, 1);
 
         if (statusConfirmOrder != 200) {
             jsonObject.put("status", statusConfirmOrder);
@@ -498,9 +515,9 @@ public class OrderController {
             return jsonObject;
         }
 
-        String sql = "select * from `user` where user user_id=? ";
+        String sql = "select * from `user` where user user_id = ?";
         List<Object> list = new ArrayList<>();
-        list.add(userId);
+        list.add(Integer.parseInt(userId));
         List<User> user;
         try {
             user = db.queryInfo(sql, list, User.class);
@@ -528,7 +545,7 @@ public class OrderController {
         SimpleDateFormat sdf = new SimpleDateFormat(pat);
         String currentTime = sdf.format(new Date());
 
-        sql = "insert into `comment` (`comment_content`, `user_id`, `user_name`, `order_id`, `product_id`, `time`, `star`) values(?, ?, ?, ?, ?, ?, ?)";
+        sql = "insert into `comment_product` (`comment_content`, `user_id`, `user_name`, `order_id`, `product_id`, `time`, `star`) values(?, ?, ?, ?, ?, ?, ?)";
         list.clear();
         list.add(comment);
         list.add(userId);
