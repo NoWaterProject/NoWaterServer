@@ -5,7 +5,7 @@ package com.NoWater.model;
  */
 public class Favorite {
     private int favorite_id;
-    private String favorite_time;
+    private String time;
     private int user_id;
     private int favorite_type;
     private int is_del;
@@ -19,12 +19,12 @@ public class Favorite {
         this.favorite_id = favorite_id;
     }
 
-    public String getFavoriteTime() {
-        return favorite_time;
+    public String getTime() {
+        return time;
     }
 
-    public void setFavoriteTime(String favorite_time) {
-        this.favorite_time = favorite_time;
+    public void setTime(String time) {
+        this.time = time;
     }
 
     public int getUserId() {
