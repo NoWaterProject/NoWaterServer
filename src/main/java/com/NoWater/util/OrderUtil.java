@@ -306,4 +306,85 @@ public final class OrderUtil {
             return "";
         }
     }
+
+    public static double getIncome(int user_id, int timeFilter, String beginTime, String endTime) throws Exception {//user_id = 0 管理员
+        double income = 0;
+        DBUtil db = new DBUtil();
+        List<Order> orderDetail;
+        List<Object> list = new ArrayList<>();
+        String sql;
+        if (user_id == 0) {
+            sql = "select * from `order` where `order_type` in (0, 3)";
+        } else {
+            sql = "select * from `order` where `order_type` in (0, 3) and `target_id` = " + user_id;
+        }
+        try {
+            orderDetail = db.queryInfo(sql, list, Order.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1;
+        }
+        for (int i = 0; i < orderDetail.size(); i++) {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String getTime = orderDetail.get(i).getTime();
+
+            Date orderTime = sdf.parse(getTime);
+            Calendar orderDate = Calendar.getInstance();
+            orderDate.setTime(orderTime);
+
+            Calendar nowDate = Calendar.getInstance();
+
+            if (timeFilter == 0) {
+                //0 不处理  1 每天 ； 2 每周 ； 3 每月 ；4 每年 ; 5处理时间段
+                income += orderDetail.get(i).getCommission() * orderDetail.get(i).getSumPrice();
+            } else if (timeFilter == 1) {
+                nowDate.add(Calendar.DATE, -1);
+                if (orderDate.before(nowDate)) {
+                    continue;
+                } else {
+                    income += orderDetail.get(i).getCommission() * orderDetail.get(i).getSumPrice();
+                }
+
+            } else if (timeFilter == 2) {
+                nowDate.add(Calendar.DATE, -7);
+                if (orderDate.before(nowDate)) {
+                    continue;
+                } else {
+                    income += orderDetail.get(i).getCommission() * orderDetail.get(i).getSumPrice();
+                }
+
+            } else if (timeFilter == 3) {
+                nowDate.add(Calendar.MONTH, -1);
+                if (orderDate.before(nowDate)) {
+                    continue;
+                } else {
+                    income += orderDetail.get(i).getCommission() * orderDetail.get(i).getSumPrice();
+                }
+
+            } else if (timeFilter == 4) {
+                nowDate.add(Calendar.YEAR, -1);
+                if (orderDate.before(nowDate)) {
+                    continue;
+                } else {
+                    income += orderDetail.get(i).getCommission() * orderDetail.get(i).getSumPrice();
+                }
+
+            } else if (timeFilter == 5) {
+                SimpleDateFormat sdfYMD = new SimpleDateFormat("yyyy-MM-dd");
+                Date begin = sdfYMD.parse(beginTime);
+                Calendar beginDate = Calendar.getInstance();
+                beginDate.setTime(begin);
+                Date end = sdfYMD.parse(endTime);
+                Calendar endDate = Calendar.getInstance();
+                endDate.setTime(end);
+
+                if (orderDate.before(beginDate) || orderDate.after(endDate)) {
+                    continue;
+                } else {
+                    income += orderDetail.get(i).getCommission() * orderDetail.get(i).getSumPrice();
+                }
+            }
+        }
+        return income;
+    }
 }
