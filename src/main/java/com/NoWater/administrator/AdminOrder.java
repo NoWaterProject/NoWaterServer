@@ -28,7 +28,7 @@ public class AdminOrder {
     public JSONObject paymentList(@RequestParam(value = "count") int count,
                                   @RequestParam(value = "startId", defaultValue = "0") int startId,
                                   @RequestParam(value = "timeFilter", defaultValue = "0") int timeFilter,
-                                  @RequestParam(value = "beginTime", defaultValue = "1970-01-01 00:00:00") String beginTime,
+                                  @RequestParam(value = "beginTime", defaultValue = "1970-01-01") String beginTime,
                                   @RequestParam(value = "endTime", defaultValue = "-1") String endTime,
                                   @RequestParam(value = "searchKey", defaultValue = "") String searchKey,
                                   HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -45,8 +45,8 @@ public class AdminOrder {
             return jsonObject;
         }
 
-        if (endTime == "-1") {
-            endTime = timeUtil.getShowTime() + " 23:59:59";
+        if (endTime.equals("-1")) {
+            endTime = timeUtil.getShowTime();
         }
 
         StringBuffer getOrderList = new StringBuffer("select * from `order` where");
@@ -62,12 +62,12 @@ public class AdminOrder {
             getOrderDetailList.add(startId);
         }
 
-        getOrderList.append(" `order_type` in (0, 3) order by `order_id` desc");
+        getOrderList.append(" `order_type` in (0, 3) and `status` != -3 order by `order_id` desc");
 
         try {
             JSONArray jsonArray = OrderUtil.getOrderDetail(getOrderList.toString(), getOrderDetailList, timeFilter, beginTime, endTime, true, count);
             if (jsonArray.size() == count + 1) {
-                jsonObject.put("startId", jsonArray.getJSONObject(count).get("order_id"));
+                jsonObject.put("startId", jsonArray.getJSONObject(count).get("orderId"));
                 jsonArray.remove(count);
             } else {
                 jsonObject.put("startId", -1);

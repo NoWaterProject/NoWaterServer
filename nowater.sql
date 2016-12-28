@@ -85,7 +85,7 @@ CREATE TABLE `favorite` (
   `user_id` int(11) NOT NULL,
   `favorite_type` int(11) NOT NULL,
   `id` int(11) NOT NULL,
-  `favorite_time` varchar(1024) NOT NULL,
+  `time` varchar(1024) NOT NULL,
   `is_del` int(11) NOT NULL DEFAULT 0,
   PRIMARY KEY (`favorite_id`)
 );
