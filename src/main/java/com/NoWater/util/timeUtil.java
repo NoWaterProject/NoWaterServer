@@ -1,5 +1,7 @@
 package com.NoWater.util;
 
+import redis.clients.jedis.Jedis;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -38,8 +40,10 @@ public class timeUtil {
         SimpleDateFormat sdf = new SimpleDateFormat(pat);
         String currentDate = sdf.format(new Date());
 
+        Jedis jedis = new Jedis("127.0.0.1", 6379);
+
         // add y m d
-        String limitTime = NoWaterProperties.getApplyLimitTime();
+        String limitTime = jedis.get("applyLimitTime");
         limitTime = currentDate + " " + limitTime;
         Date limitDate;
         SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

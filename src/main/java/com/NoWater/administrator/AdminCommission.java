@@ -36,6 +36,7 @@ public class AdminCommission {
         String commission = jedis.get("commission");
 
         jsonObject.put("commission", commission);
+        jsonObject.put("status", 200);
         LogHelper.info(String.format("[admin/commission/show] %s", jsonObject.toString()));
         return jsonObject;
     }
@@ -58,6 +59,54 @@ public class AdminCommission {
 
         Jedis jedis = new Jedis("127.0.0.1", 6379);
         jedis.set("commission", commission);
+
+        jsonObject.put("status", 200);
+        LogHelper.info(String.format("[admin/commission/changing] %s", jsonObject.toString()));
+        return jsonObject;
+    }
+
+    @RequestMapping("/admin/apply/limit/time/show")
+    public JSONObject adminLimitTimeShow(HttpServletRequest request, HttpServletResponse response) {
+        response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+        JSONObject jsonObject = new JSONObject();
+
+        String token = CookieUtil.getCookieValueByName(request, "admin_token");
+        String admin = CookieUtil.confirmUser(token);
+
+        if (admin == null) {
+            jsonObject.put("status", 300);
+            LogHelper.info(String.format("[/admin/apply/limit/time/show] %s", jsonObject.toString()));
+            return jsonObject;
+        }
+
+        Jedis jedis = new Jedis("127.0.0.1", 6379);
+        String applyLimitTime = jedis.get("applyLimitTime");
+
+        jsonObject.put("applyLimitTime", applyLimitTime);
+        jsonObject.put("status", 200);
+        LogHelper.info(String.format("[admin/commission/show] %s", jsonObject.toString()));
+        return jsonObject;
+    }
+
+    @RequestMapping("/admin/apply/limit/time/changing")
+    public JSONObject adminApplyLimitTimeEdit(@RequestParam(value = "applyLimitTime") String applyLimitTime,
+                                          HttpServletRequest request, HttpServletResponse response) {
+        response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+        JSONObject jsonObject = new JSONObject();
+
+        String token = CookieUtil.getCookieValueByName(request, "admin_token");
+        String admin = CookieUtil.confirmUser(token);
+
+        if (admin == null) {
+            jsonObject.put("status", 300);
+            LogHelper.info(String.format("[/admin/apply/limit/time/changing] %s", jsonObject.toString()));
+            return jsonObject;
+        }
+
+        Jedis jedis = new Jedis("127.0.0.1", 6379);
+        jedis.set("applyLimitTime", applyLimitTime);
 
         jsonObject.put("status", 200);
         LogHelper.info(String.format("[admin/commission/changing] %s", jsonObject.toString()));

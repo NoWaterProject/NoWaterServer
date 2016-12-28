@@ -340,15 +340,22 @@ public final class OrderUtil {
 
             Calendar nowDate = Calendar.getInstance();
 
+            double commission;
+            if (user_id == 0) {
+                commission = orderDetail.get(i).getCommission();
+            } else {
+                commission = 1 - orderDetail.get(i).getCommission();
+            }
+
             if (timeFilter == 0) {
                 //0 不处理  1 每天 ； 2 每周 ； 3 每月 ；4 每年 ; 5处理时间段
-                income += orderDetail.get(i).getCommission() * orderDetail.get(i).getSumPrice();
+                income += commission * orderDetail.get(i).getSumPrice();
             } else if (timeFilter == 1) {
                 nowDate.add(Calendar.DATE, -1);
                 if (orderDate.before(nowDate)) {
                     continue;
                 } else {
-                    income += orderDetail.get(i).getCommission() * orderDetail.get(i).getSumPrice();
+                    income += commission * orderDetail.get(i).getSumPrice();
                 }
 
             } else if (timeFilter == 2) {
@@ -356,7 +363,7 @@ public final class OrderUtil {
                 if (orderDate.before(nowDate)) {
                     continue;
                 } else {
-                    income += orderDetail.get(i).getCommission() * orderDetail.get(i).getSumPrice();
+                    income += commission * orderDetail.get(i).getSumPrice();
                 }
 
             } else if (timeFilter == 3) {
@@ -364,7 +371,7 @@ public final class OrderUtil {
                 if (orderDate.before(nowDate)) {
                     continue;
                 } else {
-                    income += orderDetail.get(i).getCommission() * orderDetail.get(i).getSumPrice();
+                    income += commission * orderDetail.get(i).getSumPrice();
                 }
 
             } else if (timeFilter == 4) {
@@ -372,7 +379,7 @@ public final class OrderUtil {
                 if (orderDate.before(nowDate)) {
                     continue;
                 } else {
-                    income += orderDetail.get(i).getCommission() * orderDetail.get(i).getSumPrice();
+                    income += commission * orderDetail.get(i).getSumPrice();
                 }
 
             } else if (timeFilter == 5) {
@@ -387,7 +394,7 @@ public final class OrderUtil {
                 if (orderDate.before(beginDate) || orderDate.after(endDate)) {
                     continue;
                 } else {
-                    income += orderDetail.get(i).getCommission() * orderDetail.get(i).getSumPrice();
+                    income += commission * orderDetail.get(i).getSumPrice();
                 }
             }
         }

@@ -74,6 +74,7 @@ public final class NoWaterProperties {
             db_password = prop.getProperty("database.password").trim();
             db_url = prop.getProperty("database.url").trim();
             applyLimitTime = prop.getProperty("applyTimeLimit").trim();
+            jedis.set("applyLimitTime", applyLimitTime);
         } catch (IOException e) {
             e.printStackTrace();
         }
