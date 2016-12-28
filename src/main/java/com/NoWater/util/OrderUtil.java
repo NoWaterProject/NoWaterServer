@@ -16,7 +16,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Created by Koprvhdix on 2016/12/18.
+ * Created by wukai on 2016/12/18.
  */
 public final class OrderUtil {
     public static int insertOrder(int order_type, int productId, String time, int user_id, int num) {
@@ -320,9 +320,9 @@ public final class OrderUtil {
         List<Object> list = new ArrayList<>();
         String sql;
         if (user_id == 0) {
-            sql = "select * from `order` where `order_type` in (0, 3)";
+            sql = "select * from `order` where `order_type` in (0, 3) and `status` != -3";
         } else {
-            sql = "select * from `order` where `order_type` in (0, 3) and `target_id` = " + user_id;
+            sql = "select * from `order` where `order_type` in (0, 3) and `status` != -3 and `target_id` = " + user_id;
         }
         try {
             orderDetail = db.queryInfo(sql, list, Order.class);

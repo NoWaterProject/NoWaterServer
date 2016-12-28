@@ -26,7 +26,7 @@ public class AdminIncome {
         response.setHeader("Access-Control-Allow-Credentials", "true");
         JSONObject jsonObject = new JSONObject();
 
-        double income = 0;
+        double income;
         String token = CookieUtil.getCookieValueByName(request, "admin_token");
         String admin = CookieUtil.confirmUser(token);
 

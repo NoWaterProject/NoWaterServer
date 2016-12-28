@@ -26,7 +26,7 @@ public class ShopOwnerIncome {
         response.setHeader("Access-Control-Allow-Credentials", "true");
         JSONObject jsonObject = new JSONObject();
 
-        double income = 0;
+        double income;
         String token = CookieUtil.getCookieValueByName(request, "token");
         String userId = CookieUtil.confirmUser(token);
 
@@ -35,10 +35,17 @@ public class ShopOwnerIncome {
             LogHelper.info(String.format("[shop-owner/income] %s", jsonObject.toString()));
             return jsonObject;
         }
+
+        int shopId = CookieUtil.confirmShop(userId);
+        if (shopId == -1) {
+            jsonObject.put("status", 400);
+            return jsonObject;
+        }
+
         if (endTime.equals("-1")) {
             endTime = timeUtil.getShowTime();
         }
-        income = OrderUtil.getIncome(Integer.parseInt(userId), timeFilter, beginTime, endTime);
+        income = OrderUtil.getIncome(shopId, timeFilter, beginTime, endTime);
 
         jsonObject.put("status", 200);
         jsonObject.put("income", income);
