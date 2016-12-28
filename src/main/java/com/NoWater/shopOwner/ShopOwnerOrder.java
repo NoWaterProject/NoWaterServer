@@ -21,7 +21,7 @@ public class ShopOwnerOrder {
     @RequestMapping("/shop-owner/order/list")
     public JSONObject shopOwnerOrderList(@RequestParam(value = "status", defaultValue = "0") int status,
                                          @RequestParam(value = "timeFilter", defaultValue = "0") int timeFilter,
-                                         @RequestParam(value = "beginTime", defaultValue = "1970-01-01 00:00:00") String beginTime,
+                                         @RequestParam(value = "beginTime", defaultValue = "1970-01-01") String beginTime,
                                          @RequestParam(value = "endTime", defaultValue = "-1") String endTime,
                                          @RequestParam(value = "searchKey", defaultValue = "") String searchKey,
                                          HttpServletRequest request, HttpServletResponse response) {
@@ -48,7 +48,7 @@ public class ShopOwnerOrder {
         }
 
         if (endTime == "-1") {
-            endTime = timeUtil.getShowTime() + " 23:59:59";
+            endTime = timeUtil.getShowTime();
         }
 
         StringBuffer getOrderList = new StringBuffer("select * from `order` where");

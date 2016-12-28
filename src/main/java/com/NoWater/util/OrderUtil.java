@@ -173,10 +173,11 @@ public final class OrderUtil {
                 }
 
             } else if (timeFilter == 5) {
-                Date begin = sdf.parse(beginTime);
+                SimpleDateFormat sdfYMD = new SimpleDateFormat("yyyy-MM-dd");
+                Date begin = sdfYMD.parse(beginTime);
                 Calendar beginDate = Calendar.getInstance();
                 beginDate.setTime(begin);
-                Date end = sdf.parse(endTime);
+                Date end = sdfYMD.parse(endTime);
                 Calendar endDate = Calendar.getInstance();
                 endDate.setTime(end);
 
@@ -290,6 +291,11 @@ public final class OrderUtil {
         try {
             List<Product> productList = db.queryInfo(sql.toString(), new ArrayList<>(), Product.class);
             StringBuffer stringBuffer = new StringBuffer();
+
+            if (productList.size() == 0) {
+                return " (`order_id` = ?) and ";
+            }
+
             stringBuffer.append(" ((`order_id` = ?) or (`product_id` in (");
             for (int i = 0; i < productList.size(); i++) {
                 stringBuffer.append(productList.get(i).getProductId());
