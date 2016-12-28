@@ -104,5 +104,15 @@ public class CustomerLogin {
 
         return jsonObject;
     }
+
+    @RequestMapping("/customer/info/detail")
+    public JSONObject customerInforDetail() {
+
+    }
+
+    @RequestMapping("/customer/info/edit")
+    public JSONObject customerInforEdit() {
+        
+    }
 }
 

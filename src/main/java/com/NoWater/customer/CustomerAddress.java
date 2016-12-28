@@ -45,7 +45,6 @@ public class CustomerAddress {
         }
 
         if (addressId != -1) { // 添加address
-
             List<Object> list = new ArrayList<>();
             DBUtil db = new DBUtil();
             StringBuffer sql = new StringBuffer();
@@ -67,9 +66,7 @@ public class CustomerAddress {
                 jsonObject.put("status", 1000);
                 return jsonObject;
             }
-
         } else {  // 传入addressId  修改address
-
             List<Object> list = new ArrayList<>();
             DBUtil db = new DBUtil();
             String sql = "select user_id from address where address_id = ?";
@@ -107,7 +104,7 @@ public class CustomerAddress {
         }
     }
 
-    @RequestMapping("customer/address/detail")
+    @RequestMapping("customer/address/deleting")
     public JSONObject CustomerAddressDetail(
             @RequestParam(value = "addressId") int addressId,
             HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -124,19 +121,26 @@ public class CustomerAddress {
 
         DBUtil db = new DBUtil();
         List<Object> list = new ArrayList<>();
-        String sql = "select * from address where address_id = ?";
+        String sql = "select * from `address` where `address_id` = ? and `userId` = ?";
         list.add(addressId);
+        list.add(userId);
         List<Address> addressList = db.queryInfo(sql, list, Address.class);
-        JSONArray jsonArray = JSONArray.fromObject(addressList);
+        if (addressList.size() == 0) {
+            jsonObject.put("status", 400);
+            return jsonObject;
+        }
+
+        String addressSQL = "update `address` set `is_del` = 1 where `address_id` = ?";
+        List<Object> objectList = new ArrayList<>();
+        objectList.add(addressId);
+        db.insertUpdateDeleteExute(addressSQL, objectList);
         jsonObject.put("status", 200);
-        jsonObject.put("data", jsonArray);
 
         return jsonObject;
     }
 
     @RequestMapping("customer/address/list")
-    public JSONObject CustomerAddressList(
-            HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public JSONObject CustomerAddressList(HttpServletRequest request, HttpServletResponse response) throws Exception {
         response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
         response.setHeader("Access-Control-Allow-Credentials", "true");
         JSONObject jsonObject = new JSONObject();
@@ -150,21 +154,11 @@ public class CustomerAddress {
 
         DBUtil db = new DBUtil();
         List<Object> list = new ArrayList<>();
-        String sql = "select * from address where user_id = ?";
+        String sql = "select * from `address` where `user_id` = ? and `is_del` = 0";
         list.add(userId);
         List<Address> addressList = db.queryInfo(sql, list, Address.class);
         jsonObject.put("status", 200);
-        JSONArray jsonArray = new JSONArray();
-        for (int i = 0; i < addressList.size(); i++) {
-            String address = addressList.get(i).getFirstName() + " " + addressList.get(i).getLastName() + ", "
-                    + addressList.get(i).getTelephone() + ", " + addressList.get(i).getPostCode() + ", "
-                    + addressList.get(i).getAddress1() + " " + addressList.get(i).getAddress2() + " "
-                    + addressList.get(i).getAddress3();
-            JSONObject jsonObject1 = new JSONObject();
-            jsonObject1.put("address",address);
-            jsonArray.add(jsonObject1);
-        }
-        jsonObject.put("data",jsonArray);
+        jsonObject.put("data", JSONArray.fromObject(addressList));
 
         return jsonObject;
     }

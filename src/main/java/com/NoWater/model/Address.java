@@ -14,6 +14,15 @@ public class Address {
     private String last_name;
     private int user_id;
     private int is_default;
+    private int is_del;
+
+    public int getIsDel() {
+        return is_del;
+    }
+
+    public void setIs_del(int is_del) {
+        this.is_del = is_del;
+    }
 
     public int getAddressId() {
         return address_id;

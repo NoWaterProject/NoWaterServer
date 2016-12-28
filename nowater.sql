@@ -141,5 +141,6 @@ CREATE TABLE `address` (
   `last_name` varchar(1024) DEFAULT NULL,
   `user_id` int(11) NOT NULL,
   `is_default` int(11) DEFAULT 0,
+  `is_del` int(11) DEFAULT 0,
   PRIMARY KEY (`address_id`)
 );
