@@ -106,13 +106,13 @@ public class CustomerLogin {
     }
 
     @RequestMapping("/customer/info/detail")
-    public JSONObject customerInforDetail() {
-
+    public JSONObject customerInfoDetail() {
+        return new JSONObject();
     }
 
     @RequestMapping("/customer/info/edit")
-    public JSONObject customerInforEdit() {
-        
+    public JSONObject customerInfoEdit() {
+        return new JSONObject();
     }
 }
 
