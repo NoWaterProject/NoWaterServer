@@ -138,16 +138,16 @@ public class CustomerLogin {
             return jsonObject;
         }
 
-        jsonObject.put("status",200);
-        jsonObject.put("data",JSONObject.fromObject(userList.get(0)));
+        jsonObject.put("status", 200);
+        jsonObject.put("data", JSONObject.fromObject(userList.get(0)));
 
         return jsonObject;
     }
 
     @RequestMapping("/customer/password/changing")
     public JSONObject customerPasswordChange(@RequestParam(value = "oldPassword", defaultValue = "/") String oldPassword,
-                                       @RequestParam(value = "newPassword", defaultValue = "/") String newPassword,
-                                       HttpServletRequest request,HttpServletResponse response) {
+                                             @RequestParam(value = "newPassword", defaultValue = "/") String newPassword,
+                                             HttpServletRequest request, HttpServletResponse response) {
         response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
         response.setHeader("Access-Control-Allow-Credentials", "true");
         JSONObject jsonObject = new JSONObject();
@@ -180,8 +180,8 @@ public class CustomerLogin {
         List<Object> paramUser = new ArrayList<>();
         paramUser.add(userId);
         try {
-            db.insertUpdateDeleteExute(sql,paramUser);
-            jsonObject.put("status",200);
+            db.insertUpdateDeleteExute(sql, paramUser);
+            jsonObject.put("status", 200);
             return jsonObject;
 
         } catch (Exception e) {
@@ -192,8 +192,44 @@ public class CustomerLogin {
     }
 
     @RequestMapping("/customer/info/edit")
-    public JSONObject customerInfoEdit() {
-        return new JSONObject();
+    public JSONObject customerInfoEdit(@RequestParam(value = "telephone", defaultValue = "/") String telephone,
+                                       @RequestParam(value = "address1", defaultValue = "/") String address1,
+                                       @RequestParam(value = "address2", defaultValue = "/") String address2,
+                                       @RequestParam(value = "address3", defaultValue = "/") String address3,
+                                       @RequestParam(value = "postCode", defaultValue = "710126") String postCode,
+                                       @RequestParam(value = "firstName", defaultValue = "") String firstName,
+                                       @RequestParam(value = "lastName", defaultValue = "") String lastName,
+                                       HttpServletRequest request, HttpServletResponse response) {
+        response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+        JSONObject jsonObject = new JSONObject();
+
+        String token = CookieUtil.getCookieValueByName(request, "token");
+        String userId = CookieUtil.confirmUser(token);
+        if (userId == null) {
+            jsonObject.put("status", 300);
+            return jsonObject;
+        }
+
+        DBUtil db = new DBUtil();
+        String updateUser = "update `user` set `telephone` = ?, `address1` = ?, `address2` = ?, `address3` = ?," +
+                "`post_code` = ?, `first_name` = ?, `last_name` = ? where `user_id` = ?";
+        String updateAddress = "update `address` set `is_del` = 0, `telephone` = ?, `address1` = ?, `address2` = ?, `address3` = ?," +
+                "`post_code` = ?, `first_name` = ?, `last_name` = ? where `user_id` = ? and `is_default` = 1";
+        List<Object> objectList = new ArrayList<>();
+        objectList.add(telephone);
+        objectList.add(address1);
+        objectList.add(address2);
+        objectList.add(address3);
+        objectList.add(postCode);
+        objectList.add(firstName);
+        objectList.add(lastName);
+        objectList.add(userId);
+        db.insertUpdateDeleteExute(updateUser, objectList);
+        db.insertUpdateDeleteExute(updateAddress, objectList);
+
+        jsonObject.put("status", 200);
+        return jsonObject;
     }
 }
 
