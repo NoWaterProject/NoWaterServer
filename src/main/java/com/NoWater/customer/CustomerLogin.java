@@ -145,7 +145,7 @@ public class CustomerLogin {
     }
 
     @RequestMapping("/customer/password/changing")
-    public JSONObject customerInfoEdit(@RequestParam(value = "oldPassword", defaultValue = "/") String oldPassword,
+    public JSONObject customerPasswordChange(@RequestParam(value = "oldPassword", defaultValue = "/") String oldPassword,
                                        @RequestParam(value = "newPassword", defaultValue = "/") String newPassword,
                                        HttpServletRequest request,HttpServletResponse response) {
         response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
@@ -189,6 +189,11 @@ public class CustomerLogin {
             e.printStackTrace();
             return jsonObject;
         }
+    }
+
+    @RequestMapping("/customer/info/edit")
+    public JSONObject customerInfoEdit() {
+        return new JSONObject();
     }
 }
 
