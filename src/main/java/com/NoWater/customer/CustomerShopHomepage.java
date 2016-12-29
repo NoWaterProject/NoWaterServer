@@ -34,6 +34,7 @@ public class CustomerShopHomepage {
 
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("status", 200);
+        jsonObject.put("shop", ProductShopUtil.GetShopDetail(shopId, false));
         jsonObject.put("data", jsonArray1);
         return jsonObject;
     }

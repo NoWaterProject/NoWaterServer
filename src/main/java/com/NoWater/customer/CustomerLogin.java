@@ -131,7 +131,6 @@ public class CustomerLogin {
                 jsonObject.put("status", 500);
                 return jsonObject;
             }
-
         } catch (Exception e) {
             jsonObject.put("status", 1100);
             e.printStackTrace();

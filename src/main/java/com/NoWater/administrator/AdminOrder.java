@@ -26,7 +26,7 @@ public class AdminOrder {
 
     @RequestMapping("admin/order/list")
     public JSONObject paymentList(@RequestParam(value = "count") int count,
-                                  @RequestParam(value = "orderType") int orderType,
+                                  @RequestParam(value = "orderType", defaultValue = "0") int orderType,
                                   @RequestParam(value = "startId", defaultValue = "0") int startId,
                                   @RequestParam(value = "timeFilter", defaultValue = "0") int timeFilter,
                                   @RequestParam(value = "beginTime", defaultValue = "1970-01-01") String beginTime,
