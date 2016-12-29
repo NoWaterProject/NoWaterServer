@@ -283,9 +283,18 @@ public class ShopAd {
             return jsonObject;
         }
 
-        int statusConfirmOrder = OrderUtil.confirmOrderUserId(orderId, userId, 1, 2);
-        if (statusConfirmOrder != 200) {
-            jsonObject.put("status", statusConfirmOrder);
+        String confirmOrder = "select * from `order` where `order_id` = ? and `order_type` in (1, 2) and `target_id` = ?";
+        List<Object> objectList2 = new ArrayList<>();
+        objectList2.add(orderId);
+        objectList2.add(shopId);
+        try {
+            List<Order> orderList = db.queryInfo(confirmOrder, objectList2, Order.class);
+            if (orderList.size() == 0) {
+                jsonObject.put("status", 400);
+                return jsonObject;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
             return jsonObject;
         }
 
@@ -293,6 +302,10 @@ public class ShopAd {
         List<Object> objectList = new ArrayList<>();
         objectList.add(orderId);
         db.insertUpdateDeleteExute(updateSQL, objectList);
+
+        Jedis jedis = new Jedis("127.0.0.1", 6379);
+        jedis.del(timeUtil.getShowTime() + String.valueOf(shopId));
+
         jsonObject.put("status", 200);
         return jsonObject;
     }
