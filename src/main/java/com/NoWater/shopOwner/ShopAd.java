@@ -287,8 +287,9 @@ public class ShopAd {
         List<Object> objectList2 = new ArrayList<>();
         objectList2.add(orderId);
         objectList2.add(shopId);
+        List<Order> orderList;
         try {
-            List<Order> orderList = db.queryInfo(confirmOrder, objectList2, Order.class);
+            orderList = db.queryInfo(confirmOrder, objectList2, Order.class);
             if (orderList.size() == 0) {
                 jsonObject.put("status", 400);
                 return jsonObject;
@@ -304,7 +305,11 @@ public class ShopAd {
         db.insertUpdateDeleteExute(updateSQL, objectList);
 
         Jedis jedis = new Jedis("127.0.0.1", 6379);
-        jedis.del(timeUtil.getShowTime() + String.valueOf(shopId));
+        if (orderList.get(0).getOrderType() == 2) {
+            jedis.del(timeUtil.getShowTime() + String.valueOf(shopId));
+        } else {
+            jedis.del("product" + timeUtil.getShowTime() + String.valueOf(orderList.get(0).getProductId()));
+        }
 
         jsonObject.put("status", 200);
         return jsonObject;

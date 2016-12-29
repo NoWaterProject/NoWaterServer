@@ -320,9 +320,9 @@ public final class OrderUtil {
         List<Object> list = new ArrayList<>();
         String sql;
         if (user_id == 0) {
-            sql = "select * from `order` where `order_type` in (0, 3) and `status` != -3";
+            sql = "select * from `order` where `order_type` in (0, 3) and `status` = 5";
         } else {
-            sql = "select * from `order` where `order_type` in (0, 3) and `status` != -3 and `target_id` = " + user_id;
+            sql = "select * from `order` where `order_type` in (0, 3) and `status` = 5 and `target_id` = " + user_id;
         }
         try {
             orderDetail = db.queryInfo(sql, list, Order.class);

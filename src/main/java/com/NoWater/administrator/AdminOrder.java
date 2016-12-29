@@ -26,7 +26,6 @@ public class AdminOrder {
 
     @RequestMapping("admin/order/list")
     public JSONObject paymentList(@RequestParam(value = "count") int count,
-                                  @RequestParam(value = "orderType", defaultValue = "0") int orderType,
                                   @RequestParam(value = "startId", defaultValue = "0") int startId,
                                   @RequestParam(value = "timeFilter", defaultValue = "0") int timeFilter,
                                   @RequestParam(value = "beginTime", defaultValue = "1970-01-01") String beginTime,
@@ -63,12 +62,7 @@ public class AdminOrder {
             getOrderDetailList.add(startId);
         }
 
-        if (orderType == 0) {
-            getOrderList.append(" `order_type` in (0, 3) and `status` != -3 order by `order_id` desc");
-        } else {
-            getOrderList.append(" `order_type` = ? and `status` = 5 order by `order_id` desc");
-            getOrderDetailList.add(orderType);
-        }
+        getOrderList.append(" `order_type` in (0, 3) and `status` != -3 order by `order_id` desc");
 
         try {
             JSONArray jsonArray = OrderUtil.getOrderDetail(getOrderList.toString(), getOrderDetailList, timeFilter, beginTime, endTime, true, count);
@@ -89,6 +83,39 @@ public class AdminOrder {
         return jsonObject;
     }
 
+    @RequestMapping("admin/order/detail")
+    public JSONObject adminOrderDetail(@RequestParam(value = "orderId") String orderId,
+                                       HttpServletRequest request, HttpServletResponse response) {
+        response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+        JSONObject jsonObject = new JSONObject();
+
+        String token = CookieUtil.getCookieValueByName(request, "admin_token");
+        String admin = CookieUtil.confirmUser(token);
+
+        if (admin == null) {
+            jsonObject.put("status", 300);
+            LogHelper.info(String.format("[admin/product/ad/approve] %s", jsonObject.toString()));
+            return jsonObject;
+        }
+
+        String getOrderDetailSQL = "select * from `order` where `order_id` = ?";
+        List<Object> getOrderDetailList = new ArrayList<>();
+        getOrderDetailList.add(orderId);
+        JSONArray orderDetail;
+        try {
+            orderDetail = OrderUtil.getOrderDetail(getOrderDetailSQL, getOrderDetailList, 0, "", "", false, 0);
+        } catch (Exception e) {
+            jsonObject.put("status", 1100);
+            return jsonObject;
+        }
+
+        jsonObject.put("data", orderDetail);
+        jsonObject.put("status", 200);
+        LogHelper.info(String.format("[order/detail] %s", jsonObject.toString()));
+        return jsonObject;
+    }
+
     @RequestMapping("admin/product/ad/list")
     public JSONObject adminProductAdList(HttpServletRequest request, HttpServletResponse response) {
         response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
@@ -104,7 +131,7 @@ public class AdminOrder {
             return jsonObject;
         }
 
-        String getOrderSQL = "select * from `order` where `order_type` = 1 and `show_time` = ? order by `price` desc";
+        String getOrderSQL = "select * from `order` where `order_type` = 1 and `status` = 2 and `show_time` = ? order by `price` desc";
         List<Object> objectList = new ArrayList<>();
         objectList.add(timeUtil.getShowTime());
         Order.getProductAdOrder(getOrderSQL, objectList, jsonObject, 0, true);
@@ -127,7 +154,7 @@ public class AdminOrder {
             return jsonObject;
         }
 
-        String getOrderSQL = "select * from `order` where `order_type` = 2 and `show_time` = ? order by `price` desc";
+        String getOrderSQL = "select * from `order` where `order_type` = 2 and `status` = 2 and `show_time` = ? order by `price` desc";
         List<Object> objectList = new ArrayList<>();
         objectList.add(timeUtil.getShowTime());
         jsonObject.put("status", 200);

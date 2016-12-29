@@ -1,6 +1,7 @@
 package com.NoWater.customer;
 
 import com.NoWater.model.Favorite;
+import com.NoWater.model.Product;
 import com.NoWater.model.User;
 import com.NoWater.util.CookieUtil;
 import com.NoWater.util.DBUtil;
@@ -63,8 +64,21 @@ public class CustomerFavorite {
             return jsonObject;
         }
 
+        if (type == 1) {
+            JSONObject jsonObject1 = ProductShopUtil.GetShopDetail(id, false);
+            if (jsonObject1.containsKey("status")) {
+                jsonObject.put("status", 500);
+                return jsonObject;
+            }
+        } else {
+            if (!ProductShopUtil.ProductExist(id)) {
+                jsonObject.put("status", 500);
+                return jsonObject;
+            }
+        }
+
         List<Object> list = new ArrayList<>();
-        String sql = "insert into favorite (user_id, favorite_type, id, favorite_time) value (?, ?, ?, ?)";
+        String sql = "insert into favorite (user_id, favorite_type, id, time) value (?, ?, ?, ?)";
         list.add(userId);
         list.add(type);
         list.add(id);
@@ -144,7 +158,7 @@ public class CustomerFavorite {
         }
         DBUtil db = new DBUtil();
 
-        String getFavorite = "select * from `favorite` where `user_id` = ? and `favorite_type` = ?";
+        String getFavorite = "select * from `favorite` where `user_id` = ? and `favorite_type` = ? and `is_del` = 0";
         List<Object> objectList = new ArrayList<>();
         objectList.add(userId);
         objectList.add(type);
@@ -163,10 +177,15 @@ public class CustomerFavorite {
                     } else {
                         jsonObject1 = ProductShopUtil.GetProductDetail(Id, true, false, false);
                     }
+                    jsonObject1.put("favoriteId", favoriteList.get(i).getFavoriteId());
+                    jsonObject1.put("favoriteType",favoriteList.get(i).getFavoriteType());
+                    jsonObject1.put("id", favoriteList.get(i).getId());
+                    jsonObject1.put("time", favoriteList.get(i).getTime());
                     jsonArray.add(jsonObject1);
                 }
                 jsonObject.put("data", jsonArray);
             }
+            jsonObject.put("status", 200);
         } catch (Exception e) {
             e.printStackTrace();
             jsonObject.put("status", 1100);
