@@ -5,12 +5,14 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 import com.NoWater.model.Admin;
+import com.NoWater.model.Product;
 import com.NoWater.model.Status;
 import com.NoWater.model.User;
 import com.NoWater.util.CookieUtil;
 import com.NoWater.util.DBUtil;
 import com.NoWater.util.LogHelper;
 import com.NoWater.util.Uuid;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -106,13 +108,87 @@ public class CustomerLogin {
     }
 
     @RequestMapping("/customer/info/detail")
-    public JSONObject customerInfoDetail() {
-        return new JSONObject();
+    public JSONObject customerInfoDetail(HttpServletRequest request, HttpServletResponse response) {
+        response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+        JSONObject jsonObject = new JSONObject();
+
+        String token = CookieUtil.getCookieValueByName(request, "token");
+        String userId = CookieUtil.confirmUser(token);
+        if (userId == null) {
+            jsonObject.put("status", 300);
+            return jsonObject;
+        }
+
+        DBUtil db = new DBUtil();
+        String sql = "select `user_id`,`name`,`telephone`,`address1`,`address2`,`address3`,`post_code`,`first_name`,`last_name`,`status` from `user` where `user_id` = ?";
+        List<Object> paramUser = new ArrayList<>();
+        paramUser.add(userId);
+        List<User> userList;
+        try {
+            userList = db.queryInfo(sql, paramUser, User.class);
+            if (userList.size() == 0) {
+                jsonObject.put("status", 500);
+                return jsonObject;
+            }
+
+        } catch (Exception e) {
+            jsonObject.put("status", 1100);
+            e.printStackTrace();
+            return jsonObject;
+        }
+
+        jsonObject.put("status",200);
+        jsonObject.put("data",JSONObject.fromObject(userList.get(0)));
+
+        return jsonObject;
     }
 
-    @RequestMapping("/customer/info/edit")
-    public JSONObject customerInfoEdit() {
-        return new JSONObject();
+    @RequestMapping("/customer/password/changing")
+    public JSONObject customerInfoEdit(@RequestParam(value = "oldPassword", defaultValue = "/") String oldPassword,
+                                       @RequestParam(value = "newPassword", defaultValue = "/") String newPassword,
+                                       HttpServletRequest request,HttpServletResponse response) {
+        response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+        JSONObject jsonObject = new JSONObject();
+
+        String token = CookieUtil.getCookieValueByName(request, "token");
+        String userId = CookieUtil.confirmUser(token);
+        if (userId == null) {
+            jsonObject.put("status", 300);
+            return jsonObject;
+        }
+
+        DBUtil db = new DBUtil();
+
+        String confirmPassword = "select * from `user` where `user_id` = ? and `password` = ?";
+        List<Object> objectList = new ArrayList<>();
+        objectList.add(userId);
+        objectList.add(oldPassword);
+        try {
+            List<User> userList = db.queryInfo(confirmPassword, objectList, User.class);
+            if (userList.size() == 0) {
+                jsonObject.put("status", 400);  // password error
+                return jsonObject;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return jsonObject;
+        }
+
+        String sql = "update `user` set `password` = ? where `user_id` = ?";
+        List<Object> paramUser = new ArrayList<>();
+        paramUser.add(userId);
+        try {
+            db.insertUpdateDeleteExute(sql,paramUser);
+            jsonObject.put("status",200);
+            return jsonObject;
+
+        } catch (Exception e) {
+            jsonObject.put("status", 1100);
+            e.printStackTrace();
+            return jsonObject;
+        }
     }
 }
 
