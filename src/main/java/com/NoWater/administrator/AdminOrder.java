@@ -108,6 +108,7 @@ public class AdminOrder {
         List<Object> objectList = new ArrayList<>();
         objectList.add(timeUtil.getShowTime());
         Order.getProductAdOrder(getOrderSQL, objectList, jsonObject, 0, true);
+        jsonObject.put("status", 200);
         return jsonObject;
     }
 
@@ -265,6 +266,8 @@ public class AdminOrder {
             jsonObject.put("status", 1100);
             return jsonObject;
         }
+
+        OrderUtil.approvedOrder(orderId);
 
         Jedis jedis = new Jedis("127.0.0.1", 6379);
         String prepareProductAd = jedis.get("prepareProductAd");

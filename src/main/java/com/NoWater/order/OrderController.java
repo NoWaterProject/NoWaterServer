@@ -206,7 +206,6 @@ public class OrderController {
 
             List<Object> getConfirmOrderId = new ArrayList<>();
             getConfirmOrderId.add(currentTime);
-            getConfirmOrderId.add(orderId);
 
             if (addressId != 0) {
                 String getAddressSQL = "select * from `address` where `address_id` = ?";
@@ -228,6 +227,7 @@ public class OrderController {
                 getConfirmOrderId.add("");
             }
 
+            getConfirmOrderId.add(orderId);
             String updateConfirm = "update `order` set `status` = 1, `time` = ?, `address` = ? where `order_id` = ?";
             db.insertUpdateDeleteExute(updateConfirm, getConfirmOrderId);
         }

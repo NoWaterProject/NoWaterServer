@@ -41,7 +41,7 @@ public class ShopOwnerApply {
 
         List<Object> list = new ArrayList<>();
         DBUtil db = new DBUtil();
-        String sql = "select Status from shop where owner_id = ?";
+        String sql = "select * from shop where owner_id = ?";
         list.add(user_id);
         List<Shop> shopList = db.queryInfo(sql, list, Shop.class);
 
@@ -51,6 +51,10 @@ public class ShopOwnerApply {
                 jsonObject.put("status", 500);  //正在审查
             } else if (status == 1) {
                 jsonObject.put("status", 200);  //已成为卖家
+                Jedis jedis = new Jedis("127.0.0.1", 6379);
+                String shopHomepage = jedis.get("shop" + shopList.get(0).getShopId());
+                if (shopHomepage == null)
+                    jedis.set("shop" + shopList.get(0).getShopId(), "[]");
             } else if (status == -1 || status == -2) {
                 jsonObject.put("status", 600);  //已拒绝
             } else if (status == 2) {
@@ -226,14 +230,64 @@ public class ShopOwnerApply {
                 DBUtil db = new DBUtil();
                 List<Object> listUpdate = new ArrayList<>();
                 listUpdate.add(userId);
-                String sqlUpdate = "update `shop` set `status`=0 where `owner_id` = ?";
-                db.insertUpdateDeleteExute(sqlUpdate, listUpdate);
+                if (confirmCode.startsWith("emailchange")) {
+                    String newPhone = jedis.get(userId + "newPhone");
+                    String newEmail = jedis.get(userId + "newEmail");
+                    String updatePhoneEmail = "update `shop` set `email` = ?, telephone = ? where `owner_id` = ?";
 
+                    List<Object> objectList = new ArrayList<>();
+                    objectList.add(newEmail);
+                    objectList.add(newPhone);
+                    objectList.add(userId);
+                    db.insertUpdateDeleteExute(updatePhoneEmail, objectList);
+                } else {
+                    String sqlUpdate = "update `shop` set `status`=0 where `owner_id` = ?";
+                    db.insertUpdateDeleteExute(sqlUpdate, listUpdate);
+                }
                 jedis.del(userId + "email");
             } else {
                 jsonObject.put("status", 300);
             }
         }
+        return jsonObject;
+    }
+
+    @RequestMapping("/shop-owner/info/edit")
+    public JSONObject shopOwnerInfoEdit(@RequestParam(value = "email", defaultValue = "/") String email,
+                                        @RequestParam(value = "telephone", defaultValue = "/") String telephone,
+                                        HttpServletRequest request, HttpServletResponse response) {
+        response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+
+        JSONObject jsonObject = new JSONObject();
+        String token = CookieUtil.getCookieValueByName(request, "token");
+        String userId = CookieUtil.confirmUser(token);
+
+        if (userId == null) {
+            jsonObject.put("status", 300);
+            return jsonObject;
+        }
+
+        int shopId = CookieUtil.confirmShop(userId);
+
+        if (shopId == -1) {
+            jsonObject.put("status", 500);      // not shop owner
+            return jsonObject;
+        }
+
+        Jedis jedis = new Jedis("127.0.0.1", 6379);
+        String confirmCode = "emailchange" + Uuid.getUuid();
+        jedis.set(userId + "email", confirmCode);
+        jedis.expire(userId + "email", 86400);
+        SendEmail.send(email, "Please confirm your email in 24 hours：http://123.206.100.98/customer/checkApply.html?confirmCode="
+                + confirmCode + "&userId=" + userId);
+
+        jedis.set(userId + "newPhone", telephone);
+        jedis.expire(userId + "newPhone", 86400);
+        jedis.set(userId + "newEmail", email);
+        jedis.expire(userId + "newEmail", 86400);
+
+        jsonObject.put("status", 200);
         return jsonObject;
     }
 }

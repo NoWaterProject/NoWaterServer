@@ -144,3 +144,11 @@ CREATE TABLE `address` (
   `is_del` int(11) DEFAULT 0,
   PRIMARY KEY (`address_id`)
 );
+
+DROP TABLE IF EXISTS `shop_homepage`;
+CREATE TABLE `shop_homepage` (
+  `shop_homepage_id` int(11) NOT NULL AUTO_INCREMENT,
+  `shop_id` int(11) NOT NULL,
+  `product_id` int(11) NOT NULL,
+  PRIMARY KEY (`shop_homepage_id`)
+);
