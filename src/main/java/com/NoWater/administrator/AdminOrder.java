@@ -26,6 +26,7 @@ public class AdminOrder {
 
     @RequestMapping("admin/order/list")
     public JSONObject paymentList(@RequestParam(value = "count") int count,
+                                  @RequestParam(value = "orderType") int orderType,
                                   @RequestParam(value = "startId", defaultValue = "0") int startId,
                                   @RequestParam(value = "timeFilter", defaultValue = "0") int timeFilter,
                                   @RequestParam(value = "beginTime", defaultValue = "1970-01-01") String beginTime,
@@ -62,7 +63,12 @@ public class AdminOrder {
             getOrderDetailList.add(startId);
         }
 
-        getOrderList.append(" `order_type` in (0, 3) and `status` != -3 order by `order_id` desc");
+        if (orderType == 0) {
+            getOrderList.append(" `order_type` in (0, 3) and `status` != -3 order by `order_id` desc");
+        } else {
+            getOrderList.append(" `order_type` = ? and `status` = 5 order by `order_id` desc");
+            getOrderDetailList.add(orderType);
+        }
 
         try {
             JSONArray jsonArray = OrderUtil.getOrderDetail(getOrderList.toString(), getOrderDetailList, timeFilter, beginTime, endTime, true, count);
