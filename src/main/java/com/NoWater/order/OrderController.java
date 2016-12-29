@@ -437,6 +437,9 @@ public class OrderController {
             endTime = timeUtil.getShowTime();
         }
 
+        beginTime += " 00:00:00";
+        endTime += " 23:59:59";
+
         try {
             JSONArray jsonArray = OrderUtil.getOrderDetail(getOrderList.toString(), list, timeFilter, beginTime, endTime, false, 0);
             jsonObject.put("status", 200);

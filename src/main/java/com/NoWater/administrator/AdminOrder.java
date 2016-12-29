@@ -49,6 +49,9 @@ public class AdminOrder {
             endTime = timeUtil.getShowTime();
         }
 
+        beginTime += " 00:00:00";
+        endTime += " 23:59:59";
+
         StringBuffer getOrderList = new StringBuffer("select * from `order` where");
         List<Object> getOrderDetailList = new ArrayList<>();
         if (!searchKey.isEmpty()) {

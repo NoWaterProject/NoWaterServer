@@ -173,7 +173,7 @@ public final class OrderUtil {
                 }
 
             } else if (timeFilter == 5) {
-                SimpleDateFormat sdfYMD = new SimpleDateFormat("yyyy-MM-dd");
+                SimpleDateFormat sdfYMD = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 Date begin = sdfYMD.parse(beginTime);
                 Calendar beginDate = Calendar.getInstance();
                 beginDate.setTime(begin);
