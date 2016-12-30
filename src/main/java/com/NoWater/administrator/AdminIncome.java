@@ -26,7 +26,6 @@ public class AdminIncome {
         response.setHeader("Access-Control-Allow-Credentials", "true");
         JSONObject jsonObject = new JSONObject();
 
-        double income;
         String token = CookieUtil.getCookieValueByName(request, "admin_token");
         String admin = CookieUtil.confirmUser(token);
 
@@ -38,10 +37,9 @@ public class AdminIncome {
         if (endTime.equals("-1")) {
             endTime = timeUtil.getShowTime();
         }
-        income = OrderUtil.getIncome(0, timeFilter, beginTime, endTime);
 
         jsonObject.put("status", 200);
-        jsonObject.put("income", income);
+        jsonObject.put("income", OrderUtil.getIncome(0, timeFilter, beginTime, endTime));
         LogHelper.info(String.format("[admin/income] %s", jsonObject.toString()));
         return jsonObject;
     }

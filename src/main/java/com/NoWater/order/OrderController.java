@@ -531,7 +531,7 @@ public class OrderController {
         }
         String userName = user.get(0).getName().substring(0, 1) + "*****";
 
-        sql="select * from `order` where `order_id`=?";
+        sql="select * from `order` where `order_id` = ?";
         list.clear();
         list.add(orderId);
         List<Order> order;
@@ -559,6 +559,12 @@ public class OrderController {
         list.add(star);
         db.insertUpdateDeleteExute(sql, list);
         jsonObject.put("status", 200);
+
+        String updateStatus = "update `order` set `status` = 5 where `order_id` = ?";
+        list.clear();
+        list.add(orderId);
+        db.insertUpdateDeleteExute(updateStatus, list);
+
         LogHelper.info(String.format("[order/comment] %s", jsonObject.toString()));
 
         return jsonObject;

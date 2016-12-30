@@ -8,6 +8,7 @@ import net.sf.json.util.EnumMorpher;
 import redis.clients.jedis.Jedis;
 
 import java.lang.reflect.Executable;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -116,15 +117,9 @@ public final class OrderUtil {
             return jsonArray;
         }
 
-        int actualCount;
-        if (count == 0 || orderDetail.size() <= count) {
-            actualCount = orderDetail.size();
-        } else {
-            // 加一是为了把下一个startId带出去。。。。我实在是想不到更好的办法了。。。
-            actualCount = count + 1;
-        }
+        int actualCount = 0;
 
-        for (int i = 0; i < actualCount; i++) {
+        for (int i = 0; i < orderDetail.size(); i++) {
             JSONObject orderItem = new JSONObject();
 
             //获取订单时间
@@ -196,6 +191,13 @@ public final class OrderUtil {
             JSONObject product = ProductShopUtil.GetProductDetail(productId, true, false, hasPhoto);
             orderItem.put("product", product);
             jsonArray.add(orderItem);
+
+            actualCount += 1;
+            if (count != 0 && orderDetail.size() > count) {
+                if (actualCount == count + 1) {
+                    break;
+                }
+            }
         }
 
         return jsonArray;
@@ -313,7 +315,7 @@ public final class OrderUtil {
         }
     }
 
-    public static double getIncome(int user_id, int timeFilter, String beginTime, String endTime) throws Exception {//user_id = 0 管理员
+    public static String getIncome(int user_id, int timeFilter, String beginTime, String endTime) throws Exception {//user_id = 0 管理员
         double income = 0;
         DBUtil db = new DBUtil();
         List<Order> orderDetail;
@@ -328,7 +330,7 @@ public final class OrderUtil {
             orderDetail = db.queryInfo(sql, list, Order.class);
         } catch (Exception e) {
             e.printStackTrace();
-            return -1;
+            return "";
         }
         for (int i = 0; i < orderDetail.size(); i++) {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -398,6 +400,7 @@ public final class OrderUtil {
                 }
             }
         }
-        return income;
+        DecimalFormat decimalFormat=new DecimalFormat(".00");
+        return decimalFormat.format(income);
     }
 }

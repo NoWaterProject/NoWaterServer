@@ -10,8 +10,10 @@ import net.sf.json.JSONObject;
 import org.springframework.cglib.core.ProcessArrayCallback;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -74,11 +76,12 @@ public final class FileUpload {
     }
 
     public static int UploadToCOS(ArrayList<String> addFileNameList, String userId, String belongId, int photoType) {
-        for(int i = 0; i < addFileNameList.size(); i++) {
+        for (int i = 0; i < addFileNameList.size(); i++) {
             String fileName = addFileNameList.get(i);
             String path = "/tmp/" + userId + "/" + fileName;
             LogHelper.info("addFile:" + path);
-            String cmd = "/usr/bin/python /root/src/base/COS_API.py upload " + "/" + fileName + " " + path;
+
+            String cmd = "/usr/bin/python bin/COS_API.py upload " + "/" + fileName + " " + path;
             LogHelper.info("add file cmd:" + cmd);
             String rmCmd = "rm -f " + path;
             try {
