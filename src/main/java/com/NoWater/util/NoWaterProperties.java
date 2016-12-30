@@ -81,6 +81,8 @@ public final class NoWaterProperties {
             applyLimitTime = prop.getProperty("applyTimeLimit").trim();
             key = prop.getProperty("key").trim();
             jedis.set("applyLimitTime", applyLimitTime);
+            jedis.set("backupDB", "00:10:00");
+            jedis.set("changeAd", "00:00:00");
 
             String cmd = "/usr/bin/python bin/start_crontab.py " + key;
             LogHelper.info("start crontab: " + cmd);

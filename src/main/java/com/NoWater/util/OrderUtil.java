@@ -313,7 +313,7 @@ public final class OrderUtil {
     }
 
     public static String getIncome(int user_id, int timeFilter, String beginTime, String endTime) throws Exception {//user_id = 0 管理员
-        double income = 0;
+        double income = 0.0;
         DBUtil db = new DBUtil();
         List<Order> orderDetail;
         List<Object> list = new ArrayList<>();
@@ -397,6 +397,11 @@ public final class OrderUtil {
                 }
             }
         }
+
+        if (income == 0.0) {
+            return "0.00";
+        }
+
         DecimalFormat decimalFormat=new DecimalFormat(".00");
         return decimalFormat.format(income);
     }

@@ -71,7 +71,7 @@ public class AdminCrontab {
         jedis.set("applyLimitTime", applyLimitTime);
 
         jedis.set("backupDB", backupDB);
-        String cmd = "/usr/bin/python bin/change_crontab.py " + "2" + timeUtil.changeToCron(backupDB);
+        String cmd = "/usr/bin/python bin/change_crontab.py " + "2 " + timeUtil.changeToCron(backupDB);
         LogHelper.info("change crontab: " + cmd);
         try {
             Process proc = Runtime.getRuntime().exec(cmd);
@@ -81,7 +81,7 @@ public class AdminCrontab {
         }
 
         jedis.set("changeAd", changeAd);
-        cmd = "/usr/bin/python bin/change_crontab.py " + "1" + timeUtil.changeToCron(changeAd);
+        cmd = "/usr/bin/python bin/change_crontab.py " + "1 " + timeUtil.changeToCron(changeAd);
         LogHelper.info("change crontab: " + cmd);
         try {
             Process proc = Runtime.getRuntime().exec(cmd);
@@ -142,7 +142,7 @@ public class AdminCrontab {
                     if (statusCount[index] == -3 && orderId.length() != 2) {
                         updateSQL = "delete from `order` where `order_id` in " + orderId;
                     } else if (statusCount[index] == 1 && orderId.length() != 2) {
-                        updateSQL = "update `order` set `status` = -1 where `order_id` in " + orderId;
+                        updateSQL = "update `order` set `status` = 10 where `order_id` in " + orderId;
                     } else if (orderId.length() != 2) {
                         updateSQL = "update `order` set `status` = 5 where `order_id` in " + orderId;
                     }

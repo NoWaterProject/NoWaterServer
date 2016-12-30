@@ -93,8 +93,9 @@ public class ShopOwnerProductHandle {
                 return jsonObject;
             }
 
-            String getProduct = "select * from products where product_name = ? and shop_id = ?";
+            String getProduct = "select * from products where product_name = ? and shop_id = ? and update_time = ?";
             getProductName.add(shop_id);
+            getProductName.add(currentTime);
             List<Product> productDetail = db.queryInfo(getProduct, getProductName, Product.class);
             int productId = productDetail.get(0).getProductId();
 
