@@ -48,7 +48,7 @@ public class CustomerFavorite {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String time = sdf.format(new Date());
 
-        String confirmFavorite = "select * from `favorite` where `favorite_type` = ? and `id` = ? and `user_id` = ?";
+        String confirmFavorite = "select * from `favorite` where `favorite_type` = ? and `id` = ? and `user_id` = ? and `is_del` = 0";
         List<Object> objectList = new ArrayList<>();
         objectList.add(type);
         objectList.add(id);
@@ -57,6 +57,7 @@ public class CustomerFavorite {
             List<Favorite> favoriteList = db.queryInfo(confirmFavorite, objectList, Favorite.class);
             if (favoriteList.size() > 0) {
                 jsonObject.put("status", 400);      //  已添加到收藏
+                return jsonObject;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -65,8 +66,7 @@ public class CustomerFavorite {
         }
 
         if (type == 1) {
-            JSONObject jsonObject1 = ProductShopUtil.GetShopDetail(id, false);
-            if (jsonObject1.containsKey("status")) {
+            if (!ProductShopUtil.ShopExist(id)) {
                 jsonObject.put("status", 500);
                 return jsonObject;
             }

@@ -177,6 +177,7 @@ public class CustomerLogin {
 
         String sql = "update `user` set `password` = ? where `user_id` = ?";
         List<Object> paramUser = new ArrayList<>();
+        paramUser.add(newPassword);
         paramUser.add(userId);
         try {
             db.insertUpdateDeleteExute(sql, paramUser);

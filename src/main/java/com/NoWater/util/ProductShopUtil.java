@@ -91,6 +91,25 @@ public final class ProductShopUtil {
         }
     }
 
+    public static boolean ShopExist(int shopId) {
+        DBUtil db = new DBUtil();
+        String getProduct = "select * from `shop` where `shop_id` = ?";
+        List<Object> list = new ArrayList<>();
+        list.add(shopId);
+        List<Shop> shopList;
+        try {
+            shopList = db.queryInfo(getProduct, list, Shop.class);
+            if (shopList.size() == 0) {
+                return false;
+            } else {
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public static JSONObject GetShopDetail(int shopId, boolean hasPhoto) {
         JSONObject jsonObject = new JSONObject();
         DBUtil db = new DBUtil();

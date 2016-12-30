@@ -61,6 +61,7 @@ Then get the SDK of TencentCloud's Object Store Service.
 
 * pip install qcloud_cos
 * pip install python-crontab
+* pip install requests
 
 #### Start
 

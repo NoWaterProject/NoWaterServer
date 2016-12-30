@@ -1,13 +1,15 @@
 package com.NoWater.administrator;
 
 import com.NoWater.model.Order;
-import com.NoWater.util.DBUtil;
-import com.NoWater.util.NoWaterProperties;
+import com.NoWater.util.*;
 import net.sf.json.JSONObject;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import redis.clients.jedis.Jedis;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -20,13 +22,76 @@ import java.util.List;
 @RestController
 public class AdminCrontab {
     @RequestMapping("admin/time/show")
-    public JSONObject adminDBBackupTimeShow() {
-        return new JSONObject();
+    public JSONObject adminDBBackupTimeShow(HttpServletRequest request, HttpServletResponse response) {
+        response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+        JSONObject jsonObject = new JSONObject();
+
+        String token = CookieUtil.getCookieValueByName(request, "admin_token");
+        String admin = CookieUtil.confirmUser(token);
+
+        if (admin == null) {
+            jsonObject.put("status", 300);
+            LogHelper.info(String.format("[admin/income] %s", jsonObject.toString()));
+            return jsonObject;
+        }
+
+        Jedis jedis = new Jedis("127.0.0.1", 6379);
+        String applyLimitTime = jedis.get("applyLimitTime");
+        jsonObject.put("applyLimitTime", applyLimitTime);
+
+        String backupDB = jedis.get("backupDB");
+        jsonObject.put("backupDB", backupDB);
+
+        String changeAd = jedis.get("changeAd");
+        jsonObject.put("changeAd", changeAd);
+
+        return jsonObject;
     }
 
-    @RequestMapping("admin/db/backup/time/changing")
-    public JSONObject adminDBBackupTimeChanging() {
-        return new JSONObject();
+    @RequestMapping("admin/time/changing")
+    public JSONObject adminDBBackupTimeChanging(@RequestParam(value = "applyLimitTime") String applyLimitTime,
+                                                @RequestParam(value = "backupDB") String backupDB,
+                                                @RequestParam(value = "changeAd") String changeAd,
+                                                HttpServletRequest request, HttpServletResponse response) {
+        response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+        JSONObject jsonObject = new JSONObject();
+
+        String token = CookieUtil.getCookieValueByName(request, "admin_token");
+        String admin = CookieUtil.confirmUser(token);
+
+        if (admin == null) {
+            jsonObject.put("status", 300);
+            LogHelper.info(String.format("[admin/income] %s", jsonObject.toString()));
+            return jsonObject;
+        }
+
+        Jedis jedis = new Jedis("127.0.0.1", 6379);
+        jedis.set("applyLimitTime", applyLimitTime);
+
+        jedis.set("backupDB", backupDB);
+        String cmd = "/usr/bin/python bin/change_crontab.py " + "2" + timeUtil.changeToCron(backupDB);
+        LogHelper.info("change crontab: " + cmd);
+        try {
+            Process proc = Runtime.getRuntime().exec(cmd);
+            proc.waitFor();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        jedis.set("changeAd", changeAd);
+        cmd = "/usr/bin/python bin/change_crontab.py " + "1" + timeUtil.changeToCron(changeAd);
+        LogHelper.info("change crontab: " + cmd);
+        try {
+            Process proc = Runtime.getRuntime().exec(cmd);
+            proc.waitFor();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        jsonObject.put("status", 200);
+        return jsonObject;
     }
 
     @RequestMapping("admin/checkout/time")
@@ -69,18 +134,22 @@ public class AdminCrontab {
                     String orderId = "(";
                     for (int i = 0; i < orderIdList.size(); i++) {
                         orderId += orderIdList.get(i);
-                        orderId += ", ";
+                        if (i != orderIdList.size() - 1)
+                            orderId += ", ";
                     }
                     orderId += ")";
-                    String updateSQL;
-                    if (statusCount[index] == -3) {
+                    String updateSQL = "";
+                    if (statusCount[index] == -3 && orderId.length() != 2) {
                         updateSQL = "delete from `order` where `order_id` in " + orderId;
-                    } else if (statusCount[index] == 1) {
+                    } else if (statusCount[index] == 1 && orderId.length() != 2) {
                         updateSQL = "update `order` set `status` = -1 where `order_id` in " + orderId;
-                    } else {
+                    } else if (orderId.length() != 2) {
                         updateSQL = "update `order` set `status` = 5 where `order_id` in " + orderId;
                     }
-                    db.insertUpdateDeleteExute(updateSQL, new ArrayList<>());
+                    LogHelper.info("updateSQL:" + updateSQL);
+                    if (!updateSQL.isEmpty())
+                        db.insertUpdateDeleteExute(updateSQL, new ArrayList<>());
+                    jsonObject.put("status", 200);
                 } catch (Exception e) {
                     e.printStackTrace();
                     return jsonObject;

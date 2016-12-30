@@ -71,4 +71,23 @@ public class timeUtil {
         String showTime = YMDFormat.format(calendar.getTime());
         return showTime;
     }
+
+    public static String changeToCron(String time) {
+        SimpleDateFormat sdf1 = new SimpleDateFormat("HH:mm:ss");
+        Date DateTime;
+        try {
+            DateTime = sdf1.parse(time);
+            Calendar timeCalendar = Calendar.getInstance();
+            timeCalendar.setTime(DateTime);
+
+            String cronString = "";
+            cronString += timeCalendar.get(Calendar.MINUTE);
+            cronString += " ";
+            cronString += timeCalendar.get(Calendar.HOUR);
+            return cronString;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
 }
