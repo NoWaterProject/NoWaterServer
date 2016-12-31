@@ -27,6 +27,7 @@ public class AdminList {
     public JSONObject adminShopList(@RequestParam(value = "shopType", defaultValue = "/") int shopType,
                                     @RequestParam(value = "count", defaultValue = "/") int count,
                                     @RequestParam(value = "startId", defaultValue = "0") int startId,
+                                    @RequestParam(value = "searchKey", defaultValue = "") String searchKey,
                                     HttpServletRequest request, HttpServletResponse response) throws Exception {
         response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
         response.setHeader("Access-Control-Allow-Credentials", "true");
@@ -45,9 +46,31 @@ public class AdminList {
 
         DBUtil db = new DBUtil();
         List<Object> list = new ArrayList<>();
-        String sql = "select * from shop where status = ?";
+        StringBuffer searchBuffer = new StringBuffer();
+        searchBuffer.append("select * from shop where status = ?");
         list.add(shopType);
-        List<Shop> shopList = db.queryInfo(sql, list, Shop.class);
+
+
+        if (!searchKey.isEmpty()) {
+            searchBuffer.append(" and (`shop_id` = ? or (");
+
+            String[] keyWords = searchKey.split(" ");
+
+            for (int i = 0; i < keyWords.length; i++) {
+                searchBuffer.append("`shop_name` like '%");
+                searchBuffer.append(keyWords[i]);
+                if (i != keyWords.length - 1)
+                    searchBuffer.append("%' and ");
+                else
+                    searchBuffer.append("%'");
+            }
+
+            searchBuffer.append("))");
+            list.add(searchKey);
+        }
+
+        LogHelper.info("shop list SQL" + searchBuffer.toString());
+        List<Shop> shopList = db.queryInfo(searchBuffer.toString(), list, Shop.class);
 
         if (shopList.size() == 0) {
             jsonObject.put("status", 200);
@@ -83,6 +106,7 @@ public class AdminList {
     public JSONObject adminCustomerList(@RequestParam(value = "customerType", defaultValue = "/") int customerType,
                                         @RequestParam(value = "count", defaultValue = "/") int count,
                                         @RequestParam(value = "startId", defaultValue = "0") int startId,
+                                        @RequestParam(value = "searchKey", defaultValue = "") String searchKey,
                                         HttpServletRequest request, HttpServletResponse response) throws Exception {
         response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
         response.setHeader("Access-Control-Allow-Credentials", "true");
@@ -101,9 +125,29 @@ public class AdminList {
 
         DBUtil db = new DBUtil();
         List<Object> list = new ArrayList<>();
-        String sql = "select * from user where status = ?";
+        StringBuffer searchBuffer = new StringBuffer();
+        searchBuffer.append("select * from user where status = ?");
         list.add(customerType);
-        List<User> userList = db.queryInfo(sql, list, User.class);
+
+        if (!searchKey.isEmpty()) {
+            searchBuffer.append(" and (`user_id` = ? or (");
+
+            String[] keyWords = searchKey.split(" ");
+
+            for (int i = 0; i < keyWords.length; i++) {
+                searchBuffer.append("`name` like '%");
+                searchBuffer.append(keyWords[i]);
+                if (i != keyWords.length - 1)
+                    searchBuffer.append("%' and ");
+                else
+                    searchBuffer.append("%'");
+            }
+
+            searchBuffer.append("))");
+            list.add(searchKey);
+        }
+
+        List<User> userList = db.queryInfo(searchBuffer.toString(), list, User.class);
 
         if (userList.size() == 0) {
             jsonObject.put("status", 200);
