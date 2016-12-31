@@ -5,6 +5,7 @@ import com.NoWater.model.User;
 import com.NoWater.util.CookieUtil;
 import com.NoWater.util.DBUtil;
 import com.NoWater.util.LogHelper;
+import com.NoWater.util.ProductShopUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -66,7 +67,7 @@ public class AdminList {
 
             JSONArray jsonArray = new JSONArray();
             for (int i = 0; i < actualCount; i++) {
-                JSONObject jsonObject1 = JSONObject.fromObject(shopList.get(i + startId));
+                JSONObject jsonObject1 = ProductShopUtil.GetShopDetail(shopList.get(i + startId).getShopId(), true);
                 jsonArray.add(jsonObject1);
             }
 

@@ -44,7 +44,7 @@ public class CustomerAddress {
             return jsonObject;
         }
 
-        if (addressId != -1) { // 添加address
+        if (addressId == -1) { // 添加address
             List<Object> list = new ArrayList<>();
             DBUtil db = new DBUtil();
             StringBuffer sql = new StringBuffer();
@@ -121,7 +121,7 @@ public class CustomerAddress {
 
         DBUtil db = new DBUtil();
         List<Object> list = new ArrayList<>();
-        String sql = "select * from `address` where `address_id` = ? and `userId` = ?";
+        String sql = "select * from `address` where `address_id` = ? and `user_id` = ?";
         list.add(addressId);
         list.add(userId);
         List<Address> addressList = db.queryInfo(sql, list, Address.class);
