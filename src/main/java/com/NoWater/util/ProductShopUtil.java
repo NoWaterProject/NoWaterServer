@@ -141,7 +141,7 @@ public final class ProductShopUtil {
     public static ArrayList<Integer> GetClassDetail(int shopId) {
         ArrayList<Integer> classList = new ArrayList<>();
         DBUtil db = new DBUtil();
-        String getProductSQL = "select * from `products` where `shop_id` = ?";
+        String getProductSQL = "select * from `products` where `shop_id` = ? and `is_del` = 0";
         List<Object> list = new ArrayList<>();
         list.add(shopId);
         List<Product> productList;

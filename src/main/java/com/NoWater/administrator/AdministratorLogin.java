@@ -47,7 +47,7 @@ public class AdministratorLogin {
 
                 uuid = Uuid.getUuid();
                 Cookie cookie = new Cookie("admin_token", uuid);
-                cookie.setMaxAge(1800);
+                cookie.setMaxAge(86400);
                 cookie.setPath("/");
                 response.addCookie(cookie);
                 jedis = new Jedis("127.0.0.1", 6379);

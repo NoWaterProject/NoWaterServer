@@ -57,6 +57,8 @@ public class CookieUtil {
             } else {
                 String realToken = jedis.get(userId);
                 if (uuid.equals(realToken)) {
+                    jedis.expire(realToken, 1800);
+                    jedis.expire(userId, 1800);
                     return userId;
                 } else {
                     return null;

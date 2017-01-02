@@ -31,8 +31,8 @@ public class CustomerLogin {
     private Jedis jedis;
 
     @RequestMapping("/customer/login")
-    public JSONObject login(@RequestParam(value = "name", defaultValue = "/") String name,
-                            @RequestParam(value = "password", defaultValue = "/") String password,
+    public JSONObject login(@RequestParam(value = "name") String name,
+                            @RequestParam(value = "password") String password,
                             HttpServletResponse response) throws Exception {
         response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
         response.setHeader("Access-Control-Allow-Credentials", "true");
@@ -55,7 +55,7 @@ public class CustomerLogin {
                 jsonObject.put("status", status);
                 uuid = Uuid.getUuid();
                 Cookie cookie = new Cookie("token", uuid);
-                cookie.setMaxAge(1800);
+                cookie.setMaxAge(86400);
                 cookie.setPath("/");
                 response.addCookie(cookie);
                 String user_id = userList.get(0).getUserId().toString();
@@ -144,8 +144,8 @@ public class CustomerLogin {
     }
 
     @RequestMapping("/customer/password/changing")
-    public JSONObject customerPasswordChange(@RequestParam(value = "oldPassword", defaultValue = "/") String oldPassword,
-                                             @RequestParam(value = "newPassword", defaultValue = "/") String newPassword,
+    public JSONObject customerPasswordChange(@RequestParam(value = "oldPassword") String oldPassword,
+                                             @RequestParam(value = "newPassword") String newPassword,
                                              HttpServletRequest request, HttpServletResponse response) {
         response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
         response.setHeader("Access-Control-Allow-Credentials", "true");
@@ -192,13 +192,13 @@ public class CustomerLogin {
     }
 
     @RequestMapping("/customer/info/edit")
-    public JSONObject customerInfoEdit(@RequestParam(value = "telephone", defaultValue = "/") String telephone,
-                                       @RequestParam(value = "address1", defaultValue = "/") String address1,
-                                       @RequestParam(value = "address2", defaultValue = "/") String address2,
-                                       @RequestParam(value = "address3", defaultValue = "/") String address3,
-                                       @RequestParam(value = "postCode", defaultValue = "710126") String postCode,
-                                       @RequestParam(value = "firstName", defaultValue = "") String firstName,
-                                       @RequestParam(value = "lastName", defaultValue = "") String lastName,
+    public JSONObject customerInfoEdit(@RequestParam(value = "telephone") String telephone,
+                                       @RequestParam(value = "address1") String address1,
+                                       @RequestParam(value = "address2") String address2,
+                                       @RequestParam(value = "address3") String address3,
+                                       @RequestParam(value = "postCode") String postCode,
+                                       @RequestParam(value = "firstName") String firstName,
+                                       @RequestParam(value = "lastName") String lastName,
                                        HttpServletRequest request, HttpServletResponse response) {
         response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
         response.setHeader("Access-Control-Allow-Credentials", "true");

@@ -20,15 +20,15 @@ import java.util.List;
 @RestController
 public class CustomerRegister {
     @RequestMapping("/customer/register")
-    public JSONObject register(@RequestParam(value = "name", defaultValue = "/") String name,
-                               @RequestParam(value = "password", defaultValue = "/") String password,
-                               @RequestParam(value = "telephone", defaultValue = "/") String telephone,
-                               @RequestParam(value = "address1", defaultValue = "/") String address1,
-                               @RequestParam(value = "address2", defaultValue = "/") String address2,
-                               @RequestParam(value = "address3", defaultValue = "/") String address3,
-                               @RequestParam(value = "postCode", defaultValue = "710126") String postCode,
-                               @RequestParam(value = "firstName", defaultValue = "") String firstName,
-                               @RequestParam(value = "lastName", defaultValue = "") String lastName,
+    public JSONObject register(@RequestParam(value = "name") String name,
+                               @RequestParam(value = "password") String password,
+                               @RequestParam(value = "telephone") String telephone,
+                               @RequestParam(value = "address1") String address1,
+                               @RequestParam(value = "address2") String address2,
+                               @RequestParam(value = "address3") String address3,
+                               @RequestParam(value = "postCode") String postCode,
+                               @RequestParam(value = "firstName") String firstName,
+                               @RequestParam(value = "lastName") String lastName,
                                HttpServletResponse response) throws Exception {
         response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
         response.setHeader("Access-Control-Allow-Credentials", "true");

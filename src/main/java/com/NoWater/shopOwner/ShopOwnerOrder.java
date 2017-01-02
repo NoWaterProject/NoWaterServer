@@ -104,12 +104,14 @@ public class ShopOwnerOrder {
         int shopId = CookieUtil.confirmShop(userId);
         if (shopId == -1) {
             jsonObject.put("status", 500);          // user not shop owner
+            LogHelper.info(String.format("[/shop-owner/order/delivery] %s", jsonObject.toString()));
             return jsonObject;
         }
 
-        int statusConfirmOrder = OrderUtil.confirmOrderUserId(orderId, userId, 2, 2);
+        int statusConfirmOrder = OrderUtil.confirmOrderUserId(orderId, String.valueOf(shopId), 2, 2);
         if (statusConfirmOrder != 200) {
             jsonObject.put("status", statusConfirmOrder);
+            LogHelper.info(String.format("[/shop-owner/order/delivery] %s", jsonObject.toString()));
             return jsonObject;
         }
 
@@ -120,6 +122,7 @@ public class ShopOwnerOrder {
         updateOrderList.add(orderId);
         db.insertUpdateDeleteExute(updateOrder, updateOrderList);
         jsonObject.put("status", 200);
+        LogHelper.info(String.format("[/shop-owner/order/delivery] %s", jsonObject.toString()));
         return jsonObject;
     }
 
