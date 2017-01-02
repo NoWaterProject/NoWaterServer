@@ -149,7 +149,7 @@ public class ShopOwnerApply {
             jsonObject.put("status", 500);  //店名已有人使用
         } else if (!email.contains("@")) {
             jsonObject.put("status", 800);  // email error
-        } else if ((telephone.charAt(0) != '6' && telephone.charAt(0) != '9') || telephone.length() != 8) {
+        } else if (telephone.length() != 8) {
             jsonObject.put("status", 900);  // telephone error
         } else {
             int shop_status = 2;            //插入申请，正在成为卖家

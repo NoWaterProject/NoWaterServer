@@ -569,4 +569,19 @@ public class OrderController {
 
         return jsonObject;
     }
+
+    @RequestMapping("order/commission")
+    public JSONObject orderCommission(HttpServletRequest request, HttpServletResponse response) {
+        response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+
+        JSONObject jsonObject = new JSONObject();
+        Jedis jedis = new Jedis("127.0.0.1", 6379);
+        String commission = jedis.get("commission");
+
+        jsonObject.put("commission", commission);
+        jsonObject.put("status", 200);
+        LogHelper.info(String.format("[order/commission] %s", jsonObject.toString()));
+        return jsonObject;
+    }
 }

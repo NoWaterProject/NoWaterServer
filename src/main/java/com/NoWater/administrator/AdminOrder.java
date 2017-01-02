@@ -127,6 +127,7 @@ public class AdminOrder {
 
         String token = CookieUtil.getCookieValueByName(request, "admin_token");
         String admin = CookieUtil.confirmUser(token);
+        DBUtil db = new DBUtil();
 
         if (admin == null) {
             jsonObject.put("status", 300);
@@ -134,9 +135,22 @@ public class AdminOrder {
             return jsonObject;
         }
 
-        String getOrderSQL = "select * from `order` where `order_type` = 1 and `status` = 2 and `show_time` = ? order by `price` desc";
+        int limitCount;
+        try {
+            String getCountSQL = "select * from `order` where `order_type` = 1";
+            List<Order> orderList = db.queryInfo(getCountSQL, new ArrayList<>(), Order.class);
+            limitCount = orderList.size();
+        } catch (Exception e) {
+            e.printStackTrace();
+            jsonObject.put("status", 1100);
+            return jsonObject;
+        }
+
+        String getOrderSQL = "(select * from `order` where `order_type` = 1 and `status` = 2 and `show_time` = ? order by `price` desc limit ?) union all (select * from `order` where `order_type` = 1 and `status` = 5 order by `order_id` desc limit ?)";
         List<Object> objectList = new ArrayList<>();
         objectList.add(timeUtil.getShowTime());
+        objectList.add(limitCount);
+        objectList.add(limitCount);
         Order.getProductAdOrder(getOrderSQL, objectList, jsonObject, 0, true);
         jsonObject.put("status", 200);
         return jsonObject;
@@ -157,10 +171,24 @@ public class AdminOrder {
             return jsonObject;
         }
 
-        String getOrderSQL = "select * from `order` where `order_type` = 2 and `status` = 2 and `show_time` = ? order by `price` desc";
+        DBUtil db = new DBUtil();
+        int limitCount;
+        try {
+            String getCountSQL = "select * from `order` where `order_type` = 2";
+            List<Order> orderList = db.queryInfo(getCountSQL, new ArrayList<>(), Order.class);
+            limitCount = orderList.size();
+        } catch (Exception e) {
+            e.printStackTrace();
+            jsonObject.put("status", 1100);
+            return jsonObject;
+        }
+
+        String getOrderSQL = "(select * from `order` where `order_type` = 2 and `status` = 2 and `show_time` = ? order by `price` desc limit ?) union all (select * from `order` where `order_type` = 2 and `status` = 5 order by `order_id` desc limit ?)";
         List<Object> objectList = new ArrayList<>();
         objectList.add(timeUtil.getShowTime());
         jsonObject.put("status", 200);
+        objectList.add(limitCount);
+        objectList.add(limitCount);
         Order.getShopAdOrder(getOrderSQL, objectList, jsonObject, 0, true);
         return jsonObject;
     }

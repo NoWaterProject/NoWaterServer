@@ -148,13 +148,13 @@ public final class ProductShopUtil {
         try {
             productList = db.queryInfo(getProductSQL, list, Product.class);
 
-            int[] classSet = {0, 0, 0, 0, 0, 0, 0, 0, 0};
+            int[] classSet = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
             for (int i = 0; i < productList.size(); i++) {
                 classSet[productList.get(i).getClassId()] = 1;
             }
 
-            for (int i = 0; i < 9; i++) {
+            for (int i = 0; i < 10; i++) {
                 if (classSet[i] == 1) {
                     classList.add(i);
                 }

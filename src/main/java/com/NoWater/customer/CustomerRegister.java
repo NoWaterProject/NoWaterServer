@@ -48,7 +48,7 @@ public class CustomerRegister {
         } else {
             try {
                 int first = Integer.parseInt(telephone.substring(0, 1));
-                if (telephone.length() != 8 || (first != 9 && first != 6)) {
+                if (telephone.length() != 8) {
                     status = 400; //电话号码不合格
                     jsonObject.put("status", status);
                 } else {

@@ -1,5 +1,6 @@
 package com.NoWater.shopOwner;
 
+import com.NoWater.model.Order;
 import com.NoWater.model.Shop;
 import com.NoWater.util.*;
 import net.sf.json.JSONArray;
@@ -33,6 +34,7 @@ public class ShopOwnerOrder {
 
         String token = CookieUtil.getCookieValueByName(request, "token");
         String userId = CookieUtil.confirmUser(token);
+        DBUtil db = new DBUtil();
 
         if (userId == null) {
             jsonObject.put("status", 300);
@@ -63,8 +65,24 @@ public class ShopOwnerOrder {
         }
 
         if (status == 0) {
-            getOrderList.append(" `order_type` in (0, 3) and `target_id` = ? and `status` != -3 order by `status`");
+            String getCount = "select * from `order` where `order_type` in (0, 3) and `target_id` = ?";
+            int limitCount;
+            try {
+                List<Object> objectListForCount = new ArrayList<>();
+                objectListForCount.add(shopId);
+                List<Order> getCountList = db.queryInfo(getCount, objectListForCount, Order.class);
+                limitCount = getCountList.size() + 100;
+            } catch (Exception e) {
+                e.printStackTrace();
+                jsonObject.put("status", 1100);
+                return jsonObject;
+            }
+
+            getOrderList.insert(0, "(");
+            getOrderList.append(" `order_type` in (0, 3) and `target_id` = ? and `status` = 2) union all (select * from `order` where `order_type` in (0, 3) and `target_id` = ? and `status` != -3 and `status` != 2 order by `status` limit ?)");
             getOrderDetailList.add(shopId);
+            getOrderDetailList.add(shopId);
+            getOrderDetailList.add(limitCount);
         } else {
             getOrderList.append(" `order_type` in (0, 3) and `target_id` = ? and `status` = ?");
             getOrderDetailList.add(shopId);
