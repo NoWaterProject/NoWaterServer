@@ -177,7 +177,7 @@ public class OrderController {
 
             productList.add(getOrderItem.get(0).getProductId());
             numList.add(getOrderItem.get(0).getNum());
-            sumPrice = getOrderItem.get(0).getSumPrice();
+            sumPrice += getOrderItem.get(0).getSumPrice();
 
             // 检查库存
             int confirmStock = Product.confirmStock(getOrderItem.get(0).getNum(), getOrderItem.get(0).getProductId());
@@ -428,8 +428,30 @@ public class OrderController {
         }
 
         if (status == 0) {
-            getOrderList.append(" `order_type` in (0, 3) and `initiator_id` = ? and `status` != -3 order by `status`");
+            String getCountSQL = "select * from `order` where `order_type` in (0, 3) and `initiator_id` = ?";
+            int sum;
+            List<Object> objectList = new ArrayList<>();
+            objectList.add(userId);
+            try {
+                List<Order> getCount = db.queryInfo(getCountSQL, objectList, Order.class);
+                sum = getCount.size();
+            } catch (Exception e) {
+                e.printStackTrace();
+                jsonObject.put("status", 1100);
+                return jsonObject;
+            }
+
+            getOrderList.insert(0, "(");
+            getOrderList.append(" `order_type` in (0, 3) and `initiator_id` = ? and `status` = 3) union all (select * from `order` where ");
             list.add(userId);
+            if (!searchKey.isEmpty()) {
+                String searchResult = OrderUtil.searchProduct(searchKey);
+                getOrderList.append(searchResult);
+                list.add(searchKey);
+            }
+            getOrderList.append(" `order_type` in (0, 3) and `initiator_id` = ? and `status` != 3 and `status` != -3 order by `status`, `order_id` desc limit ?)");
+            list.add(userId);
+            list.add(sum);
         } else {
             getOrderList.append(" `order_type` in (0, 3) and `initiator_id` = ? and `status` = ?");
             list.add(userId);
@@ -444,6 +466,7 @@ public class OrderController {
         endTime += " 23:59:59";
 
         try {
+            LogHelper.info("getOrderSQL" + getOrderList.toString());
             JSONArray jsonArray = OrderUtil.getOrderDetail(getOrderList.toString(), list, timeFilter, beginTime, endTime, false, 0);
             jsonObject.put("status", 200);
             jsonObject.put("data", jsonArray);
@@ -587,4 +610,6 @@ public class OrderController {
         LogHelper.info(String.format("[order/commission] %s", jsonObject.toString()));
         return jsonObject;
     }
+
+
 }

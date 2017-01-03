@@ -74,7 +74,7 @@ public final class ProductShopUtil {
 
     public static boolean ProductExist(int productId) {
         DBUtil db = new DBUtil();
-        String getProduct = "select * from `products` where `product_id` = ?";
+        String getProduct = "select * from `products` where `product_id` = ? and `is_del` = 0";
         List<Object> list = new ArrayList<>();
         list.add(productId);
         List<Product> productList;
@@ -93,7 +93,7 @@ public final class ProductShopUtil {
 
     public static boolean ShopExist(int shopId) {
         DBUtil db = new DBUtil();
-        String getProduct = "select * from `shop` where `shop_id` = ?";
+        String getProduct = "select * from `shop` where `shop_id` = ? and `is_del` = 0";
         List<Object> list = new ArrayList<>();
         list.add(shopId);
         List<Shop> shopList;
@@ -213,7 +213,7 @@ public final class ProductShopUtil {
     }
 
     public static void cancelOrderByProductId(int productId) {
-        String cancelOrderByProductId = "update `order` set `status` = 10 where `product_id` = ? and `order_type` in (0, 3) and `status` = 2";
+        String cancelOrderByProductId = "update `order` set `status` = 10 where `product_id` = ? and `order_type` in (0, 3) and `status` in (1, 2)";
         DBUtil db = new DBUtil();
         List<Object> objectList = new ArrayList<>();
         objectList.add(productId);

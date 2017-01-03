@@ -83,7 +83,7 @@ public class timeUtil {
             String cronString = "";
             cronString += timeCalendar.get(Calendar.MINUTE);
             cronString += " ";
-            cronString += timeCalendar.get(Calendar.HOUR);
+            cronString += timeCalendar.get(Calendar.HOUR_OF_DAY);
             return cronString;
         } catch (Exception e) {
             e.printStackTrace();

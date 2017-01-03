@@ -79,8 +79,14 @@ public class ShopOwnerOrder {
             }
 
             getOrderList.insert(0, "(");
-            getOrderList.append(" `order_type` in (0, 3) and `target_id` = ? and `status` = 2) union all (select * from `order` where `order_type` in (0, 3) and `target_id` = ? and `status` != -3 and `status` != 2 order by `status` limit ?)");
+            getOrderList.append(" `order_type` in (0, 3) and `target_id` = ? and `status` = 2) union all (select * from `order` where ");
             getOrderDetailList.add(shopId);
+            if (!searchKey.isEmpty()) {
+                String searchResult = OrderUtil.searchProduct(searchKey);
+                getOrderList.append(searchResult);
+                getOrderDetailList.add(searchKey);
+            }
+            getOrderList.append(" `order_type` in (0, 3) and `target_id` = ? and `status` != -3 and `status` != 2 order by `status` limit ?)");
             getOrderDetailList.add(shopId);
             getOrderDetailList.add(limitCount);
         } else {

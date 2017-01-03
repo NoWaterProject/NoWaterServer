@@ -46,6 +46,9 @@ public class ShopOwnerIncome {
             endTime = timeUtil.getShowTime();
         }
 
+        beginTime += " 00:00:00";
+        endTime += " 23:59:59";
+
         jsonObject.put("status", 200);
         jsonObject.put("income", OrderUtil.getIncome(shopId, timeFilter, beginTime, endTime));
         LogHelper.info(String.format("[shop-owner/income] %s", jsonObject.toString()));

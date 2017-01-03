@@ -38,6 +38,9 @@ public class AdminIncome {
             endTime = timeUtil.getShowTime();
         }
 
+        beginTime += " 00:00:00";
+        endTime += " 23:59:59";
+
         jsonObject.put("status", 200);
         jsonObject.put("income", OrderUtil.getIncome(0, timeFilter, beginTime, endTime));
         LogHelper.info(String.format("[admin/income] %s", jsonObject.toString()));

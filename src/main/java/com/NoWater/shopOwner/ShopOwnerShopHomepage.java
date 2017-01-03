@@ -103,6 +103,7 @@ public class ShopOwnerShopHomepage {
                 db.insertUpdateDeleteExute(insertSQL, objectList);
             } else {
                 jsonObject.put("status", 600);
+                return jsonObject;
             }
         } catch (Exception e) {
             e.printStackTrace();

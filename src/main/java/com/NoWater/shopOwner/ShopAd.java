@@ -44,17 +44,19 @@ public class ShopAd {
             jsonObject.put("status", 500);      // not shop owner
             return jsonObject;
         }
+        Jedis jedis = new Jedis("127.0.0.1", 6379);
 
-        if (timeUtil.timeLimit()) {
-            jsonObject.put("allow", 0);
-        } else {
-            String showTime = timeUtil.getShowTime();
-            Jedis jedis = new Jedis("127.0.0.1", 6379);
-            String hasApply = jedis.get(showTime + String.valueOf(shopId));
-            if (hasApply == null)
-                jsonObject.put("allow", 1);
-            else
+
+        String showTime = timeUtil.getShowTime();
+        String hasApply = jedis.get(showTime + String.valueOf(shopId));
+        if (hasApply == null) {
+            if (timeUtil.timeLimit()) {
                 jsonObject.put("allow", 0);
+            } else {
+                jsonObject.put("allow", 1);
+            }
+        } else {
+            jsonObject.put("allow", -1);
         }
 
         jsonObject.put("status", 200);
@@ -62,6 +64,8 @@ public class ShopAd {
         List<Object> objectList = new ArrayList<>();
         objectList.add(shopId);
         Order.getShopAdOrder(getOrderSQL, objectList, jsonObject, 0, false);
+
+        jsonObject.put("applyLimitTime", jedis.get("applyLimitTime"));
         return jsonObject;
     }
 
@@ -88,12 +92,13 @@ public class ShopAd {
             return jsonObject;
         }
 
+        Jedis jedis = new Jedis("127.0.0.1", 6379);
         if (timeUtil.timeLimit()) {
             jsonObject.put("status", 600);      // 超时
+            jsonObject.put("applyLimitTime", jedis.get("applyLimitTime"));
             return jsonObject;
         } else {
             String showTime = timeUtil.getShowTime();
-            Jedis jedis = new Jedis("127.0.0.1", 6379);
             String hasApply = jedis.get(showTime + String.valueOf(shopId));
             if (hasApply != null) {
                 jsonObject.put("status", 700);
@@ -199,12 +204,13 @@ public class ShopAd {
             return jsonObject;
         }
 
+        Jedis jedis = new Jedis("127.0.0.1", 6379);
         if (timeUtil.timeLimit()) {
             jsonObject.put("status", 600);      // 超时
+            jsonObject.put("applyLimitTime", jedis.get("applyLimitTime"));
             return jsonObject;
         } else {
             String showTime = timeUtil.getShowTime();
-            Jedis jedis = new Jedis("127.0.0.1", 6379);
             String hasApply = jedis.get("product" + showTime + String.valueOf(productId));
             if (hasApply != null) {
                 jsonObject.put("status", 700);
