@@ -4,6 +4,7 @@ import com.NoWater.model.User;
 import com.NoWater.util.CookieUtil;
 import com.NoWater.util.DBUtil;
 import com.NoWater.util.LogHelper;
+import com.NoWater.util.ProductShopUtil;
 import net.sf.json.JSONObject;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -56,6 +57,7 @@ public class AdminDelete {
             jedis.del(String.valueOf(userId));
             jsonObject.put("status", 200);
             LogHelper.info(String.format("[admin/customer/delete] %s", jsonObject.toString()));
+            ProductShopUtil.deleteShopFromUser(userId, -2);
         }
 
         return jsonObject;

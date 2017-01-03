@@ -138,6 +138,7 @@ public class OrderController {
         DBUtil db = new DBUtil();
 
         LogHelper.info(String.format("[order/confirm] [param] [orderIdList: %s]", orderIdList));
+        double sumPrice = 0.0;
 
         String token = CookieUtil.getCookieValueByName(request, "token");
         String userId = CookieUtil.confirmUser(token);
@@ -176,6 +177,7 @@ public class OrderController {
 
             productList.add(getOrderItem.get(0).getProductId());
             numList.add(getOrderItem.get(0).getNum());
+            sumPrice = getOrderItem.get(0).getSumPrice();
 
             // 检查库存
             int confirmStock = Product.confirmStock(getOrderItem.get(0).getNum(), getOrderItem.get(0).getProductId());
@@ -233,6 +235,7 @@ public class OrderController {
         }
 
         jsonObject.put("status", 200);
+        jsonObject.put("sumPrice", sumPrice);
         LogHelper.info(String.format("[order/confirm] %s", jsonObject.toString()));
 
         return jsonObject;

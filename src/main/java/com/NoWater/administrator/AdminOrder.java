@@ -146,10 +146,11 @@ public class AdminOrder {
             return jsonObject;
         }
 
-        String getOrderSQL = "(select * from `order` where `order_type` = 1 and `status` = 2 and `show_time` = ? order by `price` desc limit ?) union all (select * from `order` where `order_type` = 1 and `status` = 5 order by `order_id` desc limit ?)";
+        String getOrderSQL = "(select * from `order` where `order_type` = 1 and (`status` = 2 or `status` = 5 or `status` = 10 or `status` = 11) and `show_time` = ? order by `status`, `price` desc limit ?) union all (select * from `order` where `order_type` = 1 and `status` = 5 and `show_time` != ? order by `order_id` desc limit ?)";
         List<Object> objectList = new ArrayList<>();
         objectList.add(timeUtil.getShowTime());
         objectList.add(limitCount);
+        objectList.add(timeUtil.getShowTime());
         objectList.add(limitCount);
         Order.getProductAdOrder(getOrderSQL, objectList, jsonObject, 0, true);
         jsonObject.put("status", 200);
@@ -183,18 +184,20 @@ public class AdminOrder {
             return jsonObject;
         }
 
-        String getOrderSQL = "(select * from `order` where `order_type` = 2 and `status` = 2 and `show_time` = ? order by `price` desc limit ?) union all (select * from `order` where `order_type` = 2 and `status` = 5 order by `order_id` desc limit ?)";
+        String getOrderSQL = "(select * from `order` where `order_type` = 2 and (`status` = 2 or `status` = 5 or `status` = 10 or `status` = 11) and `show_time` = ? order by `status`, `price` desc limit ?) union all (select * from `order` where `order_type` = 2 and `status` = 5 and `show_time` != ? order by `order_id` desc limit ?)";
         List<Object> objectList = new ArrayList<>();
         objectList.add(timeUtil.getShowTime());
-        jsonObject.put("status", 200);
         objectList.add(limitCount);
+        objectList.add(timeUtil.getShowTime());
         objectList.add(limitCount);
         Order.getShopAdOrder(getOrderSQL, objectList, jsonObject, 0, true);
+        jsonObject.put("status", 200);
         return jsonObject;
     }
 
     @RequestMapping("admin/shop/ad/approve")
     public JSONObject adminShopAdApprove(@RequestParam(value = "orderId") int orderId,
+                                         @RequestParam(value = "isApprove") int isApprove,
                                          HttpServletRequest request, HttpServletResponse response) {
         response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
         response.setHeader("Access-Control-Allow-Credentials", "true");
@@ -232,39 +235,41 @@ public class AdminOrder {
             return jsonObject;
         }
 
-        JSONObject jsonObject1 = new JSONObject();
-        jsonObject1.put("shopId", orderList.get(0).getTargetId());
-        jsonObject1.put("adPhotoUrl", orderList.get(0).getPhoto());
+        OrderUtil.approvedOrder(orderId, isApprove);
 
-        OrderUtil.approvedOrder(orderId);
+        if (isApprove == 1) {
+            JSONObject jsonObject1 = new JSONObject();
+            jsonObject1.put("shopId", orderList.get(0).getTargetId());
+            jsonObject1.put("adPhotoUrl", orderList.get(0).getPhoto());
 
-        Jedis jedis = new Jedis("127.0.0.1", 6379);
-        String prepareShopAd = jedis.get("prepareShopAd");
-        JSONArray jsonArray = new JSONArray();
-        if (prepareShopAd == null) {
-            jsonArray.add(jsonObject1);
-        } else {
-            jsonArray = JSONArray.fromObject(prepareShopAd);
+            Jedis jedis = new Jedis("127.0.0.1", 6379);
+            String prepareShopAd = jedis.get("prepareShopAd");
+            JSONArray jsonArray = new JSONArray();
+            if (prepareShopAd == null) {
+                jsonArray.add(jsonObject1);
+            } else {
+                jsonArray = JSONArray.fromObject(prepareShopAd);
+
+                if (jsonArray.size() == 5) {
+                    jsonObject.put("status", 500);
+                    return jsonObject;
+                } else {
+                    jsonArray.add(jsonObject1);
+                }
+            }
+            jedis.set("prepareShopAd", jsonArray.toString());
 
             if (jsonArray.size() == 5) {
-                jsonObject.put("status", 500);
-                return jsonObject;
-            } else {
-                jsonArray.add(jsonObject1);
+                OrderUtil.rejectAllOrder(2, 1, timeUtil.getShowTime());
             }
         }
-        jedis.set("prepareShopAd", jsonArray.toString());
-
-        if (jsonArray.size() == 5) {
-            OrderUtil.rejectAllOrder(2, 1, timeUtil.getShowTime());
-        }
-
         jsonObject.put("status", 200);
         return jsonObject;
     }
 
     @RequestMapping("admin/product/ad/approve")
     public JSONObject adminProductAdApprove(@RequestParam(value = "orderId") int orderId,
+                                            @RequestParam(value = "isApprove") int isApprove,
                                             HttpServletRequest request, HttpServletResponse response) {
         response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
         response.setHeader("Access-Control-Allow-Credentials", "true");
@@ -302,51 +307,53 @@ public class AdminOrder {
             return jsonObject;
         }
 
-        int productId = orderList.get(0).getProductId();
+        OrderUtil.approvedOrder(orderId, isApprove);
 
-        String getProduct = "select * from `products` where `product_id` = ?";
-        List<Object> objectList1 = new ArrayList<>();
-        objectList1.add(productId);
-        JSONObject jsonObject1 = new JSONObject();
-        try {
-            List<Product> productList = db.queryInfo(getProduct, objectList1, Product.class);
-            jsonObject1.put("productId", productList.get(0).getProductId());
-            jsonObject1.put("productName", productList.get(0).getProductName());
-            jsonObject1.put("price", productList.get(0).getPrice());
+        if (isApprove == 1) {
+            int productId = orderList.get(0).getProductId();
 
-            String getPhotoSQL = "select * from photo where belong_id = ? and photo_type = ? and is_del = 0";
+            String getProduct = "select * from `products` where `product_id` = ?";
+            List<Object> objectList1 = new ArrayList<>();
+            objectList1.add(productId);
+            JSONObject jsonObject1 = new JSONObject();
+            try {
+                List<Product> productList = db.queryInfo(getProduct, objectList1, Product.class);
+                jsonObject1.put("productId", productList.get(0).getProductId());
+                jsonObject1.put("productName", productList.get(0).getProductName());
+                jsonObject1.put("price", productList.get(0).getPrice());
 
-            ArrayList<String> stringArrayList = Photo.getPhotoURL(getPhotoSQL, productId, 2);
+                String getPhotoSQL = "select * from photo where belong_id = ? and photo_type = ? and is_del = 0";
 
-            jsonObject1.put("photoIdUrl", stringArrayList.get(0));
-        } catch (Exception e) {
-            e.printStackTrace();
-            jsonObject.put("status", 1100);
-            return jsonObject;
-        }
+                ArrayList<String> stringArrayList = Photo.getPhotoURL(getPhotoSQL, productId, 2);
 
-        OrderUtil.approvedOrder(orderId);
+                jsonObject1.put("photoIdUrl", stringArrayList.get(0));
+            } catch (Exception e) {
+                e.printStackTrace();
+                jsonObject.put("status", 1100);
+                return jsonObject;
+            }
 
-        Jedis jedis = new Jedis("127.0.0.1", 6379);
-        String prepareProductAd = jedis.get("prepareProductAd");
-        JSONArray jsonArray = new JSONArray();
-        if (prepareProductAd == null) {
-            jsonArray.add(jsonObject1);
-        } else {
-            jsonArray = JSONArray.fromObject(prepareProductAd);
+            Jedis jedis = new Jedis("127.0.0.1", 6379);
+            String prepareProductAd = jedis.get("prepareProductAd");
+            JSONArray jsonArray = new JSONArray();
+            if (prepareProductAd == null) {
+                jsonArray.add(jsonObject1);
+            } else {
+                jsonArray = JSONArray.fromObject(prepareProductAd);
+
+                if (jsonArray.size() == 10) {
+                    jsonObject.put("status", 500);
+                    return jsonObject;
+                } else {
+                    jsonArray.add(jsonObject1);
+                }
+            }
+
+            jedis.set("prepareProductAd", jsonArray.toString());
 
             if (jsonArray.size() == 10) {
-                jsonObject.put("status", 500);
-                return jsonObject;
-            } else {
-                jsonArray.add(jsonObject1);
+                OrderUtil.rejectAllOrder(1, 1, timeUtil.getShowTime());
             }
-        }
-
-        jedis.set("prepareProductAd", jsonArray.toString());
-
-        if (jsonArray.size() == 10) {
-            OrderUtil.rejectAllOrder(1, 1, timeUtil.getShowTime());
         }
 
         jsonObject.put("status", 200);

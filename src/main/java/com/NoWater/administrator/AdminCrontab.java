@@ -21,7 +21,7 @@ import java.util.List;
  */
 @RestController
 public class AdminCrontab {
-    @RequestMapping("admin/time/show")
+    @RequestMapping("admin/ad/time/show")
     public JSONObject adminDBBackupTimeShow(HttpServletRequest request, HttpServletResponse response) {
         response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
         response.setHeader("Access-Control-Allow-Credentials", "true");
@@ -37,22 +37,14 @@ public class AdminCrontab {
         }
 
         Jedis jedis = new Jedis("127.0.0.1", 6379);
-        String applyLimitTime = jedis.get("applyLimitTime");
-        jsonObject.put("applyLimitTime", applyLimitTime);
-
-        String backupDB = jedis.get("backupDB");
-        jsonObject.put("backupDB", backupDB);
-
         String changeAd = jedis.get("changeAd");
         jsonObject.put("changeAd", changeAd);
-
+        jsonObject.put("status", 200);
         return jsonObject;
     }
 
-    @RequestMapping("admin/time/changing")
-    public JSONObject adminDBBackupTimeChanging(@RequestParam(value = "applyLimitTime") String applyLimitTime,
-                                                @RequestParam(value = "backupDB") String backupDB,
-                                                @RequestParam(value = "changeAd") String changeAd,
+    @RequestMapping("admin/ad/time/changing")
+    public JSONObject adminDBBackupTimeChanging(@RequestParam(value = "changeAd") String changeAd,
                                                 HttpServletRequest request, HttpServletResponse response) {
         response.setHeader("Access-Control-Allow-Origin", "http://123.206.100.98");
         response.setHeader("Access-Control-Allow-Credentials", "true");
@@ -68,25 +60,15 @@ public class AdminCrontab {
         }
 
         Jedis jedis = new Jedis("127.0.0.1", 6379);
-        jedis.set("applyLimitTime", applyLimitTime);
-
-        jedis.set("backupDB", backupDB);
-        String cmd = "/usr/bin/python bin/change_crontab.py " + "2 " + timeUtil.changeToCron(backupDB);
-        LogHelper.info("change crontab: " + cmd);
-        try {
-            Process proc = Runtime.getRuntime().exec(cmd);
-            proc.waitFor();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
         jedis.set("changeAd", changeAd);
-        cmd = "/usr/bin/python bin/change_crontab.py " + "1 " + timeUtil.changeToCron(changeAd);
+        String cmd = "/usr/bin/python bin/change_crontab.py " + "1 " + timeUtil.changeToCron(changeAd);
         LogHelper.info("change crontab: " + cmd);
         try {
             Process proc = Runtime.getRuntime().exec(cmd);
             proc.waitFor();
         } catch (Exception e) {
+            jsonObject.put("status", 1100);
             e.printStackTrace();
         }
 

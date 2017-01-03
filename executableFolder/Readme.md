@@ -52,7 +52,7 @@ If you want to build the project from source code, you should have **apache-mave
 
 #### JDK1.8
 
-You should put the run **tar zxvf **, then put the **bin** to $PATH.
+You should put the run **tar zxvf**, then put the **bin** to $PATH.
 
 #### pip
 

@@ -202,7 +202,7 @@ public final class OrderUtil {
 
     public static void rejectAllOrder(int orderType, int status, String showTime) {
         DBUtil db = new DBUtil();
-        String rejectAllOrderSQL = "update `order` set `status` = -2 where `status` = ? and `order_type` = ? and `show_time` = ?";
+        String rejectAllOrderSQL = "update `order` set `status` = 11 where `status` = ? and `order_type` = ? and `show_time` = ?";
         List<Object> objectList = new ArrayList<>();
         objectList.add(status);
         objectList.add(orderType);
@@ -210,9 +210,14 @@ public final class OrderUtil {
         db.insertUpdateDeleteExute(rejectAllOrderSQL, objectList);
     }
 
-    public static void approvedOrder(int orderId) {
+    public static void approvedOrder(int orderId, int isApprove) {
         DBUtil db = new DBUtil();
-        String approveOrder = "update `order` set `status` = 5 where `order_id` = ?";
+        String approveOrder;
+        if (isApprove == 1) {
+            approveOrder = "update `order` set `status` = 5 where `order_id` = ?";
+        } else {
+            approveOrder = "update `order` set `status` = 11 where `order_id` = ?";
+        }
         List<Object> objectList = new ArrayList<>();
         objectList.add(orderId);
         db.insertUpdateDeleteExute(approveOrder, objectList);

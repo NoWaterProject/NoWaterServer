@@ -166,4 +166,57 @@ public final class ProductShopUtil {
 
         return classList;
     }
+
+    public static void deleteShopFromUser(int userId, int status) {
+        DBUtil db = new DBUtil();
+        String hasShop = "select * from `shop` where `owner_id` = ?";
+        List<Object> objectList = new ArrayList<>();
+        objectList.add(userId);
+
+        try {
+            List<Shop> shopList = db.queryInfo(hasShop, objectList, Shop.class);
+            if (shopList.size() > 0) {
+                deleteShop(shopList.get(0).getShopId(), status);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void deleteShop(int shopId, int status) {
+        DBUtil db = new DBUtil();
+        String updateShopId = "update `shop` set `status` = ? where `shop_id` = ?";
+        List<Object> objectList = new ArrayList<>();
+        objectList.add(status);
+        objectList.add(shopId);
+        db.insertUpdateDeleteExute(updateShopId, objectList);
+        deleteProduct(shopId);
+    }
+
+    public static void deleteProduct(int shopId) {
+        String getAllProductSQL = "select * from `products` where `shop_id` = ?";
+        DBUtil db = new DBUtil();
+        List<Object> objectList = new ArrayList<>();
+        objectList.add(shopId);
+        try {
+            List<Product> productList = db.queryInfo(getAllProductSQL, objectList, Product.class);
+            for (int i = 0; i < productList.size(); i++) {
+                String updateProduct = "update `products` set `is_del` = 1 where `product_id` = ?";
+                objectList.clear();
+                objectList.add(productList.get(i).getProductId());
+                db.insertUpdateDeleteExute(updateProduct, objectList);
+                cancelOrderByProductId(productList.get(i).getProductId());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void cancelOrderByProductId(int productId) {
+        String cancelOrderByProductId = "update `order` set `status` = 10 where `product_id` = ? and `order_type` in (0, 3) and `status` = 2";
+        DBUtil db = new DBUtil();
+        List<Object> objectList = new ArrayList<>();
+        objectList.add(productId);
+        db.insertUpdateDeleteExute(cancelOrderByProductId, objectList);
+    }
 }

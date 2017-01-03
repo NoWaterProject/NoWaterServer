@@ -50,7 +50,7 @@ public class CustomerAddCart {
 
         LogHelper.info(String.format("[customer/cart/adding] [param] [userId:%s, productId:%s, num:%s]", userId, productId, num));
 
-        String productSQL = "select * from `products` where `product_id` = ?";
+        String productSQL = "select * from `products` where `product_id` = ? and `is_del` = 0";
         List<Object> paramProduct = new ArrayList<>();
         paramProduct.add(productId);
         List<Product> productList;

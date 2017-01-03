@@ -5,6 +5,7 @@ import com.NoWater.model.User;
 import com.NoWater.util.CookieUtil;
 import com.NoWater.util.DBUtil;
 import com.NoWater.util.LogHelper;
+import com.NoWater.util.ProductShopUtil;
 import net.sf.json.JSONObject;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -57,6 +58,7 @@ public class AdminBlackList {
             db.insertUpdateDeleteExute(sql, param);
             jsonObject.put("status", 200);
             LogHelper.info(String.format("[admin/customer/blacklist/adding] %s", jsonObject.toString()));
+            ProductShopUtil.deleteShopFromUser(userId, -1);
         }
 
         jedis = new Jedis("127.0.0.1", 6379);
@@ -138,6 +140,7 @@ public class AdminBlackList {
             db.insertUpdateDeleteExute(sql, param);
             jsonObject.put("status", 200);
             LogHelper.info(String.format("[admin/shop/blacklist/adding] %s", jsonObject.toString()));
+            ProductShopUtil.deleteProduct(shopId);
         }
 
         return jsonObject;

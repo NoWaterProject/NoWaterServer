@@ -156,7 +156,9 @@ public class ShopOwnerProductHandle {
                 if (Integer.parseInt(jsonArray.getJSONObject(i).get("productId").toString()) == product_id) {
                     String getPhotoSQL = "select * from photo where belong_id = ? and photo_type = ? and is_del = 0";
                     ArrayList<String> stringArrayList = Photo.getPhotoURL(getPhotoSQL, product_id, 2);
-                    jsonArray.getJSONObject(i).put("photoIdUrl",stringArrayList.get(0));
+                    jsonArray.getJSONObject(i).put("photoIdUrl", stringArrayList.get(0));
+                    jsonArray.getJSONObject(i).put("productName", product_name);
+                    jsonArray.getJSONObject(i).put("price", price);
                 }
             }
             jedis.set("ProductAd", jsonArray.toString());
@@ -165,6 +167,13 @@ public class ShopOwnerProductHandle {
             sql.append("UPDATE products SET shop_id = ?, class_id = ?, product_name = ?, price = ?, quantity_stock = ? WHERE product_id = ?");
             param.add(product_id);
             db.insertUpdateDeleteExute(sql.toString(), param);
+
+            String updatePrice = "update `order` set `price` = ?, `sum_price`=`num`*`price` where `status` = -3 and `product_id` = ?";
+            List<Object> objectList = new ArrayList<>();
+            objectList.add(price);
+            objectList.add(product_id);
+            db.insertUpdateDeleteExute(updatePrice, objectList);
+
             jsonObject.put("status", 200);                  //修改商品成功
         }
         LogHelper.info(String.format("[/shop-owner/products/edit] %s", jsonObject.toString()));
@@ -200,6 +209,7 @@ public class ShopOwnerProductHandle {
         objectList.add(productId);
         DBUtil db = new DBUtil();
         db.insertUpdateDeleteExute(deleteSQL, objectList);
+        ProductShopUtil.cancelOrderByProductId(productId);
         jsonObject.put("status", 200);
         return jsonObject;
     }

@@ -24,6 +24,12 @@ public class CustomerShopHomepage {
 
         Jedis jedis = new Jedis("127.0.0.1", 6379);
         String getProductAd = jedis.get("shop" + shopId);
+
+        if (getProductAd == null) {
+            jedis.set("shop" + shopId, "[]");
+            getProductAd = jedis.get("shop" + shopId);
+        }
+
         JSONArray jsonArray = JSONArray.fromObject(getProductAd);
 
         JSONArray jsonArray1 = new JSONArray();
